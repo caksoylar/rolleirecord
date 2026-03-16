@@ -11,6 +11,13 @@
       <h1>Rolleirecord
     </h1>
 
+      <div id="rollContainer" class="roll-selector-bar">
+        <label for="rollSelect" title="Select roll">📋</label>
+        <select id="rollSelect">
+          <!-- Options will be populated dynamically -->
+        </select>
+      </div>
+
       <div class="camera-selector-bar">
         <label for="cameraSelect" title="Select camera">📷</label>
         <select id="cameraSelect">
@@ -29,7 +36,7 @@
       <div class="controls">
         <button id="exportBtn" class="secondary">Export</button>
         <button id="settingsBtn" class="secondary">Options</button>
-        <button id="clearBtn" class="danger">Clear All</button>
+        <button id="clearBtn" class="danger">Delete Roll</button>
       </div>
     </div>
 
@@ -91,6 +98,33 @@
           <div class="options-footer">
             <button type="submit" class="save-btn">Save</button>
             <button type="button" class="cancel-btn secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Create Roll Modal -->
+    <div class="modal" id="createRollModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Create New Roll</h2>
+        </div>
+        <form id="createRollForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="rollNameInput">Roll Name</label>
+              <input
+                type="text"
+                id="rollNameInput"
+                name="name"
+                placeholder="e.g., Kodak Gold 200"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Create</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
           </div>
         </form>
       </div>

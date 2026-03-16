@@ -26,6 +26,48 @@ h1 {
   color: #333;
 }
 
+/* Roll Selector Bar */
+.roll-selector-bar {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.roll-selector-bar label {
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.roll-selector-bar select {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 0.375rem;
+  background-color: white;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  padding-right: 2.5rem;
+}
+
+.roll-selector-bar select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
 /* Camera Selector Bar */
 .camera-selector-bar {
   background-color: white;

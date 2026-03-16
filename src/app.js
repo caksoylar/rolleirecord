@@ -3,12 +3,17 @@
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Initialize RollManager first (creates default roll if needed)
+  RollManager.init();
+
   // Initialize modules
   Modal.init();
   ConfirmDialog.init();
   OptionsDialog.init();
   CameraSelector.init();
   FilmSelector.init();
+  RollSelector.init();
+  CreateRollModal.init();
 
   // Render initial table
   TableRenderer.render();
@@ -21,13 +26,21 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("settingsBtn")
     .addEventListener("click", () => OptionsDialog.open());
   document.getElementById("clearBtn").addEventListener("click", () => {
+    const currentRoll = RollManager.getCurrentRoll();
     if (
       confirm(
-        "Are you sure you want to delete all data? This cannot be undone.",
+        `Are you sure you want to delete the roll "${currentRoll.name}"? This cannot be undone.`,
       )
     ) {
-      DataModel.clearData();
-      TableRenderer.render();
+      const success = RollManager.deleteRoll(currentRoll.id);
+      if (success) {
+        RollSelector.render();
+        TableRenderer.render();
+        CameraSelector.render();
+        FilmSelector.render();
+      } else {
+        alert("Cannot delete the last roll. Create a new roll first.");
+      }
     }
   });
 

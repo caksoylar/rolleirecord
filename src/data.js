@@ -2,25 +2,22 @@
 // DATA LAYER - Session management, options management, and data persistence
 // ============================================================================
 
-// SESSION MANAGER - manage camera and film selection
+// SESSION MANAGER - manage camera and film selection (now delegates to current roll)
 // ============================================================================
 const SessionManager = {
-  CAMERA_KEY: "selectedCamera",
-  FILM_KEY: "selectedFilm",
-
-  // Get selected camera
+  // Get selected camera from current roll
   getSelectedCamera() {
-    const stored = localStorage.getItem(this.CAMERA_KEY);
-    if (stored) {
-      return stored;
-    }
-    // Default to first camera
-    return CAMERAS[0].name;
+    const currentRoll = RollManager.getCurrentRoll();
+    return currentRoll ? currentRoll.camera : CAMERAS[0].name;
   },
 
-  // Set selected camera
+  // Set selected camera in current roll
   setSelectedCamera(cameraName) {
-    localStorage.setItem(this.CAMERA_KEY, cameraName);
+    const currentRoll = RollManager.getCurrentRoll();
+    if (currentRoll) {
+      currentRoll.camera = cameraName;
+      RollManager.updateRoll(currentRoll.id, currentRoll);
+    }
   },
 
   // Get all available cameras
@@ -28,19 +25,19 @@ const SessionManager = {
     return CAMERAS;
   },
 
-  // Get selected film
+  // Get selected film from current roll
   getSelectedFilm() {
-    const stored = localStorage.getItem(this.FILM_KEY);
-    if (stored) {
-      return stored;
-    }
-    // Default to first film
-    return FILMS[0].name;
+    const currentRoll = RollManager.getCurrentRoll();
+    return currentRoll ? currentRoll.film : FILMS[0].name;
   },
 
-  // Set selected film
+  // Set selected film in current roll
   setSelectedFilm(filmName) {
-    localStorage.setItem(this.FILM_KEY, filmName);
+    const currentRoll = RollManager.getCurrentRoll();
+    if (currentRoll) {
+      currentRoll.film = filmName;
+      RollManager.updateRoll(currentRoll.id, currentRoll);
+    }
   },
 
   // Get all available films
@@ -148,79 +145,49 @@ const OptionsManager = {
   },
 };
 const DataModel = {
-  STORAGE_KEY: "tableData",
+  // Delegate to RollManager for all operations
 
-  // Load data from localStorage
-  loadData() {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
-  },
-
-  // Save data to localStorage
-  saveData(data) {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
-  },
-
-  // Clear all data
-  clearData() {
-    localStorage.removeItem(this.STORAGE_KEY);
-  },
-
-  // Get all rows
+  // Get all rows from current roll
   getAllRows() {
-    return this.loadData();
+    return RollManager.getFrames();
   },
 
-  // Get a row by ID
+  // Get a row by ID from current roll
   getRowById(id) {
-    const rows = this.loadData();
-    return rows.find((row) => row.id === id);
+    return RollManager.getFrameById(id);
   },
 
-  // Add new row
+  // Add new row to current roll
   addRow(rowData) {
-    const rows = this.loadData();
-    rows.push(rowData);
-    this.saveData(rows);
-    return rowData;
+    return RollManager.addFrame(rowData);
   },
 
-  // Update existing row
+  // Update existing row in current roll
   updateRow(id, rowData) {
-    const rows = this.loadData();
-    const index = rows.findIndex((row) => row.id === id);
-    if (index !== -1) {
-      rows[index] = rowData;
-      this.saveData(rows);
-    }
-    return rows[index] || null;
+    return RollManager.updateFrame(id, rowData);
   },
 
-  // Delete row by ID
+  // Delete row by ID from current roll
   deleteRow(id) {
-    const rows = this.loadData();
-    const filtered = rows.filter((row) => row.id !== id);
-    this.saveData(filtered);
+    return RollManager.deleteFrame(id);
   },
 
-  // Check if ID is unique (excluding current row if editing)
+  // Check if ID is unique in current roll (excluding current row if editing)
   isIdUnique(id, excludeId = null) {
-    const rows = this.loadData();
-    return !rows.some((row) => row.id === id && row.id !== excludeId);
+    return RollManager.isFrameIdUnique(id, excludeId);
   },
 
-  // Get highest existing ID
+  // Get highest existing ID in current roll
   getLastId() {
-    const rows = this.loadData();
-    if (rows.length === 0) return null;
-    const ids = rows.map((r) => r.id).filter((id) => typeof id === "number");
-    return Math.max(...ids);
+    const frames = RollManager.getFrames();
+    if (frames.length === 0) return null;
+    const ids = frames.map((f) => f.id).filter((id) => typeof id === "number");
+    return ids.length === 0 ? null : Math.max(...ids);
   },
 
-  // Get next suggested ID
+  // Get next suggested ID for current roll
   getNextSuggestedId() {
-    const lastId = this.getLastId();
-    return lastId === null ? 0 : lastId + 1;
+    return RollManager.getNextSuggestedFrameId();
   },
 };
 
@@ -286,6 +253,231 @@ const LocationManager = {
     }
     const cleaned = coordString.replace(/\s+/g, "");
     return `https://www.google.com/maps?q=${cleaned}`;
+  },
+};
+
+// ROLL MANAGER - Multi-roll management system
+// ============================================================================
+const RollManager = {
+  ROLLS_KEY: "rolleirecord-rolls",
+  CURRENT_ROLL_KEY: "rolleirecord-current-roll-id",
+  ROLL_ID_COUNTER_KEY: "rolleirecord-roll-counter",
+
+  // Initialize rollmanager with default roll if needed
+  init() {
+    const rolls = this.getRolls();
+    if (rolls.length === 0) {
+      // Create default roll on first init
+      this.createRoll("Roll 1");
+    }
+
+    // Ensure current roll is set
+    const currentRollId = this.getCurrentRollId();
+    if (!currentRollId) {
+      const rolls = this.getRolls();
+      if (rolls.length > 0) {
+        this.setCurrentRoll(rolls[0].id);
+      }
+    }
+  },
+
+  // Get all rolls
+  getRolls() {
+    const stored = localStorage.getItem(this.ROLLS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  },
+
+  // Save all rolls
+  saveRolls(rolls) {
+    localStorage.setItem(this.ROLLS_KEY, JSON.stringify(rolls));
+  },
+
+  // Get current roll ID
+  getCurrentRollId() {
+    return localStorage.getItem(this.CURRENT_ROLL_KEY);
+  },
+
+  // Set current roll ID
+  setCurrentRollId(rollId) {
+    localStorage.setItem(this.CURRENT_ROLL_KEY, rollId);
+  },
+
+  // Get next roll ID
+  getNextRollId() {
+    let counter = localStorage.getItem(this.ROLL_ID_COUNTER_KEY);
+    counter = counter ? parseInt(counter) + 1 : 1;
+    localStorage.setItem(this.ROLL_ID_COUNTER_KEY, counter.toString());
+    return `roll-${counter}`;
+  },
+
+  // Get roll by ID
+  getRollById(rollId) {
+    const rolls = this.getRolls();
+    return rolls.find((r) => r.id === rollId) || null;
+  },
+
+  // Get current roll
+  getCurrentRoll() {
+    const currentId = this.getCurrentRollId();
+    if (!currentId) return null;
+    return this.getRollById(currentId);
+  },
+
+  // Create new roll
+  createRoll(name) {
+    const rolls = this.getRolls();
+
+    // Generate unique roll ID
+    const rollId = this.getNextRollId();
+
+    // Create roll with defaults
+    const newRoll = {
+      id: rollId,
+      name: name,
+      camera: CAMERAS[0]?.name || "",
+      film: FILMS[0]?.name || "",
+      frames: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+
+    rolls.push(newRoll);
+    this.saveRolls(rolls);
+
+    // Set as current roll if it's the first one
+    if (rolls.length === 1) {
+      this.setCurrentRollId(rollId);
+    }
+
+    return newRoll;
+  },
+
+  // Delete roll
+  deleteRoll(rollId) {
+    const rolls = this.getRolls();
+
+    // Prevent deleting if it's the last roll
+    if (rolls.length === 1) {
+      return false;
+    }
+
+    const filtered = rolls.filter((r) => r.id !== rollId);
+    this.saveRolls(filtered);
+
+    // If deleted roll was current, switch to first remaining roll
+    if (this.getCurrentRollId() === rollId && filtered.length > 0) {
+      this.setCurrentRollId(filtered[0].id);
+    }
+
+    return true;
+  },
+
+  // Rename roll
+  renameRoll(rollId, newName) {
+    const rolls = this.getRolls();
+    const roll = rolls.find((r) => r.id === rollId);
+
+    if (roll) {
+      roll.name = newName;
+      roll.updatedAt = new Date().toISOString();
+      this.saveRolls(rolls);
+    }
+
+    return roll || null;
+  },
+
+  // Update entire roll
+  updateRoll(rollId, rollData) {
+    const rolls = this.getRolls();
+    const roll = rolls.find((r) => r.id === rollId);
+
+    if (roll) {
+      Object.assign(roll, rollData);
+      roll.updatedAt = new Date().toISOString();
+      this.saveRolls(rolls);
+    }
+
+    return roll || null;
+  },
+
+  // Set current roll
+  setCurrentRoll(rollId) {
+    const roll = this.getRollById(rollId);
+    if (roll) {
+      this.setCurrentRollId(rollId);
+    }
+    return roll || null;
+  },
+
+  // Get frames from current roll
+  getFrames() {
+    const currentRoll = this.getCurrentRoll();
+    return currentRoll ? currentRoll.frames : [];
+  },
+
+  // Get frame by ID from current roll
+  getFrameById(frameId) {
+    const frames = this.getFrames();
+    return frames.find((f) => f.id === frameId) || null;
+  },
+
+  // Add frame to current roll
+  addFrame(frameData) {
+    const currentRoll = this.getCurrentRoll();
+    if (!currentRoll) return null;
+
+    currentRoll.frames.push(frameData);
+    currentRoll.updatedAt = new Date().toISOString();
+    this.updateRoll(currentRoll.id, currentRoll);
+
+    return frameData;
+  },
+
+  // Update frame in current roll
+  updateFrame(frameId, frameData) {
+    const currentRoll = this.getCurrentRoll();
+    if (!currentRoll) return null;
+
+    const frameIndex = currentRoll.frames.findIndex((f) => f.id === frameId);
+    if (frameIndex !== -1) {
+      currentRoll.frames[frameIndex] = frameData;
+      currentRoll.updatedAt = new Date().toISOString();
+      this.updateRoll(currentRoll.id, currentRoll);
+      return frameData;
+    }
+
+    return null;
+  },
+
+  // Delete frame from current roll
+  deleteFrame(frameId) {
+    const currentRoll = this.getCurrentRoll();
+    if (!currentRoll) return false;
+
+    const initialLength = currentRoll.frames.length;
+    currentRoll.frames = currentRoll.frames.filter((f) => f.id !== frameId);
+
+    if (currentRoll.frames.length < initialLength) {
+      currentRoll.updatedAt = new Date().toISOString();
+      this.updateRoll(currentRoll.id, currentRoll);
+      return true;
+    }
+
+    return false;
+  },
+
+  // Check if frame ID is unique in current roll
+  isFrameIdUnique(frameId, excludeId = null) {
+    const frames = this.getFrames();
+    return !frames.some((f) => f.id === frameId && f.id !== excludeId);
+  },
+
+  // Get next suggested frame ID
+  getNextSuggestedFrameId() {
+    const frames = this.getFrames();
+    if (frames.length === 0) return 1;
+    const ids = frames.map((f) => f.id).filter((id) => typeof id === "number");
+    return ids.length === 0 ? 1 : Math.max(...ids) + 1;
   },
 };
 
