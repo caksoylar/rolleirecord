@@ -12,8 +12,8 @@ document.addEventListener("DOMContentLoaded", function () {
   OptionsDialog.init();
   CameraSelector.init();
   FilmSelector.init();
-  RollSelector.init();
   CreateRollModal.init();
+  RollSelector.init();
 
   // Render initial table
   TableRenderer.render();
@@ -27,20 +27,17 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("click", () => OptionsDialog.open());
   document.getElementById("clearBtn").addEventListener("click", () => {
     const currentRoll = RollManager.getCurrentRoll();
+    if (!currentRoll) return;
     if (
       confirm(
         `Are you sure you want to delete the roll "${currentRoll.name}"? This cannot be undone.`,
       )
     ) {
-      const success = RollManager.deleteRoll(currentRoll.id);
-      if (success) {
-        RollSelector.render();
-        TableRenderer.render();
-        CameraSelector.render();
-        FilmSelector.render();
-      } else {
-        alert("Cannot delete the last roll. Create a new roll first.");
-      }
+      RollManager.deleteRoll(currentRoll.id);
+      RollSelector.render();
+      TableRenderer.render();
+      CameraSelector.render();
+      FilmSelector.render();
     }
   });
 

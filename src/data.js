@@ -263,21 +263,16 @@ const RollManager = {
   CURRENT_ROLL_KEY: "rolleirecord-current-roll-id",
   ROLL_ID_COUNTER_KEY: "rolleirecord-roll-counter",
 
-  // Initialize rollmanager with default roll if needed
+  // Initialize rollmanager
   init() {
     const rolls = this.getRolls();
-    if (rolls.length === 0) {
-      // Create default roll on first init
-      this.createRoll("Roll 1");
-    }
 
-    // Ensure current roll is set
+    // Ensure current roll is set if rolls exist, cleared if not
     const currentRollId = this.getCurrentRollId();
-    if (!currentRollId) {
-      const rolls = this.getRolls();
-      if (rolls.length > 0) {
-        this.setCurrentRoll(rolls[0].id);
-      }
+    if (rolls.length === 0) {
+      localStorage.removeItem(this.CURRENT_ROLL_KEY);
+    } else if (!currentRollId || !rolls.find((r) => r.id === currentRollId)) {
+      this.setCurrentRollId(rolls[0].id);
     }
   },
 
@@ -356,17 +351,16 @@ const RollManager = {
   deleteRoll(rollId) {
     const rolls = this.getRolls();
 
-    // Prevent deleting if it's the last roll
-    if (rolls.length === 1) {
-      return false;
-    }
-
     const filtered = rolls.filter((r) => r.id !== rollId);
     this.saveRolls(filtered);
 
-    // If deleted roll was current, switch to first remaining roll
-    if (this.getCurrentRollId() === rollId && filtered.length > 0) {
-      this.setCurrentRollId(filtered[0].id);
+    // If deleted roll was current, switch to first remaining or clear
+    if (this.getCurrentRollId() === rollId) {
+      if (filtered.length > 0) {
+        this.setCurrentRollId(filtered[0].id);
+      } else {
+        localStorage.removeItem(this.CURRENT_ROLL_KEY);
+      }
     }
 
     return true;

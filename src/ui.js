@@ -11,6 +11,20 @@ let appState = {
 };
 
 // ============================================================================
+// UI VISIBILITY - Show/hide elements based on roll state
+// ============================================================================
+const UIVisibility = {
+  update() {
+    const hasRoll = RollManager.getCurrentRoll() !== null;
+    const cameraBar = document.querySelector(".camera-selector-bar");
+    const controls = document.querySelector(".controls");
+
+    if (cameraBar) cameraBar.style.display = hasRoll ? "" : "none";
+    if (controls) controls.style.display = hasRoll ? "" : "none";
+  },
+};
+
+// ============================================================================
 // TABLE RENDERING
 // ============================================================================
 const TableRenderer = {
@@ -60,8 +74,17 @@ const TableRenderer = {
 
   // Full table render
   render() {
-    const tableHtml = `<table>${this.renderHeaders()}${this.renderTableBody()}</table>`;
-    document.getElementById("tableContainer").innerHTML = tableHtml;
+    const container = document.getElementById("tableContainer");
+    const hasRoll = RollManager.getCurrentRoll() !== null;
+
+    if (!hasRoll) {
+      container.innerHTML =
+        '<div class="empty-state"><p>No rolls yet</p><p>Create a new roll to get started</p></div>';
+    } else {
+      container.innerHTML = `<table>${this.renderHeaders()}${this.renderTableBody()}</table>`;
+    }
+
+    UIVisibility.update();
   },
 };
 
@@ -896,8 +919,11 @@ const RollSelector = {
       
       if (value === "create-new") {
         CreateRollModal.open();
-        // Reset select to current roll
-        this.selectElement.value = RollManager.getCurrentRoll().id;
+        // Reset select to current roll if one exists
+        const currentRoll = RollManager.getCurrentRoll();
+        if (currentRoll) {
+          this.selectElement.value = currentRoll.id;
+        }
       } else {
         // Switch to selected roll
         RollManager.setCurrentRoll(value);
@@ -915,11 +941,13 @@ const RollSelector = {
     let html = '<select id="rollSelect">';
     
     rolls.forEach((roll) => {
-      const selected = roll.id === currentRoll.id ? "selected" : "";
+      const selected = currentRoll && roll.id === currentRoll.id ? "selected" : "";
       html += `<option value="${roll.id}" ${selected}>${escapeHtml(roll.name)}</option>`;
     });
 
-    html += '<option value="create-new">+ Create new roll</option>';
+    html += '<option value="create-new"';
+    if (!currentRoll) html += ' selected';
+    html += '>+ Create new roll</option>';
     html += '</select>';
 
     this.selectElement.innerHTML = '';
@@ -929,6 +957,11 @@ const RollSelector = {
     this.selectElement.replaceWith(newSelect);
     this.selectElement = newSelect;
     this.attachEventListeners();
+
+    // Auto-open create modal when no rolls exist
+    if (!currentRoll) {
+      CreateRollModal.open();
+    }
   },
 };
 
@@ -983,8 +1016,9 @@ const CreateRollModal = {
       return;
     }
 
-    // Create new roll
-    RollManager.createRoll(name);
+    // Create new roll and set as current
+    const newRoll = RollManager.createRoll(name);
+    RollManager.setCurrentRoll(newRoll.id);
     
     // Update UI
     RollSelector.render();
