@@ -20,7 +20,7 @@ const TableRenderer = {
     let html = "<thead><tr>";
 
     visibleFields.forEach((field) => {
-      html += `<th>${field.label}</th>`;
+      html += `<th>${field.header || field.label}</th>`;
     });
 
     html += '<th>Actions</th></tr></thead>';
