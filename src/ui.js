@@ -34,11 +34,11 @@ const TableRenderer = {
 
     let html = "<tbody>";
     html += "<tr>";
-    html += "</tr>";
     visibleFields.forEach((field) => {
       html += `<td></td>`;
     });
     html += `<td class="actions"><button onclick="UI.openAddModal()" title="Add new">✚</button></td>`
+    html += "</tr>";
 
     rows.sort((r1, r2) => r2.id - r1.id).forEach((row) => {
       html += "<tr>";
