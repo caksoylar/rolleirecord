@@ -54,7 +54,7 @@ const SCHEMA = {
       required: false,
       camera_specific: false,
       options: ["ƒ1.8", "ƒ2.0", "ƒ2.8", "ƒ4.0", "ƒ5.6", "ƒ8", "ƒ11", "ƒ16", "ƒ22"],
-      defaultValue: "f4.0",
+      defaultValue: "ƒ4.0",
     },
     {
       name: "lens",
