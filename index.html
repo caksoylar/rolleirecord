@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rolleirecord</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Rolleirecord
+    </h1>
+
+      <div class="camera-selector-bar">
+        <label for="cameraSelect" title="Select camera">📷</label>
+        <select id="cameraSelect">
+          <!-- Options will be populated dynamically -->
+        </select>
+        <label for="filmSelect" title="Select film">🎞️</label>
+        <select id="filmSelect">
+          <!-- Options will be populated dynamically -->
+        </select>
+      </div>
+
+      <div id="tableContainer">
+        <!-- Table will be rendered here -->
+      </div>
+
+      <div class="controls">
+        <button id="exportBtn" class="secondary">Export</button>
+        <button id="settingsBtn" class="secondary">Options</button>
+        <button id="clearBtn" class="danger">Clear All</button>
+      </div>
+    </div>
+
+    <!-- Modal Dialog -->
+    <div class="modal" id="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add Row</h2>
+        </div>
+        <form id="modalForm">
+          <div class="modal-body" id="modalBody">
+            <!-- Form fields will be rendered here -->
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Save</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div class="confirm-overlay" id="confirmOverlay"></div>
+    <div class="confirm-dialog" id="confirmDialog">
+      <div class="confirm-message" id="confirmMessage"></div>
+      <div class="confirm-buttons">
+        <button id="confirmYes" class="danger">Delete</button>
+        <button id="confirmNo" class="secondary">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Options Editor Dialog -->
+    <div class="options-dialog" id="optionsDialog">
+      <div class="options-dialog-content">
+        <div class="options-header">
+          <h2>Edit Field Options</h2>
+        </div>
+        <form id="optionsForm">
+          <div class="field-selector">
+            <label for="fieldSelect">Select Field</label>
+            <select id="fieldSelect">
+              <!-- Options will be populated dynamically -->
+            </select>
+          </div>
+          <div class="options-list">
+            <label>Options</label>
+            <div id="optionsContainer">
+              <!-- Option inputs will be rendered here -->
+            </div>
+            <button
+              type="button"
+              id="addOptionBtn"
+              class="secondary"
+              style="width: 100%; margin-top: 0.75rem"
+            >
+              + Add Option
+            </button>
+          </div>
+          <div class="options-footer">
+            <button type="submit" class="save-btn">Save</button>
+            <button type="button" class="cancel-btn secondary">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="src/config.js"></script>
+    <script src="src/data.js"></script>
+    <script src="src/ui.js"></script>
+    <script src="src/app.js"></script>
+  </body>
+</html>
