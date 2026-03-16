@@ -169,6 +169,7 @@ button.secondary:active {
 
 table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   background-color: white;
   border: 1px solid #ddd;
@@ -181,8 +182,9 @@ td {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #ddd;
-  overflow-wrap: break-word;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 th {

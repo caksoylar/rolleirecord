@@ -20,10 +20,11 @@ const TableRenderer = {
     let html = "<thead><tr>";
 
     visibleFields.forEach((field) => {
-      html += `<th>${field.header || field.label}</th>`;
+      const w = field.width ? ` style="width:${field.width}"` : "";
+      html += `<th${w}>${field.header || field.label}</th>`;
     });
 
-    html += '<th>Actions</th></tr></thead>';
+    html += '<th style="width:23%">Actions</th></tr></thead>';
     return html;
   },
 
