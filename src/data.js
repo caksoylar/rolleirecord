@@ -209,12 +209,18 @@ const DataModel = {
     return !rows.some((row) => row.id === id && row.id !== excludeId);
   },
 
+  // Get highest existing ID
+  getLastId() {
+    const rows = this.loadData();
+    if (rows.length === 0) return null;
+    const ids = rows.map((r) => r.id).filter((id) => typeof id === "number");
+    return Math.max(...ids);
+  },
+
   // Get next suggested ID
   getNextSuggestedId() {
-    const rows = this.loadData();
-    if (rows.length === 0) return 1;
-    const ids = rows.map((r) => r.id).filter((id) => typeof id === "number");
-    return Math.max(...ids) + 1;
+    const lastId = this.getLastId();
+    return lastId === null ? 0 : lastId + 1;
   },
 };
 

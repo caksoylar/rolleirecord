@@ -44,7 +44,7 @@ const TableRenderer = {
       html += "<tr>";
 
       visibleFields.forEach((field) => {
-        const value = row[field.name] || "";
+        const value = row[field.name] === null ? "" : row[field.name];
         html += `<td>${escapeHtml(String(value))}</td>`;
       });
 
@@ -90,7 +90,7 @@ const Modal = {
   },
 
   // Render form fields based on schema
-  renderFormFields(rowData = null) {
+  renderFormFields(rowData = null, isEditMode = false) {
     let html = "";
 
     SCHEMA.fields.forEach((field) => {
@@ -128,8 +128,7 @@ const Modal = {
                         `;
       } else if (field.name === "location") {
         // Special handling for location field
-        const value = rowData ? rowData[field.name] || "" : "";
-        const isEditMode = rowData !== null;
+        const value = isEditMode ? rowData[field.name] || "" : "";
         const mapsUrl = value ? LocationManager.getMapsUrl(value) : null;
         
         if (isEditMode) {
@@ -192,14 +191,14 @@ const Modal = {
       }
     });
 
-    if (rowData !== null) {
+    if (isEditMode) {
       html += `<button onclick="UI.openDeleteConfirm(${rowData.id})" class="danger" style="width: 100%">Delete</button>`
     }
 
     this.bodyElement.innerHTML = html;
 
     // Attach refresh button listener in edit mode
-    if (rowData !== null) {
+    if (isEditMode) {
       const refreshBtn = document.getElementById("refresh-location-btn");
       if (refreshBtn) {
         refreshBtn.addEventListener("click", async (e) => {
@@ -235,15 +234,16 @@ const Modal = {
 
   open(mode = "add", rowId = null) {
     appState.mode = mode;
-    appState.currentRowId = rowId;
+    appState.currentRowId = mode === "add" ? null : rowId;
 
     if (mode === "add") {
       this.titleElement.textContent = "Add New Row";
-      this.renderFormFields();
+      const refData = DataModel.getRowById(rowId);
+      this.renderFormFields(refData, false);
     } else {
       this.titleElement.textContent = "Edit Row";
       const rowData = DataModel.getRowById(rowId);
-      this.renderFormFields(rowData);
+      this.renderFormFields(rowData, true);
     }
 
     this.element.classList.add("active");
@@ -322,7 +322,8 @@ const FormValidator = {
 const ModalFlows = {
   // Handle add new row
   async openAddModal() {
-    Modal.open("add");
+    const lastId = DataModel.getLastId();
+    Modal.open("add", lastId);
     const suggestedId = DataModel.getNextSuggestedId();
     document.getElementById("field-id").value = suggestedId;
 
