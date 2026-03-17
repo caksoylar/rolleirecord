@@ -38,7 +38,7 @@ const TableRenderer = {
       html += `<th${w}>${field.header || field.label}</th>`;
     });
 
-    html += '<th style="width:23%">Actions</th></tr></thead>';
+    html += '<th>⁝</th></tr></thead>';
     return html;
   },
 
@@ -498,7 +498,7 @@ const ConfirmDialog = {
 const Export = {
   exportToJSON() {
     const rows = DataModel.getAllRows();
-    rows.forEach(row => {row.aperture = row.aperture.replace("ƒ", "")})
+    rows.forEach(row => {row.aperture = row.aperture.replace("ƒ/", "")})
 
     const camera = CAMERAS.find(val => val.name == SessionManager.getSelectedCamera()).label;
     const film = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).label;
