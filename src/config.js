@@ -63,9 +63,9 @@ const SCHEMA = {
       defaultValue: "ƒ/4.0",
     },
     {
-      name: "lens",
+      name: "focal_length",
       type: "select",
-      label: "Lens",
+      label: "Focal Length",
       header: "ƒ",
       visible: true,
       readonly: false,
@@ -92,7 +92,6 @@ const SCHEMA = {
       required: false,
     },
   ],
-  visibleFields: ["id", "notes", "lens"],
 };
 
 const APP_CONFIG = {
