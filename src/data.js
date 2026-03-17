@@ -51,6 +51,7 @@ const SessionManager = {
 // ============================================================================
 const OptionsManager = {
   OPTIONS_KEY_PREFIX: "fieldOptions_",
+  CAMERAS_PREFIX: "cameras",
 
   // Get all select fields from schema
   getSelectFields() {
@@ -259,9 +260,9 @@ const LocationManager = {
 // ROLL MANAGER - Multi-roll management system
 // ============================================================================
 const RollManager = {
-  ROLLS_KEY: "rolleirecord-rolls",
-  CURRENT_ROLL_KEY: "rolleirecord-current-roll-id",
-  ROLL_ID_COUNTER_KEY: "rolleirecord-roll-counter",
+  ROLLS_KEY: "rolls",
+  CURRENT_ROLL_KEY: "current-roll-id",
+  ROLL_ID_COUNTER_KEY: "roll-counter",
 
   // Initialize rollmanager
   init() {

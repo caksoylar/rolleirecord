@@ -34,7 +34,7 @@ h1 {
   padding: 1rem;
   margin-bottom: 1rem;
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   gap: 0.75rem;
   align-items: center;
 }
@@ -212,6 +212,13 @@ tr:last-child td {
 }
 
 .actions button {
+  padding: 0;
+  font-size: 0.875rem;
+  min-height: 40px;
+  aspect-ratio: 1;
+}
+
+.roll-selector-bar button {
   padding: 0;
   font-size: 0.875rem;
   min-height: 40px;

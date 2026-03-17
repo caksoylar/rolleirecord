@@ -16,6 +16,7 @@
         <select id="rollSelect">
           <!-- Options will be populated dynamically -->
         </select>
+        <button id="renameBtn" class="secondary">✏️</button>
       </div>
 
       <div class="camera-selector-bar">
@@ -117,13 +118,39 @@
                 type="text"
                 id="rollNameInput"
                 name="name"
-                placeholder="e.g., Kodak Gold 200"
+                placeholder="e.g., Summer Break"
                 required
               />
             </div>
           </div>
           <div class="modal-footer">
             <button type="submit" class="save-btn">Create</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Rename Roll Modal -->
+    <div class="modal" id="renameRollModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Rename Roll</h2>
+        </div>
+        <form id="renameRollForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="rollNameInput">Roll Name</label>
+              <input
+                type="text"
+                id="rollRenameInput"
+                name="name"
+                required
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Rename</button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
           </div>
         </form>

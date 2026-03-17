@@ -1031,3 +1031,61 @@ const CreateRollModal = {
     this.close();
   },
 };
+
+const RenameRollModal = {
+  element: null,
+  formElement: null,
+  inputElement: null,
+
+  init() {
+    this.element = document.getElementById("renameRollModal");
+    this.formElement = document.getElementById("renameRollForm");
+    this.inputElement = document.getElementById("rollRenameInput");
+
+    if (this.formElement) {
+      this.formElement.addEventListener("submit", (e) => this.submit(e));
+    }
+
+    const cancelBtn = this.element?.querySelector(".cancel-btn");
+    if (cancelBtn) {
+      cancelBtn.addEventListener("click", () => this.close());
+    }
+
+    this.element?.addEventListener("click", (e) => {
+      if (e.target === this.element) {
+        this.close();
+      }
+    });
+  },
+
+  open() {
+    if (!this.element) return;
+    this.element.classList.add("active");
+    this.inputElement.value = RollManager.getCurrentRoll().name;
+    this.inputElement.focus();
+  },
+
+  close() {
+    if (!this.element) return;
+    this.element.classList.remove("active");
+  },
+
+  submit(e) {
+    e.preventDefault();
+    
+    const name = this.inputElement.value.trim();
+    
+    if (!name) {
+      alert("Roll name cannot be empty");
+      return;
+    }
+
+    // Rename roll
+    const newRoll = RollManager.renameRoll(RollManager.getCurrentRollId(), name);
+    
+    // Update UI
+    RollSelector.render();
+    
+    this.close();
+  },
+};

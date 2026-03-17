@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
   FilmSelector.init();
   CreateRollModal.init();
   RollSelector.init();
+  RenameRollModal.init();
 
   // Render initial table
   TableRenderer.render();
@@ -25,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("settingsBtn")
     .addEventListener("click", () => OptionsDialog.open());
+  document
+    .getElementById("renameBtn")
+    .addEventListener("click", () => RenameRollModal.open());
   document.getElementById("clearBtn").addEventListener("click", () => {
     const currentRoll = RollManager.getCurrentRoll();
     if (!currentRoll) return;
