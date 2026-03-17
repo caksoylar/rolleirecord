@@ -502,6 +502,7 @@ const Export = {
 
     const camera = CAMERAS.find(val => val.name == SessionManager.getSelectedCamera()).label;
     const film = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).label;
+    const iso = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).iso;
     const currentRoll = RollManager.getCurrentRoll();
 
     // Add camera and film to each row
@@ -509,6 +510,7 @@ const Export = {
       ...row,
       camera,
       film,
+      iso,
     }));
 
     const jsonString = JSON.stringify(enrichedData, null, 2);
