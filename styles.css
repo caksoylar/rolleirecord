@@ -492,6 +492,17 @@ select:focus {
   transition: background-color 0.2s;
 }
 
+.option-camera-selector-bar {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.option-camera-selector-bar label {
+  font-size: 1.25rem;
+}
+
 .move-option-btn:hover:not(:disabled) {
   background-color: #e0e0e0;
 }

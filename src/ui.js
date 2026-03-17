@@ -678,7 +678,10 @@ const OptionsDialog = {
     if (!this.cameraSelectContainer) {
       this.cameraSelectContainer = document.createElement("div");
       this.cameraSelectContainer.style.marginBottom = "1rem";
-      this.cameraSelectContainer.innerHTML = `<select id="cameraForOptionsSelect" /></select>`;
+      this.cameraSelectContainer.classList.add("option-camera-selector-bar");
+      this.cameraSelectContainer.innerHTML = `
+        <label for="cameraForOptionsSelect" title="Select camera">📷</label>
+        <select id="cameraForOptionsSelect" /></select>`;
       this.optionsContainerElement.parentNode.insertBefore(
         this.cameraSelectContainer,
         this.optionsContainerElement,
