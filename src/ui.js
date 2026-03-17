@@ -498,8 +498,10 @@ const ConfirmDialog = {
 const Export = {
   exportToJSON() {
     const rows = DataModel.getAllRows();
-    const camera = SessionManager.getSelectedCamera();
-    const film = SessionManager.getSelectedFilm();
+    rows.forEach(row => {row.aperture = row.aperture.replace("ƒ", "")})
+
+    const camera = CAMERAS.find(val => val.name == SessionManager.getSelectedCamera()).label;
+    const film = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).label;
     const currentRoll = RollManager.getCurrentRoll();
 
     // Add camera and film to each row
