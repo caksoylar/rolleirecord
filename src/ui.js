@@ -170,10 +170,10 @@ const Modal = {
                                         ${field.readonly ? "readonly" : ""}
                                         style="flex: 1;"
                                     />
-                                    <button type="button" id="refresh-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 1rem;">
+                                    <button type="button" id="refresh-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
                                         🔄
                                     </button>
-                                    ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 1rem;" title="Open in Google Maps">🗺️</button>` : ""}
+                                    ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps">🗺️</button>` : ""}
                                 </div>
                                 <div class="accuracy-hint"></div>
                             </div>
@@ -213,7 +213,7 @@ const Modal = {
                                         ${field.readonly ? "readonly" : ""}
                                         style="flex: 1;"
                                     />
-                                    <button type="button" id="refresh-date-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 1rem;">
+                                    <button type="button" id="refresh-date-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
                                         🔄
                                     </button>
                                 </div>

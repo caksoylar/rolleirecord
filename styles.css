@@ -268,7 +268,7 @@ tr:last-child td {
   margin-bottom: 1rem;
   display: grid;
   grid-template-columns: max-content 1fr;
-  gap: 8px 16px; /* row gap, column gap */
+  gap: 0.5rem 0.5rem; /* row gap, column gap */
   align-items: center;
 }
 
