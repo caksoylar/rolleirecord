@@ -196,6 +196,29 @@ const Modal = {
                             </div>
                         `;
         }
+      } else if (field.name === "date") {
+        // Special handling for date field
+        const value = isEditMode ? rowData[field.name] || "" : "";
+        
+        html += `
+                            <div class="form-group">
+                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                    <input 
+                                        type="text"
+                                        id="${inputId}"
+                                        name="${field.name}"
+                                        value="${escapeHtml(String(value))}"
+                                        ${required}
+                                        ${field.readonly ? "readonly" : ""}
+                                        style="flex: 1;"
+                                    />
+                                    <button type="button" id="refresh-date-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 1rem;">
+                                        🔄
+                                    </button>
+                                </div>
+                            </div>
+                        `;
       } else {
         // Render text or number input
         const value = rowData ? rowData[field.name] || "" : "";
@@ -220,6 +243,15 @@ const Modal = {
     }
 
     this.bodyElement.innerHTML = html;
+
+    const refreshDateBtn = document.getElementById("refresh-date-btn");
+    if (refreshDateBtn) {
+      refreshDateBtn.addEventListener("click", async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        await ModalFlows.fetchAndSetDate();
+      });
+    }
 
     // Attach refresh button listener in edit mode
     if (isEditMode) {
@@ -333,6 +365,18 @@ const FormValidator = {
       }
     }
 
+    // Validate date coordinates if provided
+    if (formData.date && formData.date.trim() !== "") {
+      const dateStr = formData.date.trim();
+      const iso8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
+      const date = new Date(dateStr);
+      if (!iso8601.test(dateStr) || isNaN(date.getTime())) {
+        errors.push(
+          "Date must be a valid date string (e.g., 2026-01-12T12:35:02-07:00)"
+        );
+      }
+    }
+
     return {
       valid: errors.length === 0,
       errors: errors,
@@ -351,8 +395,9 @@ const ModalFlows = {
     const suggestedId = DataModel.getNextSuggestedId();
     document.getElementById("field-id").value = suggestedId;
 
-    // Fetch location automatically
+    // Fetch location and date automatically
     ModalFlows.fetchAndSetLocation();
+    ModalFlows.fetchAndSetDate();
   },
 
   // Handle edit existing row
@@ -400,6 +445,29 @@ const ModalFlows = {
       locationField.placeholder = errorMsg;
       console.error("Geolocation error:", error);
     }
+  },
+
+  fetchAndSetDate() {
+    const dateField = document.getElementById("field-date");
+    if (!dateField) return;
+
+    const now = new Date();
+  
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hours = pad(now.getHours());
+    const minutes = pad(now.getMinutes());
+    const seconds = pad(now.getSeconds());
+
+    const tzOffset = -now.getTimezoneOffset();
+    const sign = tzOffset >= 0 ? '+' : '-';
+    const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
+    const tzMinutes = pad(Math.abs(tzOffset) % 60);
+
+    dateField.value = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${tzHours}:${tzMinutes}`;
   },
 
   // Handle form submission

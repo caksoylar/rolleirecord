@@ -84,6 +84,14 @@ const SCHEMA = {
       required: false,
     },
     {
+      name: "date",
+      type: "text",
+      label: "Date",
+      visible: false,
+      readonly: false,
+      required: false,
+    },
+    {
       name: "location",
       type: "text",
       label: "Location",
