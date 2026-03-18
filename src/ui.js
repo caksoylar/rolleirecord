@@ -706,8 +706,6 @@ const OptionsDialog = {
         );
         this.renderOptionsInputs(options);
       });
-    } else {
-      this.cameraSelectContainer.style.display = "block";
     }
   },
 

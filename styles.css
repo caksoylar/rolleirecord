@@ -113,7 +113,7 @@ h1 {
 .controls {
   margin-bottom: 1.5rem;
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
   gap: 0.75rem;
 }
 
@@ -404,7 +404,7 @@ select:focus {
   background-color: white;
   width: 100%;
   border-radius: 0.75rem 0.75rem 0 0;
-  padding: 1.5rem;
+  padding: 1rem;
   margin-top: auto;
   max-height: 90vh;
   overflow-y: auto;

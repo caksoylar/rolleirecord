@@ -57,7 +57,7 @@ const SCHEMA = {
       visible: true,
       readonly: false,
       required: false,
-      camera_specific: false,
+      camera_specific: true,
       width: "23%",
       options: ["ƒ/1.8", "ƒ/2.0", "ƒ/2.8", "ƒ/4.0", "ƒ/5.6", "ƒ/8", "ƒ/11", "ƒ/16", "ƒ/22"],
       defaultValue: "ƒ/4.0",

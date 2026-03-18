@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("renameBtn")
     .addEventListener("click", () => RenameRollModal.open());
-  document.getElementById("clearBtn").addEventListener("click", () => {
+  document.getElementById("deleteRollBtn").addEventListener("click", () => {
     const currentRoll = RollManager.getCurrentRoll();
     if (!currentRoll) return;
     if (
