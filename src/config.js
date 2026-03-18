@@ -29,7 +29,7 @@ const SCHEMA = {
     {
       name: "id",
       type: "number",
-      label: "Frame Number",
+      label: "Frame #",
       header: "#",
       visible: true,
       readonly: false,

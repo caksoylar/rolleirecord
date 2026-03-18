@@ -266,10 +266,15 @@ tr:last-child td {
 
 .modal-body {
   margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px; /* row gap, column gap */
+  align-items: center;
 }
 
 .form-group {
   margin-bottom: 1.25rem;
+  display: contents;
 }
 
 label {
