@@ -44,6 +44,19 @@ document.addEventListener("DOMContentLoaded", function () {
       FilmSelector.render();
     }
   });
+  document.getElementById("clearAllBtn").addEventListener("click", () => {
+    if (
+      confirm(
+        `Are you sure you want to clear all storage? This cannot be undone.`,
+      )
+    ) {
+      localStorage.clear();
+      RollSelector.render();
+      TableRenderer.render();
+      CameraSelector.render();
+      FilmSelector.render();
+    }
+  });
 
   // Modal form submission
   document
