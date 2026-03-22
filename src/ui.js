@@ -192,7 +192,7 @@ const Modal = {
                                     ${field.readonly ? "readonly" : ""}
                                     placeholder="Auto-capturing via GPS..."
                                 />
-                                <div class="accuracy-hint"></div>
+                                <div/><div class="accuracy-hint"></div>
                             </div>
                         `;
         }
@@ -257,10 +257,8 @@ const Modal = {
     if (isEditMode) {
       const refreshBtn = document.getElementById("refresh-location-btn");
       if (refreshBtn) {
-        refreshBtn.addEventListener("click", async (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          await ModalFlows.fetchAndSetLocation();
+        refreshBtn.addEventListener("click", () => {
+          ModalFlows.fetchAndSetLocation();
         });
       }
 
