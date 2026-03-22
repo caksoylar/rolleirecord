@@ -7,10 +7,10 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="container">
-      <h1>Rolleirecord
-    </h1>
-
+    <header>
+      <h1>Rolleirecord</h1>
+    </header>
+    <main>
       <div id="rollContainer" class="roll-selector-bar">
         <label for="rollSelect" title="Select roll">📋</label>
         <select id="rollSelect">
@@ -33,14 +33,16 @@
       <div id="tableContainer">
         <!-- Table will be rendered here -->
       </div>
+    </main>
 
+    <footer>
       <div class="controls">
         <button id="exportBtn" class="secondary">Export</button>
         <button id="settingsBtn" class="secondary">Options</button>
         <button id="deleteRollBtn" class="danger">Delete Roll</button>
         <button id="clearAllBtn" class="danger">Clear All</button>
       </div>
-    </div>
+    </footer>
 
     <!-- Modal Dialog -->
     <div class="modal" id="modal">
