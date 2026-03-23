@@ -572,8 +572,8 @@ const Export = {
     const rows = DataModel.getAllRows();
     rows.forEach(row => {row.aperture = row.aperture.replace("ƒ/", "")})
 
-    const camera = CAMERAS.find(val => val.name == SessionManager.getSelectedCamera()).label;
-    const film = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).label;
+    const camera = CAMERAS.find(val => val.name == SessionManager.getSelectedCamera()).name;
+    const film = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).name;
     const iso = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).iso;
     const currentRoll = RollManager.getCurrentRoll();
 
@@ -626,7 +626,7 @@ const CameraSelector = {
     cameras.forEach((camera) => {
       const option = document.createElement("option");
       option.value = camera.name;
-      option.textContent = camera.label;
+      option.textContent = camera.name;
       this.element.appendChild(option);
     });
 
@@ -666,7 +666,7 @@ const FilmSelector = {
     films.forEach((film) => {
       const option = document.createElement("option");
       option.value = film.name;
-      option.textContent = film.label;
+      option.textContent = film.name;
       this.element.appendChild(option);
     });
 
@@ -785,7 +785,7 @@ const OptionsDialog = {
       SessionManager.getAllCameras().forEach((camera) => {
         const option = document.createElement("option");
         option.value = camera.name;
-        option.textContent = camera.label;
+        option.textContent = camera.name;
         cameraSelect.appendChild(option);
       });
       cameraSelect.value = SessionManager.getSelectedCamera();

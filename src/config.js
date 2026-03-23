@@ -4,24 +4,24 @@
 // Edit this file to customize cameras, films, and table fields
 
 const CAMERAS = [
-  { name: "nikon_fm", label: "Nikon FM" },
-  { name: "ektar_h35n", label: "Ektar H35n" },
+  { name: "Nikon FM" },
+  { name: "Ektar H35n" },
 ];
 
 const FILMS = [
-  { name: "portra160", label: "Kodak Portra 160", iso: 160 },
-  { name: "portra400", label: "Kodak Portra 400", iso: 400 },
-  { name: "portra800", label: "Kodak Portra 800", iso: 800 },
-  { name: "kodacolor100", label: "Kodacolor 100", iso: 100 },
-  { name: "kodacolor200", label: "Kodacolor 200", iso: 200 },
-  { name: "ultramax400", label: "Kodak Ultramax 400", iso: 400 },
-  { name: "ektar100", label: "Kodak Ektar 100", iso: 100 },
-  { name: "superia400", label: "Fujifilm Superia 400", iso: 400 },
-  { name: "hp5plus", label: "Ilford HP5 Plus", iso: 400 },
-  { name: "gold200", label: "Kodak Gold 200", iso: 200 },
-  { name: "kentmere100", label: "Kentmere 100", iso: 100 },
-  { name: "kentmere200", label: "Kentmere 200", iso: 200 },
-  { name: "kentmere400", label: "Kentmere 400", iso: 400 },
+  { name: "Kodak Portra 160", iso: 160 },
+  { name: "Kodak Portra 400", iso: 400 },
+  { name: "Kodak Portra 800", iso: 800 },
+  { name: "Kodacolor 100", iso: 100 },
+  { name: "Kodacolor 200", iso: 200 },
+  { name: "Kodak Ultramax 400", iso: 400 },
+  { name: "Kodak Ektar 100", iso: 100 },
+  { name: "Fujifilm Superia 400", iso: 400 },
+  { name: "Ilford HP5 Plus", iso: 400 },
+  { name: "Kodak Gold 200", iso: 200 },
+  { name: "Kentmere 100", iso: 100 },
+  { name: "Kentmere 200", iso: 200 },
+  { name: "Kentmere 400", iso: 400 },
 ];
 
 const SCHEMA = {
