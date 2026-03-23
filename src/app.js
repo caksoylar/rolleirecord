@@ -64,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
     .addEventListener("submit", (e) => ModalFlows.submitForm(e));
 
   // Modal cancel button
-  document.querySelectorAll(".cancel-btn").forEach((btn) => {
+  document.querySelectorAll("#modal .cancel-btn").forEach((btn) => {
     btn.addEventListener("click", () => Modal.close());
   });
 

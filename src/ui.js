@@ -238,10 +238,6 @@ const Modal = {
       }
     });
 
-    if (isEditMode) {
-      html += `<button onclick="UI.openDeleteConfirm(${rowData.id})" class="danger" style="width: 100%">Delete</button>`
-    }
-
     this.bodyElement.innerHTML = html;
 
     const refreshDateBtn = document.getElementById("refresh-date-btn");
@@ -277,6 +273,15 @@ const Modal = {
           }
         });
       }
+    }
+
+    const deleteBtn = document.getElementById("deleteFrameBtn");
+    if (isEditMode) {
+      // deleteBtn.addEventListener("click", () => { UI.openDeleteConfirm(rowData.id); this.close(); });
+      deleteBtn.onclick = (() => { UI.openDeleteConfirm(rowData.id); this.close(); });
+      deleteBtn.style.display = "";
+    } else {
+      deleteBtn.style.display = "none";
     }
 
     // Auto-focus first input (text/number/select)

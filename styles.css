@@ -333,6 +333,11 @@ select:focus {
   width: 100%;
 }
 
+#deleteFrameBtn {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
 /* Confirmation Dialog */
 .confirm-dialog {
   display: none;
