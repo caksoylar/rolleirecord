@@ -101,8 +101,3 @@ const SCHEMA = {
     },
   ],
 };
-
-const APP_CONFIG = {
-  storageKey: "tableData",
-  appName: "Dynamic Table",
-};
