@@ -7,7 +7,6 @@
 let appState = {
   mode: null, // 'add' or 'edit'
   currentRowId: null,
-  pendingConfirmDelete: null,
 };
 
 // ============================================================================
@@ -100,17 +99,21 @@ function escapeHtml(text) {
 // ============================================================================
 // MODAL DIALOG MANAGEMENT
 // ============================================================================
-const Modal = {
+const FrameModal = {
   element: null,
-  formElement: null,
   bodyElement: null,
   titleElement: null,
 
   init() {
-    this.element = document.getElementById("modal");
-    this.formElement = document.getElementById("modalForm");
-    this.bodyElement = document.getElementById("modalBody");
-    this.titleElement = document.getElementById("modalTitle");
+    this.element = document.getElementById("frameModal");
+    this.bodyElement = this.element.querySelector("#frameModalBody");
+    this.titleElement = document.getElementById("frameModalTitle");
+
+    // Save button
+    this.element.querySelector("form").addEventListener("submit", (e) => ModalFlows.submitForm(e));
+
+    // Cancel button
+    this.element.querySelector(".cancel-btn").addEventListener("click", () => this.close());
   },
 
   // Render form fields based on schema
@@ -275,7 +278,8 @@ const Modal = {
       }
     }
 
-    const deleteBtn = document.getElementById("deleteFrameBtn");
+    // Delete button
+    const deleteBtn = this.element.querySelector(".delete-btn");
     if (isEditMode) {
       // deleteBtn.addEventListener("click", () => { UI.openDeleteConfirm(rowData.id); this.close(); });
       deleteBtn.onclick = (() => { UI.openDeleteConfirm(rowData.id); this.close(); });
@@ -310,8 +314,6 @@ const Modal = {
 
   close() {
     this.element.classList.remove("active");
-    appState.mode = null;
-    appState.currentRowId = null;
   },
 };
 
@@ -394,7 +396,7 @@ const ModalFlows = {
   // Handle add new row
   async openAddModal() {
     const lastId = DataModel.getLastId();
-    Modal.open("add", lastId);
+    FrameModal.open("add", lastId);
     const suggestedId = DataModel.getNextSuggestedId();
     document.getElementById("field-id").value = suggestedId;
 
@@ -405,7 +407,7 @@ const ModalFlows = {
 
   // Handle edit existing row
   openEditModal(rowId) {
-    Modal.open("edit", rowId);
+    FrameModal.open("edit", rowId);
   },
 
   // Fetch location and set to form field
@@ -492,12 +494,12 @@ const ModalFlows = {
       DataModel.updateRow(appState.currentRowId, formData);
     }
 
-    Modal.close();
+    FrameModal.close();
     TableRenderer.render();
   },
 
   closeModal() {
-    Modal.close();
+    FrameModal.close();
   },
 };
 
@@ -530,25 +532,24 @@ const ConfirmDialog = {
     this.dialogElement = document.getElementById("confirmDialog");
     this.overlayElement = document.getElementById("confirmOverlay");
     this.messageElement = document.getElementById("confirmMessage");
+
+    this.dialogElement.querySelector("#confirmYes").addEventListener("click", () => this.confirmDelete());
+    this.dialogElement.querySelector("#confirmNo").addEventListener("click", () => this.cancel());
+    this.overlayElement.addEventListener("click", () => this.cancel());
   },
 
-  openDelete(rowId) {
-    appState.pendingConfirmDelete = rowId;
-    this.messageElement.textContent = `Are you sure you want to delete this row?`;
+  openDelete() {
+    this.messageElement.textContent = `Are you sure you want to delete this frame?`;
     this.show();
   },
 
   confirmDelete() {
-    if (appState.pendingConfirmDelete !== null) {
-      DataModel.deleteRow(appState.pendingConfirmDelete);
-      appState.pendingConfirmDelete = null;
-      this.hide();
-      TableRenderer.render();
-    }
+    const out = DataModel.deleteRow(appState.currentRowId);
+    this.hide();
+    TableRenderer.render();
   },
 
   cancel() {
-    appState.pendingConfirmDelete = null;
     this.hide();
   },
 
@@ -687,7 +688,6 @@ const FilmSelector = {
 // ============================================================================
 const OptionsDialog = {
   dialogElement: null,
-  formElement: null,
   fieldSelectElement: null,
   optionsContainerElement: null,
   currentField: null,
@@ -696,7 +696,6 @@ const OptionsDialog = {
 
   init() {
     this.dialogElement = document.getElementById("optionsDialog");
-    this.formElement = document.getElementById("optionsForm");
     this.fieldSelectElement = document.getElementById("fieldSelect");
     this.optionsContainerElement = document.getElementById("optionsContainer");
 
@@ -707,6 +706,29 @@ const OptionsDialog = {
     this.fieldSelectElement.addEventListener("change", (e) =>
       this.onFieldSelected(e.target.value),
     );
+
+    // Submit button
+    this.dialogElement.querySelector("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      this.save();
+    });
+
+    // Add button
+    this.dialogElement.querySelector("#addOptionBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.addOption();
+    });
+
+    // Cancel button
+    this.dialogElement.querySelector(".cancel-btn").addEventListener("click", () => this.close());
+
+    // Close dialog when clicking outside
+    this.dialogElement.addEventListener("click", (e) => {
+      if (e.target === this.dialogElement) {
+        OptionsDialog.close();
+      }
+    });
   },
 
   populateFieldSelector() {

@@ -44,20 +44,20 @@
       </div>
     </footer>
 
-    <!-- Modal Dialog -->
-    <div class="modal" id="modal">
+    <!-- Frame Modal -->
+    <div class="modal" id="frameModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 id="modalTitle">Add Row</h2>
+          <h2 id="frameModalTitle">Add Row</h2>
         </div>
-        <form id="modalForm">
-          <div class="modal-body" id="modalBody">
+        <form>
+          <div class="modal-body" id="frameModalBody">
             <!-- Form fields will be rendered here -->
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer" id="frameModalFooter">
             <button type="submit" class="save-btn">Save</button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
-            <button type="button" id="deleteFrameBtn" class="danger">Delete</button>
+            <button type="button" class="danger delete-btn">Delete</button>
           </div>
         </form>
       </div>
@@ -79,7 +79,7 @@
         <div class="options-header">
           <h2>Edit Field Options</h2>
         </div>
-        <form id="optionsForm">
+        <form>
           <div class="field-selector">
             <label for="fieldSelect">Select Field</label>
             <select id="fieldSelect">
@@ -102,7 +102,7 @@
           </div>
           <div class="options-footer">
             <button type="submit" class="save-btn">Save</button>
-            <button type="button" class="cancel-btn secondary">Cancel</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
           </div>
         </form>
       </div>
