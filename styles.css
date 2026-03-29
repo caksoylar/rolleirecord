@@ -56,8 +56,8 @@
   /* Select arrow (pure CSS chevron via two diagonal gradients) */
   --select-arrow-size: 6px;
   --select-arrow:
-    linear-gradient(135deg, transparent 50%, var(--color-text) 50%),
-    linear-gradient(225deg, transparent 50%, var(--color-text) 50%);
+    linear-gradient(45deg, transparent 50%, var(--color-text) 50%),
+    linear-gradient(315deg, transparent 50%, var(--color-text) 50%);
 }
 
 * {
