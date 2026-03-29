@@ -85,7 +85,7 @@ const SCHEMA = {
     },
     {
       name: "date",
-      type: "text",
+      type: "datetime",
       label: "Date",
       visible: false,
       readonly: false,

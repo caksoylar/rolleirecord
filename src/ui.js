@@ -201,14 +201,14 @@ const FrameModal = {
         }
       } else if (field.name === "date") {
         // Special handling for date field
-        const value = isEditMode ? rowData[field.name] || "" : "";
+        const value = isEditMode ? rowData[field.name].substring(0, 16) || "" : "";
         
         html += `
                             <div class="form-group">
                                 <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
                                 <div style="display: flex; gap: 0.5rem; align-items: center;">
                                     <input 
-                                        type="text"
+                                        type="datetime-local"
                                         id="${inputId}"
                                         name="${field.name}"
                                         value="${escapeHtml(String(value))}"
@@ -370,16 +370,26 @@ const FormValidator = {
       }
     }
 
-    // Validate date coordinates if provided
+    // Validate and augment date coordinates if provided
     if (formData.date && formData.date.trim() !== "") {
       const dateStr = formData.date.trim();
-      const iso8601 = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(Z|[+-]\d{2}:\d{2})$/;
+      const dtLocal = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
       const date = new Date(dateStr);
-      if (!iso8601.test(dateStr) || isNaN(date.getTime())) {
+      if (!dtLocal.test(dateStr) || isNaN(date.getTime())) {
         errors.push(
           "Date must be a valid date string (e.g., 2026-01-12T12:35:02-07:00)"
         );
       }
+      // Add timezone information and convert to ISO8601
+      const pad = (n) => String(n).padStart(2, '0');
+
+      const seconds = '00';
+      const tzOffset = -(new Date()).getTimezoneOffset();
+      const sign = tzOffset >= 0 ? '+' : '-';
+      const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
+      const tzMinutes = pad(Math.abs(tzOffset) % 60);
+
+      formData.date += `:${seconds}${sign}${tzHours}:${tzMinutes}`;
     }
 
     return {
@@ -465,14 +475,8 @@ const ModalFlows = {
     const day = pad(now.getDate());
     const hours = pad(now.getHours());
     const minutes = pad(now.getMinutes());
-    const seconds = pad(now.getSeconds());
 
-    const tzOffset = -now.getTimezoneOffset();
-    const sign = tzOffset >= 0 ? '+' : '-';
-    const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
-    const tzMinutes = pad(Math.abs(tzOffset) % 60);
-
-    dateField.value = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}${sign}${tzHours}:${tzMinutes}`;
+    dateField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
   },
 
   // Handle form submission
