@@ -113,15 +113,6 @@ h1 {
   border-radius: var(--radius);
   background-color: var(--color-surface);
   cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: var(--select-arrow);
-  background-size: var(--select-arrow-size) var(--select-arrow-size);
-  background-position:
-    calc(100% - 0.75rem - var(--select-arrow-size)) center,
-    calc(100% - 0.75rem) center;
-  background-repeat: no-repeat;
-  padding-right: 2.5rem;
 }
 
 .roll-selector-bar select:focus {
@@ -158,15 +149,6 @@ h1 {
   border-radius: var(--radius);
   background-color: var(--color-surface);
   cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: var(--select-arrow);
-  background-size: var(--select-arrow-size) var(--select-arrow-size);
-  background-position:
-    calc(100% - 0.75rem - var(--select-arrow-size)) center,
-    calc(100% - 0.75rem) center;
-  background-repeat: no-repeat;
-  padding-right: 2.5rem;
 }
 
 .camera-selector-bar select:focus {
@@ -472,15 +454,6 @@ select:focus {
   border-radius: var(--radius);
   background-color: var(--color-surface);
   cursor: pointer;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: var(--select-arrow);
-  background-size: var(--select-arrow-size) var(--select-arrow-size);
-  background-position:
-    calc(100% - 0.875rem - var(--select-arrow-size)) center,
-    calc(100% - 0.875rem) center;
-  background-repeat: no-repeat;
-  padding-right: 2.5rem;
 }
 
 .options-list {
