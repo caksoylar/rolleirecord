@@ -55,31 +55,35 @@ const OptionsManager = {
   OPTIONS_KEY_PREFIX: "fieldOptions_",
   CAMERAS_PREFIX: "cameras",
 
+  // Build storage key for a field, incorporating camera name if camera-specific
+  _getStorageKey(fieldName, camera = null) {
+    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const cameraName =
+      camera ||
+      (field && field.camera_specific
+        ? SessionManager.getSelectedCamera()
+        : null);
+
+    let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
+    if (field && field.camera_specific && cameraName) {
+      storageKey += "_" + cameraName;
+    }
+    return storageKey;
+  },
+
   // Get all select fields from schema
   getSelectFields() {
     return SCHEMA.fields.filter((f) => f.type === "select");
   },
 
   // Get options for a specific field from localStorage or defaults
-  // If field is camera_specific, use camera-specific storage key
   getOptions(fieldName, camera = null) {
     const field = SCHEMA.fields.find((f) => f.name === fieldName);
     if (!field || field.type !== "select") {
       return [];
     }
 
-    // Determine which camera to use
-    const cameraName =
-      camera ||
-      (field.camera_specific ? SessionManager.getSelectedCamera() : null);
-
-    // Build storage key: camera-specific fields include camera name
-    let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
-    if (field.camera_specific && cameraName) {
-      storageKey += "_" + cameraName;
-    }
-
-    const stored = localStorage.getItem(storageKey);
+    const stored = localStorage.getItem(this._getStorageKey(fieldName, camera));
 
     if (stored) {
       try {
@@ -95,26 +99,17 @@ const OptionsManager = {
   },
 
   // Set options for a specific field in localStorage
-  // If field is camera_specific, use camera-specific storage key
   setOptions(fieldName, optionsArray, camera = null) {
     const field = SCHEMA.fields.find((f) => f.name === fieldName);
     if (!field || field.type !== "select") {
       return false;
     }
 
-    // Determine which camera to use
-    const cameraName =
-      camera ||
-      (field.camera_specific ? SessionManager.getSelectedCamera() : null);
-
-    // Build storage key: camera-specific fields include camera name
-    let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
-    if (field.camera_specific && cameraName) {
-      storageKey += "_" + cameraName;
-    }
-
     try {
-      localStorage.setItem(storageKey, JSON.stringify(optionsArray));
+      localStorage.setItem(
+        this._getStorageKey(fieldName, camera),
+        JSON.stringify(optionsArray),
+      );
       return true;
     } catch (e) {
       console.error("Failed to save options for", fieldName, e);
@@ -133,64 +128,7 @@ const OptionsManager = {
     const field = SCHEMA.fields.find((f) => f.name === fieldName);
     if (!field) return;
 
-    // Determine which camera to use
-    const cameraName =
-      camera ||
-      (field.camera_specific ? SessionManager.getSelectedCamera() : null);
-
-    // Build storage key: camera-specific fields include camera name
-    let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
-    if (field.camera_specific && cameraName) {
-      storageKey += "_" + cameraName;
-    }
-
-    localStorage.removeItem(storageKey);
-  },
-};
-const DataModel = {
-  // Delegate to RollManager for all operations
-
-  // Get all rows from current roll
-  getAllRows() {
-    return RollManager.getFrames();
-  },
-
-  // Get a row by ID from current roll
-  getRowById(id) {
-    return RollManager.getFrameById(id);
-  },
-
-  // Add new row to current roll
-  addRow(rowData) {
-    return RollManager.addFrame(rowData);
-  },
-
-  // Update existing row in current roll
-  updateRow(id, rowData) {
-    return RollManager.updateFrame(id, rowData);
-  },
-
-  // Delete row by ID from current roll
-  deleteRow(id) {
-    return RollManager.deleteFrame(id);
-  },
-
-  // Check if ID is unique in current roll (excluding current row if editing)
-  isIdUnique(id, excludeId = null) {
-    return RollManager.isFrameIdUnique(id, excludeId);
-  },
-
-  // Get highest existing ID in current roll
-  getLastId() {
-    const frames = RollManager.getFrames();
-    if (frames.length === 0) return null;
-    const ids = frames.map((f) => f.id).filter((id) => typeof id === "number");
-    return ids.length === 0 ? null : Math.max(...ids);
-  },
-
-  // Get next suggested ID for current roll
-  getNextSuggestedId() {
-    return RollManager.getNextSuggestedFrameId();
+    localStorage.removeItem(this._getStorageKey(fieldName, camera));
   },
 };
 

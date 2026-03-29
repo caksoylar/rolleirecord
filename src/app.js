@@ -40,10 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
       )
     ) {
       RollManager.deleteRoll(currentRoll.id);
-      RollSelector.render();
-      TableRenderer.render();
-      CameraSelector.render();
-      FilmSelector.render();
+      refreshAllUI();
     }
   });
   document.getElementById("clearAllBtn").addEventListener("click", () => {
@@ -53,10 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
       )
     ) {
       localStorage.clear();
-      RollSelector.render();
-      TableRenderer.render();
-      CameraSelector.render();
-      FilmSelector.render();
+      refreshAllUI();
     }
   });
 });

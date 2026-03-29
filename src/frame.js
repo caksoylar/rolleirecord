@@ -197,7 +197,7 @@ const FrameModal = {
     if (isEditMode) {
       deleteBtn.onclick = () => {
         if (confirm("Are you sure you want to delete this frame?")) {
-          DataModel.deleteRow(rowData.id);
+          RollManager.deleteFrame(rowData.id);
           this.close();
           TableRenderer.render();
         }
@@ -220,11 +220,11 @@ const FrameModal = {
 
     if (mode === "add") {
       this.titleElement.textContent = "Add New Row";
-      const refData = DataModel.getRowById(rowId);
+      const refData = RollManager.getFrameById(rowId);
       this.renderFormFields(refData, false);
     } else {
       this.titleElement.textContent = "Edit Row";
-      const rowData = DataModel.getRowById(rowId);
+      const rowData = RollManager.getFrameById(rowId);
       this.renderFormFields(rowData, true);
     }
 
@@ -276,7 +276,7 @@ const FormValidator = {
     });
 
     // Check ID uniqueness
-    if (!DataModel.isIdUnique(formData.id, excludeId)) {
+    if (!RollManager.isFrameIdUnique(formData.id, excludeId)) {
       errors.push("ID must be unique");
     }
 
@@ -324,9 +324,9 @@ const FormValidator = {
 const ModalFlows = {
   // Handle add new row
   async openAddModal() {
-    const lastId = DataModel.getLastId();
+    const lastId = RollManager.getLastFrameId();
     FrameModal.open("add", lastId);
-    const suggestedId = DataModel.getNextSuggestedId();
+    const suggestedId = RollManager.getNextSuggestedFrameId();
     document.getElementById("field-id").value = suggestedId;
 
     // Fetch location and date automatically
@@ -418,9 +418,9 @@ const ModalFlows = {
     }
 
     if (appState.mode === "add") {
-      DataModel.addRow(formData);
+      RollManager.addFrame(formData);
     } else {
-      DataModel.updateRow(appState.currentRowId, formData);
+      RollManager.updateFrame(appState.currentRowId, formData);
     }
 
     FrameModal.close();

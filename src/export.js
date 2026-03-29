@@ -6,7 +6,7 @@
 
 const Export = {
   exportToJSON() {
-    const rows = DataModel.getAllRows();
+    const rows = RollManager.getFrames();
     rows.forEach((row) => {
       row.aperture = row.aperture.replace("ƒ/", "");
     });
@@ -14,12 +14,11 @@ const Export = {
     const camera = CAMERAS.find(
       (val) => val.name === SessionManager.getSelectedCamera(),
     ).name;
-    const film = FILMS.find(
+    const selectedFilm = FILMS.find(
       (val) => val.name === SessionManager.getSelectedFilm(),
-    ).name;
-    const iso = FILMS.find(
-      (val) => val.name === SessionManager.getSelectedFilm(),
-    ).iso;
+    );
+    const film = selectedFilm.name;
+    const iso = selectedFilm.iso;
     const currentRoll = RollManager.getCurrentRoll();
 
     // Add camera and film to each row
@@ -107,10 +106,7 @@ const Export = {
           });
 
           // Refresh all UI
-          RollSelector.render();
-          TableRenderer.render();
-          CameraSelector.render();
-          FilmSelector.render();
+          refreshAllUI();
         } catch (err) {
           alert("Failed to import: " + err.message);
         }

@@ -212,6 +212,14 @@ const RollManager = {
     return !frames.some((f) => f.id === frameId && f.id !== excludeId);
   },
 
+  // Get highest existing frame ID in current roll
+  getLastFrameId() {
+    const frames = this.getFrames();
+    if (frames.length === 0) return null;
+    const ids = frames.map((f) => f.id).filter((id) => typeof id === "number");
+    return ids.length === 0 ? null : Math.max(...ids);
+  },
+
   // Get next suggested frame ID
   getNextSuggestedFrameId() {
     const frames = this.getFrames();

@@ -190,62 +190,34 @@ const OptionsDialog = {
   },
 
   removeOption(index) {
-    const inputs =
-      this.optionsContainerElement.querySelectorAll(".option-input");
-    const newOptions = Array.from(inputs)
-      .filter((_, i) => i !== index)
-      .map((input) => input.value.trim())
-      .filter((val) => val !== "");
-
+    const currentOptions = this.collectOptions();
+    const newOptions = currentOptions.filter((_, i) => i !== index);
     this.renderOptionsInputs(newOptions);
   },
 
   moveOptionUp(index) {
     if (index <= 0) return;
-
-    const inputs =
-      this.optionsContainerElement.querySelectorAll(".option-input");
-    const currentOptions = Array.from(inputs).map((input) =>
-      input.value.trim(),
-    );
-
-    // Swap elements
+    const currentOptions = this.collectOptions();
     [currentOptions[index - 1], currentOptions[index]] = [
       currentOptions[index],
       currentOptions[index - 1],
     ];
-
     this.renderOptionsInputs(currentOptions);
   },
 
   moveOptionDown(index) {
-    const inputs =
-      this.optionsContainerElement.querySelectorAll(".option-input");
-    const currentOptions = Array.from(inputs).map((input) =>
-      input.value.trim(),
-    );
-
+    const currentOptions = this.collectOptions();
     if (index >= currentOptions.length - 1) return;
-
-    // Swap elements
     [currentOptions[index], currentOptions[index + 1]] = [
       currentOptions[index + 1],
       currentOptions[index],
     ];
-
     this.renderOptionsInputs(currentOptions);
   },
 
   addOption() {
-    const inputs =
-      this.optionsContainerElement.querySelectorAll(".option-input");
-    const currentOptions = Array.from(inputs)
-      .map((input) => input.value.trim())
-      .filter((val) => val !== "");
-
-    // Add empty string for new option
-    const newOptions = [...currentOptions, ""];
-    this.renderOptionsInputs(newOptions);
+    const currentOptions = this.collectOptions();
+    this.renderOptionsInputs([...currentOptions, ""]);
 
     // Focus the newly added input
     setTimeout(() => {
@@ -261,11 +233,9 @@ const OptionsDialog = {
   collectOptions() {
     const inputs =
       this.optionsContainerElement.querySelectorAll(".option-input");
-    const options = Array.from(inputs)
+    return Array.from(inputs)
       .map((input) => input.value.trim())
       .filter((val) => val !== "");
-
-    return options;
   },
 
   validateOptions(options) {

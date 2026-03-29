@@ -45,7 +45,7 @@ const TableRenderer = {
 
   // Render table body with all rows
   renderTableBody() {
-    const rows = DataModel.getAllRows();
+    const rows = RollManager.getFrames();
     const visibleFields = SCHEMA.fields.filter((f) => f.visible);
 
     let html = "<tbody>";
@@ -98,4 +98,11 @@ function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
+}
+
+function refreshAllUI() {
+  RollSelector.render();
+  TableRenderer.render();
+  CameraSelector.render();
+  FilmSelector.render();
 }

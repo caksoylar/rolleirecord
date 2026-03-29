@@ -110,9 +110,7 @@ const RollSelector = {
       } else {
         // Switch to selected roll
         RollManager.setCurrentRoll(value);
-        TableRenderer.render();
-        CameraSelector.render();
-        FilmSelector.render();
+        refreshAllUI();
       }
     });
   },
@@ -150,32 +148,50 @@ const RollSelector = {
 };
 
 // ============================================================================
+// SHARED MODAL HELPERS
+// ============================================================================
+function initModal(element, { formSelector, inputSelector, onSubmit }) {
+  const formElement = element.querySelector(formSelector);
+  const inputElement = element.querySelector(inputSelector);
+
+  if (formElement) {
+    formElement.addEventListener("submit", (e) => {
+      e.preventDefault();
+      onSubmit(inputElement.value.trim());
+    });
+  }
+
+  const cancelBtn = element.querySelector(".cancel-btn");
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", () =>
+      element.classList.remove("active"),
+    );
+  }
+
+  element.addEventListener("click", (e) => {
+    if (e.target === element) {
+      element.classList.remove("active");
+    }
+  });
+
+  return { element, inputElement };
+}
+
+// ============================================================================
 // CREATE ROLL MODAL
 // ============================================================================
 const CreateRollModal = {
   element: null,
-  formElement: null,
   inputElement: null,
 
   init() {
-    this.element = document.getElementById("createRollModal");
-    this.formElement = document.getElementById("createRollForm");
-    this.inputElement = document.getElementById("rollNameInput");
-
-    if (this.formElement) {
-      this.formElement.addEventListener("submit", (e) => this.submit(e));
-    }
-
-    const cancelBtn = this.element?.querySelector(".cancel-btn");
-    if (cancelBtn) {
-      cancelBtn.addEventListener("click", () => this.close());
-    }
-
-    this.element?.addEventListener("click", (e) => {
-      if (e.target === this.element) {
-        this.close();
-      }
+    const modal = initModal(document.getElementById("createRollModal"), {
+      formSelector: "#createRollForm",
+      inputSelector: "#rollNameInput",
+      onSubmit: (name) => this.submit(name),
     });
+    this.element = modal.element;
+    this.inputElement = modal.inputElement;
   },
 
   open() {
@@ -190,26 +206,16 @@ const CreateRollModal = {
     this.element.classList.remove("active");
   },
 
-  submit(e) {
-    e.preventDefault();
-
-    const name = this.inputElement.value.trim();
-
+  submit(name) {
     if (!name) {
       alert("Roll name cannot be empty");
       return;
     }
 
-    // Create new roll and set as current
     const newRoll = RollManager.createRoll(name);
     RollManager.setCurrentRoll(newRoll.id);
 
-    // Update UI
-    RollSelector.render();
-    TableRenderer.render();
-    CameraSelector.render();
-    FilmSelector.render();
-
+    refreshAllUI();
     this.close();
   },
 };
@@ -219,28 +225,16 @@ const CreateRollModal = {
 // ============================================================================
 const RenameRollModal = {
   element: null,
-  formElement: null,
   inputElement: null,
 
   init() {
-    this.element = document.getElementById("renameRollModal");
-    this.formElement = document.getElementById("renameRollForm");
-    this.inputElement = document.getElementById("rollRenameInput");
-
-    if (this.formElement) {
-      this.formElement.addEventListener("submit", (e) => this.submit(e));
-    }
-
-    const cancelBtn = this.element?.querySelector(".cancel-btn");
-    if (cancelBtn) {
-      cancelBtn.addEventListener("click", () => this.close());
-    }
-
-    this.element?.addEventListener("click", (e) => {
-      if (e.target === this.element) {
-        this.close();
-      }
+    const modal = initModal(document.getElementById("renameRollModal"), {
+      formSelector: "#renameRollForm",
+      inputSelector: "#rollRenameInput",
+      onSubmit: (name) => this.submit(name),
     });
+    this.element = modal.element;
+    this.inputElement = modal.inputElement;
   },
 
   open() {
@@ -255,22 +249,14 @@ const RenameRollModal = {
     this.element.classList.remove("active");
   },
 
-  submit(e) {
-    e.preventDefault();
-
-    const name = this.inputElement.value.trim();
-
+  submit(name) {
     if (!name) {
       alert("Roll name cannot be empty");
       return;
     }
 
-    // Rename roll
     RollManager.renameRoll(RollManager.getCurrentRollId(), name);
-
-    // Update UI
     RollSelector.render();
-
     this.close();
   },
 };
