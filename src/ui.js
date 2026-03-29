@@ -2,6 +2,8 @@
 // UI LAYER - All user interface components and utilities
 // ============================================================================
 
+/* eslint-disable no-unused-vars */
+
 // APPLICATION STATE
 // ============================================================================
 let appState = {
@@ -37,7 +39,7 @@ const TableRenderer = {
       html += `<th${w}>${field.header || field.label}</th>`;
     });
 
-    html += '<th>⁝</th></tr></thead>';
+    html += "<th>⁝</th></tr></thead>";
     return html;
   },
 
@@ -48,24 +50,26 @@ const TableRenderer = {
 
     let html = "<tbody>";
     html += "<tr>";
-    visibleFields.forEach((field) => {
+    visibleFields.forEach((_field) => {
       html += `<td></td>`;
     });
-    html += `<td class="actions"><button onclick="UI.openAddModal()" title="Add new">✚</button></td>`
+    html += `<td class="actions"><button onclick="UI.openAddModal()" title="Add new">✚</button></td>`;
     html += "</tr>";
 
-    rows.sort((r1, r2) => r2.id - r1.id).forEach((row) => {
-      html += "<tr>";
+    rows
+      .sort((r1, r2) => r2.id - r1.id)
+      .forEach((row) => {
+        html += "<tr>";
 
-      visibleFields.forEach((field) => {
-        const value = row[field.name] === null ? "" : row[field.name];
-        html += `<td>${escapeHtml(String(value))}</td>`;
-      });
+        visibleFields.forEach((field) => {
+          const value = row[field.name] === null ? "" : row[field.name];
+          html += `<td>${escapeHtml(String(value))}</td>`;
+        });
 
-      html += `<td class="actions">
+        html += `<td class="actions">
                         <button onclick="UI.openEditModal(${row.id})" title="Edit">✎</button>
                     </td></tr>`;
-    });
+      });
 
     html += "</tbody>";
     return html;
@@ -110,10 +114,14 @@ const FrameModal = {
     this.titleElement = document.getElementById("frameModalTitle");
 
     // Save button
-    this.element.querySelector("form").addEventListener("submit", (e) => ModalFlows.submitForm(e));
+    this.element
+      .querySelector("form")
+      .addEventListener("submit", (e) => ModalFlows.submitForm(e));
 
     // Cancel button
-    this.element.querySelector(".cancel-btn").addEventListener("click", () => this.close());
+    this.element
+      .querySelector(".cancel-btn")
+      .addEventListener("click", () => this.close());
   },
 
   // Render form fields based on schema
@@ -157,7 +165,7 @@ const FrameModal = {
         // Special handling for location field
         const value = isEditMode ? rowData[field.name] || "" : "";
         const mapsUrl = value ? LocationManager.getMapsUrl(value) : null;
-        
+
         if (isEditMode) {
           // In edit mode: show field with refresh button and optional maps link
           html += `
@@ -201,8 +209,10 @@ const FrameModal = {
         }
       } else if (field.name === "date") {
         // Special handling for date field
-        const value = isEditMode ? rowData[field.name].substring(0, 16) || "" : "";
-        
+        const value = isEditMode
+          ? rowData[field.name].substring(0, 16) || ""
+          : "";
+
         html += `
                             <div class="form-group">
                                 <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
@@ -281,13 +291,13 @@ const FrameModal = {
     // Delete button
     const deleteBtn = this.element.querySelector(".delete-btn");
     if (isEditMode) {
-      deleteBtn.onclick = (() => {
+      deleteBtn.onclick = () => {
         if (confirm("Are you sure you want to delete this frame?")) {
           DataModel.deleteRow(rowData.id);
           this.close();
           TableRenderer.render();
         }
-      });
+      };
       deleteBtn.style.display = "";
     } else {
       deleteBtn.style.display = "none";
@@ -370,7 +380,7 @@ const FormValidator = {
     if (formData.location && formData.location.trim() !== "") {
       if (!LocationManager.isValidCoordinates(formData.location)) {
         errors.push(
-          "Location must be in format: latitude,longitude (e.g., 40.7128,-74.0060)"
+          "Location must be in format: latitude,longitude (e.g., 40.7128,-74.0060)",
         );
       }
     }
@@ -382,15 +392,15 @@ const FormValidator = {
       const date = new Date(dateStr);
       if (!dtLocal.test(dateStr) || isNaN(date.getTime())) {
         errors.push(
-          "Date must be a valid date string (e.g., 2026-01-12T12:35:02-07:00)"
+          "Date must be a valid date string (e.g., 2026-01-12T12:35:02-07:00)",
         );
       }
       // Add timezone information and convert to ISO8601
-      const pad = (n) => String(n).padStart(2, '0');
+      const pad = (n) => String(n).padStart(2, "0");
 
-      const seconds = '00';
-      const tzOffset = -(new Date()).getTimezoneOffset();
-      const sign = tzOffset >= 0 ? '+' : '-';
+      const seconds = "00";
+      const tzOffset = -new Date().getTimezoneOffset();
+      const sign = tzOffset >= 0 ? "+" : "-";
       const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
       const tzMinutes = pad(Math.abs(tzOffset) % 60);
 
@@ -438,23 +448,29 @@ const ModalFlows = {
       const location = await LocationManager.getLocation();
       const formatted = LocationManager.formatCoordinates(
         location.lat,
-        location.lng
+        location.lng,
       );
       locationField.value = formatted;
-      
+
       // Show accuracy as a helper text if available
-      const accuracyText = location.accuracy ? 
-        ` (Accuracy: ±${Math.round(location.accuracy)}m)` : "";
-      const helperEl = locationField.parentElement?.querySelector(".accuracy-hint") || locationField.parentElement?.parentElement?.querySelector(".accuracy-hint");
+      const accuracyText = location.accuracy
+        ? ` (Accuracy: ±${Math.round(location.accuracy)}m)`
+        : "";
+      const helperEl =
+        locationField.parentElement?.querySelector(".accuracy-hint") ||
+        locationField.parentElement?.parentElement?.querySelector(
+          ".accuracy-hint",
+        );
       if (helperEl) {
         helperEl.textContent = accuracyText;
       }
-      
+
       locationField.disabled = false;
     } catch (error) {
       let errorMsg = "Location unavailable";
       if (error.code === error.PERMISSION_DENIED) {
-        errorMsg = "Permission denied. Enable in Settings > Privacy > Location Services";
+        errorMsg =
+          "Permission denied. Enable in Settings > Privacy > Location Services";
       } else if (error.code === error.TIMEOUT) {
         errorMsg = "Location request timed out";
       } else if (error.code === error.POSITION_UNAVAILABLE) {
@@ -472,8 +488,8 @@ const ModalFlows = {
     if (!dateField) return;
 
     const now = new Date();
-  
-    const pad = (n) => String(n).padStart(2, '0');
+
+    const pad = (n) => String(n).padStart(2, "0");
 
     const year = now.getFullYear();
     const month = pad(now.getMonth() + 1);
@@ -531,11 +547,19 @@ const UI = {
 const Export = {
   exportToJSON() {
     const rows = DataModel.getAllRows();
-    rows.forEach(row => {row.aperture = row.aperture.replace("ƒ/", "")})
+    rows.forEach((row) => {
+      row.aperture = row.aperture.replace("ƒ/", "");
+    });
 
-    const camera = CAMERAS.find(val => val.name == SessionManager.getSelectedCamera()).name;
-    const film = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).name;
-    const iso = FILMS.find(val => val.name == SessionManager.getSelectedFilm()).iso;
+    const camera = CAMERAS.find(
+      (val) => val.name === SessionManager.getSelectedCamera(),
+    ).name;
+    const film = FILMS.find(
+      (val) => val.name === SessionManager.getSelectedFilm(),
+    ).name;
+    const iso = FILMS.find(
+      (val) => val.name === SessionManager.getSelectedFilm(),
+    ).iso;
     const currentRoll = RollManager.getCurrentRoll();
 
     // Add camera and film to each row
@@ -554,9 +578,11 @@ const Export = {
       .toISOString()
       .replace(/[:.]/g, "-")
       .slice(0, -5);
-    
+
     // Use roll name in filename, replace special characters with underscores
-    const rollName = currentRoll ? currentRoll.name.replace(/[^a-z0-9]/gi, "_") : "export";
+    const rollName = currentRoll
+      ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
+      : "export";
     link.href = url;
     link.download = `${rollName}-${timestamp}.json`;
     document.body.appendChild(link);
@@ -607,7 +633,9 @@ const Export = {
 
           // Derive roll name from filename (strip extension and timestamp)
           const baseName = file.name.replace(/\.json$/i, "");
-          const rollName = baseName.replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "").replace(/_/g, " ");
+          const rollName = baseName
+            .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
+            .replace(/_/g, " ");
 
           // Create new roll and populate it
           const newRoll = RollManager.createRoll(rollName || "Imported Roll");
@@ -744,14 +772,18 @@ const OptionsDialog = {
     });
 
     // Add button
-    this.dialogElement.querySelector("#addOptionBtn").addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.addOption();
-    });
+    this.dialogElement
+      .querySelector("#addOptionBtn")
+      .addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.addOption();
+      });
 
     // Cancel button
-    this.dialogElement.querySelector(".cancel-btn").addEventListener("click", () => this.close());
+    this.dialogElement
+      .querySelector(".cancel-btn")
+      .addEventListener("click", () => this.close());
 
     // Close dialog when clicking outside
     this.dialogElement.addEventListener("click", (e) => {
@@ -853,8 +885,8 @@ const OptionsDialog = {
                                 value="${escapeHtml(option)}"
                                 data-index="${index}"
                             />
-                            <button type="button" class="move-option-btn up" data-index="${index}" ${!canMoveUp ? 'disabled' : ''} title="Move up">▲</button>
-                            <button type="button" class="move-option-btn down" data-index="${index}" ${!canMoveDown ? 'disabled' : ''} title="Move down">▼</button>
+                            <button type="button" class="move-option-btn up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up">▲</button>
+                            <button type="button" class="move-option-btn down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down">▼</button>
                             <button type="button" class="remove-option-btn danger" data-index="${index}" title="Remove">🗑️</button>
                         </div>
                     `;
@@ -912,29 +944,37 @@ const OptionsDialog = {
 
   moveOptionUp(index) {
     if (index <= 0) return;
-    
+
     const inputs =
       this.optionsContainerElement.querySelectorAll(".option-input");
-    const currentOptions = Array.from(inputs)
-      .map((input) => input.value.trim());
-    
+    const currentOptions = Array.from(inputs).map((input) =>
+      input.value.trim(),
+    );
+
     // Swap elements
-    [currentOptions[index - 1], currentOptions[index]] = [currentOptions[index], currentOptions[index - 1]];
-    
+    [currentOptions[index - 1], currentOptions[index]] = [
+      currentOptions[index],
+      currentOptions[index - 1],
+    ];
+
     this.renderOptionsInputs(currentOptions);
   },
 
   moveOptionDown(index) {
     const inputs =
       this.optionsContainerElement.querySelectorAll(".option-input");
-    const currentOptions = Array.from(inputs)
-      .map((input) => input.value.trim());
-    
+    const currentOptions = Array.from(inputs).map((input) =>
+      input.value.trim(),
+    );
+
     if (index >= currentOptions.length - 1) return;
-    
+
     // Swap elements
-    [currentOptions[index], currentOptions[index + 1]] = [currentOptions[index + 1], currentOptions[index]];
-    
+    [currentOptions[index], currentOptions[index + 1]] = [
+      currentOptions[index + 1],
+      currentOptions[index],
+    ];
+
     this.renderOptionsInputs(currentOptions);
   },
 
@@ -1017,7 +1057,6 @@ const OptionsDialog = {
     }
   },
 
-
   open() {
     this.dialogElement.classList.add("active");
   },
@@ -1044,7 +1083,7 @@ const RollSelector = {
   attachEventListeners() {
     this.selectElement.addEventListener("change", (e) => {
       const value = e.target.value;
-      
+
       if (value === "create-new") {
         CreateRollModal.open();
         // Reset select to current roll if one exists
@@ -1067,21 +1106,22 @@ const RollSelector = {
     const currentRoll = RollManager.getCurrentRoll();
 
     let html = '<select id="rollSelect">';
-    
+
     rolls.forEach((roll) => {
-      const selected = currentRoll && roll.id === currentRoll.id ? "selected" : "";
+      const selected =
+        currentRoll && roll.id === currentRoll.id ? "selected" : "";
       html += `<option value="${roll.id}" ${selected}>${escapeHtml(roll.name)}</option>`;
     });
 
     html += '<option value="create-new"';
-    if (!currentRoll) html += ' selected';
-    html += '>+ Create new roll</option>';
-    html += '</select>';
+    if (!currentRoll) html += " selected";
+    html += ">+ Create new roll</option>";
+    html += "</select>";
 
-    this.selectElement.innerHTML = '';
-    const temp = document.createElement('div');
+    this.selectElement.innerHTML = "";
+    const temp = document.createElement("div");
     temp.innerHTML = html;
-    const newSelect = temp.querySelector('select');
+    const newSelect = temp.querySelector("select");
     this.selectElement.replaceWith(newSelect);
     this.selectElement = newSelect;
     this.attachEventListeners();
@@ -1136,9 +1176,9 @@ const CreateRollModal = {
 
   submit(e) {
     e.preventDefault();
-    
+
     const name = this.inputElement.value.trim();
-    
+
     if (!name) {
       alert("Roll name cannot be empty");
       return;
@@ -1147,13 +1187,13 @@ const CreateRollModal = {
     // Create new roll and set as current
     const newRoll = RollManager.createRoll(name);
     RollManager.setCurrentRoll(newRoll.id);
-    
+
     // Update UI
     RollSelector.render();
     TableRenderer.render();
     CameraSelector.render();
     FilmSelector.render();
-    
+
     this.close();
   },
 };
@@ -1198,20 +1238,20 @@ const RenameRollModal = {
 
   submit(e) {
     e.preventDefault();
-    
+
     const name = this.inputElement.value.trim();
-    
+
     if (!name) {
       alert("Roll name cannot be empty");
       return;
     }
 
     // Rename roll
-    const newRoll = RollManager.renameRoll(RollManager.getCurrentRollId(), name);
-    
+    RollManager.renameRoll(RollManager.getCurrentRollId(), name);
+
     // Update UI
     RollSelector.render();
-    
+
     this.close();
   },
 };

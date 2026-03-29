@@ -2,6 +2,8 @@
 // DATA LAYER - Session management, options management, and data persistence
 // ============================================================================
 
+/* eslint-disable no-unused-vars */
+
 // SESSION MANAGER - manage camera and film selection (now delegates to current roll)
 // ============================================================================
 const SessionManager = {
@@ -215,7 +217,7 @@ const LocationManager = {
           enableHighAccuracy: true,
           timeout: 10000,
           maximumAge: 0,
-        }
+        },
       );
     });
   },
@@ -237,9 +239,7 @@ const LocationManager = {
   },
 
   parseCoordinates(coordString) {
-    const [lat, lng] = coordString
-      .split(",")
-      .map((s) => parseFloat(s.trim()));
+    const [lat, lng] = coordString.split(",").map((s) => parseFloat(s.trim()));
     return { lat, lng };
   },
 

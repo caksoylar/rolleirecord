@@ -203,7 +203,8 @@ td {
   color: #555;
 }
 
-th:first-of-type, td:first-of-type {
+th:first-of-type,
+td:first-of-type {
   text-align: right;
 }
 

@@ -3,10 +3,9 @@
 // ============================================================================
 // Edit this file to customize cameras, films, and table fields
 
-const CAMERAS = [
-  { name: "Nikon FM" },
-  { name: "Ektar H35n" },
-];
+/* eslint-disable no-unused-vars */
+
+const CAMERAS = [{ name: "Nikon FM" }, { name: "Ektar H35n" }];
 
 const FILMS = [
   { name: "Kodak Portra 160", iso: 160 },
@@ -46,7 +45,20 @@ const SCHEMA = {
       required: false,
       camera_specific: true,
       width: "23%",
-      options: ["B", "1", "1/2", "1/4", "1/8", "1/16", "1/30", "1/60", "1/125", "1/250", "1/500", "1/1000"],
+      options: [
+        "B",
+        "1",
+        "1/2",
+        "1/4",
+        "1/8",
+        "1/16",
+        "1/30",
+        "1/60",
+        "1/125",
+        "1/250",
+        "1/500",
+        "1/1000",
+      ],
       defaultValue: "1/60",
     },
     {
@@ -59,7 +71,17 @@ const SCHEMA = {
       required: false,
       camera_specific: true,
       width: "23%",
-      options: ["ƒ/1.8", "ƒ/2.0", "ƒ/2.8", "ƒ/4.0", "ƒ/5.6", "ƒ/8", "ƒ/11", "ƒ/16", "ƒ/22"],
+      options: [
+        "ƒ/1.8",
+        "ƒ/2.0",
+        "ƒ/2.8",
+        "ƒ/4.0",
+        "ƒ/5.6",
+        "ƒ/8",
+        "ƒ/11",
+        "ƒ/16",
+        "ƒ/22",
+      ],
       defaultValue: "ƒ/4.0",
     },
     {
