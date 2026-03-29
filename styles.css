@@ -120,6 +120,11 @@ h1 {
   grid-column: auto;
 }
 
+.controls #settingsBtn {
+  grid-column-start: 1;
+  grid-column-end: 3;
+}
+
 button {
   padding: 0.875rem 1.25rem;
   font-size: 1rem;

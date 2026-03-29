@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("exportBtn")
     .addEventListener("click", () => Export.exportToJSON());
   document
+    .getElementById("importBtn")
+    .addEventListener("click", () => Export.importFromJSON());
+  document
     .getElementById("settingsBtn")
     .addEventListener("click", () => OptionsDialog.open());
   document
