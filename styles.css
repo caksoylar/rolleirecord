@@ -344,57 +344,6 @@ select:focus {
   grid-column-end: 3;
 }
 
-/* Confirmation Dialog */
-.confirm-dialog {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: white;
-  padding: 1.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 2000;
-  min-width: 280px;
-  max-width: 90%;
-}
-
-.confirm-dialog.active {
-  display: block;
-}
-
-.confirm-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1999;
-}
-
-.confirm-overlay.active {
-  display: block;
-}
-
-.confirm-message {
-  margin-bottom: 1.5rem;
-  font-size: 1rem;
-  color: #333;
-}
-
-.confirm-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.confirm-buttons button {
-  width: 100%;
-}
-
 /* Options Dialog */
 .options-dialog {
   display: none;

@@ -8,7 +8,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize modules
   FrameModal.init();
-  ConfirmDialog.init();
   OptionsDialog.init();
   CameraSelector.init();
   FilmSelector.init();

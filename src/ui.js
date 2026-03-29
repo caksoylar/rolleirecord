@@ -281,8 +281,13 @@ const FrameModal = {
     // Delete button
     const deleteBtn = this.element.querySelector(".delete-btn");
     if (isEditMode) {
-      // deleteBtn.addEventListener("click", () => { UI.openDeleteConfirm(rowData.id); this.close(); });
-      deleteBtn.onclick = (() => { UI.openDeleteConfirm(rowData.id); this.close(); });
+      deleteBtn.onclick = (() => {
+        if (confirm("Are you sure you want to delete this frame?")) {
+          DataModel.deleteRow(rowData.id);
+          this.close();
+          TableRenderer.render();
+        }
+      });
       deleteBtn.style.display = "";
     } else {
       deleteBtn.style.display = "none";
@@ -517,54 +522,6 @@ const UI = {
 
   openEditModal(rowId) {
     ModalFlows.openEditModal(rowId);
-  },
-
-  openDeleteConfirm(rowId) {
-    ConfirmDialog.openDelete(rowId);
-  },
-};
-
-// ============================================================================
-// CONFIRMATION DIALOG
-// ============================================================================
-const ConfirmDialog = {
-  dialogElement: null,
-  overlayElement: null,
-  messageElement: null,
-
-  init() {
-    this.dialogElement = document.getElementById("confirmDialog");
-    this.overlayElement = document.getElementById("confirmOverlay");
-    this.messageElement = document.getElementById("confirmMessage");
-
-    this.dialogElement.querySelector("#confirmYes").addEventListener("click", () => this.confirmDelete());
-    this.dialogElement.querySelector("#confirmNo").addEventListener("click", () => this.cancel());
-    this.overlayElement.addEventListener("click", () => this.cancel());
-  },
-
-  openDelete() {
-    this.messageElement.textContent = `Are you sure you want to delete this frame?`;
-    this.show();
-  },
-
-  confirmDelete() {
-    const out = DataModel.deleteRow(appState.currentRowId);
-    this.hide();
-    TableRenderer.render();
-  },
-
-  cancel() {
-    this.hide();
-  },
-
-  show() {
-    this.dialogElement.classList.add("active");
-    this.overlayElement.classList.add("active");
-  },
-
-  hide() {
-    this.dialogElement.classList.remove("active");
-    this.overlayElement.classList.remove("active");
   },
 };
 
