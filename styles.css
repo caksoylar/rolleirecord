@@ -257,6 +257,15 @@ tr:last-child td {
   aspect-ratio: 1;
 }
 
+/* SVG Icons */
+.icon {
+  width: 1.2em;
+  height: 1.2em;
+  fill: none;
+  stroke: currentColor;
+  vertical-align: middle;
+}
+
 /* Modal & Dialog Overlays */
 .modal,
 .options-dialog {
