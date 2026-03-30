@@ -67,7 +67,7 @@ const TableRenderer = {
         });
 
         html += `<td class="actions">
-                        <button onclick="UI.openEditModal(${row.id})" title="Edit">✎</button>
+                        <button onclick="UI.openEditModal(${row.id})" title="Edit">✏️</button>
                     </td></tr>`;
       });
 
