@@ -86,9 +86,9 @@ const FrameModal = {
                                         style="flex: 1;"
                                     />
                                     <button type="button" id="refresh-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
-                                        🔄
+                                        <svg class="icon"><use href="#icon-pin"></use></svg>
                                     </button>
-                                    ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps">🗺️</button>` : ""}
+                                    ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps"><svg class="icon"><use href="#icon-map"></use></svg></button>` : ""}
                                 </div>
                                 <div class="accuracy-hint"></div>
                             </div>
@@ -131,7 +131,7 @@ const FrameModal = {
                                         style="flex: 1;"
                                     />
                                     <button type="button" id="refresh-date-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
-                                        🔄
+                                        <svg class="icon"><use href="#icon-refresh"></use></svg>
                                     </button>
                                 </div>
                             </div>

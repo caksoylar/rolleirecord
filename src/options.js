@@ -93,7 +93,7 @@ const OptionsDialog = {
       this.cameraSelectContainer.style.marginBottom = "1rem";
       this.cameraSelectContainer.classList.add("option-camera-selector-bar");
       this.cameraSelectContainer.innerHTML = `
-        <label for="cameraForOptionsSelect" title="Select camera">📷</label>
+        <label for="cameraForOptionsSelect" title="Select camera"><svg class="icon"><use href="#icon-camera"></use></svg></label>
         <select id="cameraForOptionsSelect" /></select>`;
       this.optionsContainerElement.parentNode.insertBefore(
         this.cameraSelectContainer,
@@ -143,9 +143,9 @@ const OptionsDialog = {
                                 value="${escapeHtml(option)}"
                                 data-index="${index}"
                             />
-                            <button type="button" class="move-option-btn up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up">▲</button>
-                            <button type="button" class="move-option-btn down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down">▼</button>
-                            <button type="button" class="remove-option-btn danger" data-index="${index}" title="Remove">🗑️</button>
+                            <button type="button" class="move-option-btn up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up"><svg class="icon"><use href="#icon-up"></use></svg></button>
+                            <button type="button" class="move-option-btn down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down"><svg class="icon"><use href="#icon-down"></use></svg></button>
+                            <button type="button" class="remove-option-btn danger" data-index="${index}" title="Remove"><svg class="icon"><use href="#icon-delete"></use></svg></button>
                         </div>
                     `;
     });

@@ -263,7 +263,11 @@ tr:last-child td {
   height: 1.2em;
   fill: none;
   stroke: currentColor;
-  vertical-align: middle;
+  vertical-align: text-top;
+}
+
+.option-camera-selector-bar .icon {
+  baseline-shift: -0.5rem;
 }
 
 /* Modal & Dialog Overlays */
