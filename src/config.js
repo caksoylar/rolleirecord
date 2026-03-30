@@ -33,7 +33,7 @@ const SCHEMA = {
       visible: true,
       readonly: false,
       required: true,
-      width: "10%",
+      width: "12%",
     },
     {
       name: "shutter",
