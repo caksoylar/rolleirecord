@@ -15,23 +15,16 @@
 
   /* Colors - Accent (primary buttons, focus rings) */
   --color-accent: #007bff;
-  --color-accent-hover: #0056b3;
-  --color-accent-active: #003d82;
   --color-accent-ring: rgba(0, 123, 255, 0.25);
 
   /* Colors - Danger */
   --color-danger: #dc3545;
-  --color-danger-hover: #bb2d3b;
-  --color-danger-active: #a02622;
 
   /* Colors - Secondary */
   --color-secondary: #6c757d;
-  --color-secondary-hover: #5a6268;
-  --color-secondary-active: #545b62;
 
   /* Colors - Neutral (move/reorder buttons) */
   --color-neutral: #f0f0f0;
-  --color-neutral-hover: #e0e0e0;
   --color-neutral-disabled: #f9f9f9;
 
   /* Colors - Overlay */
@@ -76,9 +69,16 @@
     --color-border: #444;
     --color-border-strong: #555;
 
+    --color-accent: #4da3ff;
+    --color-accent-ring: rgba(77, 163, 255, 0.3);
+
+    --color-danger: #e85d6c;
+
+    --color-secondary: #8a929a;
+
     --color-neutral: #3a3a3a;
-    --color-neutral-hover: #4a4a4a;
     --color-neutral-disabled: #2e2e2e;
+
     --color-backdrop: rgba(0, 0, 0, 0.7);
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
@@ -173,41 +173,25 @@ button {
   color: var(--color-btn-text);
   cursor: pointer;
   touch-action: manipulation;
-  transition: background-color var(--transition-speed);
+  transition: opacity var(--transition-speed);
   font-weight: 500;
   min-height: var(--min-tap-target);
 }
 
 button:hover {
-  background-color: var(--color-accent-hover);
+  opacity: 0.85;
 }
 
 button:active {
-  background-color: var(--color-accent-active);
+  opacity: 0.7;
 }
 
 button.danger {
   background-color: var(--color-danger);
 }
 
-button.danger:hover {
-  background-color: var(--color-danger-hover);
-}
-
-button.danger:active {
-  background-color: var(--color-danger-active);
-}
-
 button.secondary {
   background-color: var(--color-secondary);
-}
-
-button.secondary:hover {
-  background-color: var(--color-secondary-hover);
-}
-
-button.secondary:active {
-  background-color: var(--color-secondary-active);
 }
 
 table {
@@ -470,7 +454,7 @@ select:focus {
 }
 
 .move-option-btn:hover:not(:disabled) {
-  background-color: var(--color-neutral-hover);
+  opacity: 0.85;
 }
 
 .move-option-btn:disabled {
