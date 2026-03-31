@@ -116,9 +116,12 @@ header {
 }
 
 header button {
-  padding: 0.5rem 1rem;
-  font-size: var(--font-size-xs);
+  padding: 0.5rem;
   min-height: auto;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
 }
 
 /* Roll & Camera Selector Bars */
