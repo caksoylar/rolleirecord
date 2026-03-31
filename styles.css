@@ -109,6 +109,18 @@ h1 {
   margin-bottom: 1rem;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header button {
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-xs);
+  min-height: auto;
+}
+
 /* Roll & Camera Selector Bars */
 .roll-selector-bar,
 .camera-selector-bar {
@@ -147,15 +159,6 @@ h1 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
-}
-
-.controls button {
-  grid-column: auto;
-}
-
-.controls #settingsBtn {
-  grid-column-start: 1;
-  grid-column-end: 3;
 }
 
 button {
