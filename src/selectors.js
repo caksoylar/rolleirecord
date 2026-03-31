@@ -1,5 +1,5 @@
 // ============================================================================
-// SELECTORS - Camera, Film, and Roll selectors + Create/Rename roll modals
+// SELECTORS - Camera, Film, and Roll selectors + Create/Edit roll modals
 // ============================================================================
 
 /* eslint-disable no-unused-vars */
@@ -221,20 +221,24 @@ const CreateRollModal = {
 };
 
 // ============================================================================
-// RENAME ROLL MODAL
+// EDIT ROLL MODAL
 // ============================================================================
-const RenameRollModal = {
+const EditRollModal = {
   element: null,
   inputElement: null,
 
   init() {
-    const modal = initModal(document.getElementById("renameRollModal"), {
-      formSelector: "#renameRollForm",
-      inputSelector: "#rollRenameInput",
+    const modal = initModal(document.getElementById("editRollModal"), {
+      formSelector: "#editRollForm",
+      inputSelector: "#rollEditNameInput",
       onSubmit: (name) => this.submit(name),
     });
     this.element = modal.element;
     this.inputElement = modal.inputElement;
+
+    document
+      .getElementById("deleteRollModalBtn")
+      .addEventListener("click", () => this.deleteRoll());
   },
 
   open() {
@@ -258,5 +262,19 @@ const RenameRollModal = {
     RollManager.renameRoll(RollManager.getCurrentRollId(), name);
     RollSelector.render();
     this.close();
+  },
+
+  deleteRoll() {
+    const currentRoll = RollManager.getCurrentRoll();
+    if (!currentRoll) return;
+    if (
+      confirm(
+        `Are you sure you want to delete the roll "${currentRoll.name}"? This cannot be undone.`,
+      )
+    ) {
+      this.close();
+      RollManager.deleteRoll(currentRoll.id);
+      refreshAllUI();
+    }
   },
 };

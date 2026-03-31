@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
   FilmSelector.init();
   CreateRollModal.init();
   RollSelector.init();
-  RenameRollModal.init();
+  EditRollModal.init();
 
   // Render initial table
   TableRenderer.render();
@@ -29,20 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("settingsBtn")
     .addEventListener("click", () => OptionsDialog.open());
   document
-    .getElementById("renameBtn")
-    .addEventListener("click", () => RenameRollModal.open());
-  document.getElementById("deleteRollBtn").addEventListener("click", () => {
-    const currentRoll = RollManager.getCurrentRoll();
-    if (!currentRoll) return;
-    if (
-      confirm(
-        `Are you sure you want to delete the roll "${currentRoll.name}"? This cannot be undone.`,
-      )
-    ) {
-      RollManager.deleteRoll(currentRoll.id);
-      refreshAllUI();
-    }
-  });
+    .getElementById("editRollBtn")
+    .addEventListener("click", () => EditRollModal.open());
   document.getElementById("clearAllBtn").addEventListener("click", () => {
     if (
       confirm(
