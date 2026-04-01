@@ -99,13 +99,13 @@ body {
 h1 {
   font-size: var(--font-size-xl);
   color: var(--color-text);
-  margin-bottom: 1rem;
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1rem;
 }
 
 header button {
