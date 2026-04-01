@@ -75,9 +75,9 @@ class EntityFormModal {
           <div class="modal-body">
             ${fieldsHTML}
           </div>
+          <button type="button" class="secondary field-options-btn" style="display:none">Field Options</button>
           <div class="modal-footer">
             <button type="submit" class="save-btn"></button>
-            <button type="button" class="secondary field-options-btn" style="display:none">Field Options</button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
             <button type="button" class="danger delete-btn" style="display:none">Delete</button>
           </div>

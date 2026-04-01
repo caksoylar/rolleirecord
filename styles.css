@@ -152,12 +152,6 @@ header button {
   padding: 0.6rem;
 }
 
-.settings-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
 button {
   padding: 0.875rem 1.25rem;
   font-size: var(--font-size-base);
@@ -303,6 +297,12 @@ tr:last-child td {
   align-items: center;
 }
 
+.settings-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem;
+}
+
 .form-group {
   margin-bottom: 1.25rem;
   display: contents;
@@ -365,7 +365,7 @@ select:focus {
 .modal-footer,
 .options-footer {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 0.75rem;
 }
 
@@ -374,9 +374,19 @@ select:focus {
   width: 100%;
 }
 
-.modal-footer .delete-btn {
+/*.modal-footer .delete-btn {
   grid-column-start: 1;
   grid-column-end: 3;
+}*/
+
+#settingsMenu .modal-footer {
+  display: block;
+}
+
+.field-options-btn {
+  display: block;
+  width: 100%;
+  margin-bottom: 1rem;
 }
 
 /* Options Dialog Specifics */
