@@ -249,10 +249,6 @@ tr:last-child td {
   vertical-align: text-top;
 }
 
-.option-camera-selector-bar .icon {
-  baseline-shift: -0.5rem;
-}
-
 /* Modal & Dialog Overlays */
 .modal,
 .options-dialog {
@@ -433,17 +429,6 @@ select:focus {
   border: 1px solid var(--color-border-strong);
   cursor: pointer;
   transition: background-color var(--transition-speed);
-}
-
-.option-camera-selector-bar {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.option-camera-selector-bar label {
-  font-size: var(--font-size-lg);
 }
 
 .move-option-btn:hover:not(:disabled) {
