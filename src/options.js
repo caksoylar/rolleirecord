@@ -1,22 +1,21 @@
 // ============================================================================
-// OPTIONS DIALOG - Edit field options (shutter speeds, apertures, etc.)
+// FIELD OPTIONS DIALOG - Edit field options (shutter speeds, apertures, etc.)
 // ============================================================================
 
-const OptionsDialog = {
+/* eslint-disable no-unused-vars */
+
+const FieldOptionsDialog = {
   dialogElement: null,
   fieldSelectElement: null,
   optionsContainerElement: null,
   currentField: null,
-  currentCamera: null,
-  cameraSelectContainer: null,
+  entityType: null,
+  entityName: null,
 
   init() {
     this.dialogElement = document.getElementById("optionsDialog");
     this.fieldSelectElement = document.getElementById("fieldSelect");
     this.optionsContainerElement = document.getElementById("optionsContainer");
-
-    // Populate field selector with select fields
-    this.populateFieldSelector();
 
     // Listen for field selection changes
     this.fieldSelectElement.addEventListener("change", (e) =>
@@ -46,13 +45,15 @@ const OptionsDialog = {
     // Close dialog when clicking outside
     this.dialogElement.addEventListener("click", (e) => {
       if (e.target === this.dialogElement) {
-        OptionsDialog.close();
+        this.close();
       }
     });
   },
 
   populateFieldSelector() {
-    const selectFields = OptionsManager.getSelectFields();
+    const selectFields = FRAME_SCHEMA.fields.filter(
+      (f) => f.type === "select" && f.entity_specific === this.entityType,
+    );
     this.fieldSelectElement.innerHTML = "";
 
     selectFields.forEach((field) => {
@@ -71,64 +72,8 @@ const OptionsDialog = {
 
   onFieldSelected(fieldName) {
     this.currentField = fieldName;
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
-
-    // If field is camera-specific, show camera selector
-    if (field && field.entity_specific === "camera") {
-      this.showCameraSelector();
-      this.currentCamera = SessionManager.getSelectedCamera();
-      const options = OptionsManager.getOptions(fieldName, this.currentCamera);
-      this.renderOptionsInputs(options);
-    } else {
-      this.hideCameraSelector();
-      const options = OptionsManager.getOptions(fieldName);
-      this.renderOptionsInputs(options);
-    }
-  },
-
-  showCameraSelector() {
-    // Create camera selector container once
-    if (!this.cameraSelectContainer) {
-      this.cameraSelectContainer = document.createElement("div");
-      this.cameraSelectContainer.style.marginBottom = "1rem";
-      this.cameraSelectContainer.classList.add("option-camera-selector-bar");
-      this.cameraSelectContainer.innerHTML = `
-        <label for="cameraForOptionsSelect" title="Select camera"><svg class="icon"><use href="#icon-camera"></use></svg></label>
-        <select id="cameraForOptionsSelect" /></select>`;
-      this.optionsContainerElement.parentNode.insertBefore(
-        this.cameraSelectContainer,
-        this.optionsContainerElement,
-      );
-
-      // Listen for camera changes
-      document
-        .getElementById("cameraForOptionsSelect")
-        .addEventListener("change", (e) => {
-          this.currentCamera = e.target.value;
-          const options = OptionsManager.getOptions(
-            this.currentField,
-            this.currentCamera,
-          );
-          this.renderOptionsInputs(options);
-        });
-    }
-
-    // Repopulate camera list each time (picks up newly added cameras)
-    const cameraSelect = document.getElementById("cameraForOptionsSelect");
-    cameraSelect.innerHTML = "";
-    SessionManager.getAllCameras().forEach((camera) => {
-      const option = document.createElement("option");
-      option.value = camera.name;
-      option.textContent = camera.name;
-      cameraSelect.appendChild(option);
-    });
-    cameraSelect.value = SessionManager.getSelectedCamera();
-  },
-
-  hideCameraSelector() {
-    if (this.cameraSelectContainer) {
-      this.cameraSelectContainer.style.display = "none";
-    }
+    const options = OptionsManager.getOptions(fieldName, this.entityName);
+    this.renderOptionsInputs(options);
   },
 
   renderOptionsInputs(options) {
@@ -269,15 +214,11 @@ const OptionsDialog = {
       return false;
     }
 
-    // Pass camera if field is camera-specific
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === this.currentField);
-    const camera =
-      field && field.entity_specific === "camera" ? this.currentCamera : null;
-
+    // Pass entity name for entity-specific fields
     const success = OptionsManager.setOptions(
       this.currentField,
       options,
-      camera,
+      this.entityName,
     );
     if (success) {
       this.close();
@@ -289,7 +230,10 @@ const OptionsDialog = {
     }
   },
 
-  open() {
+  open({ entityType, entityName }) {
+    this.entityType = entityType;
+    this.entityName = entityName;
+    this.populateFieldSelector();
     this.dialogElement.classList.add("active");
   },
 

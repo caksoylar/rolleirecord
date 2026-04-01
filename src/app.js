@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize modules
   FrameModal.init();
-  OptionsDialog.init();
+  FieldOptionsDialog.init();
   CameraSelector.init();
   FilmSelector.init();
   RollSelector.init();
