@@ -6,7 +6,10 @@
 /* eslint-disable no-unused-vars */
 
 // Default seed data (used to populate localStorage on first load)
-const DEFAULT_CAMERAS = [{ name: "Nikon FM" }, { name: "Ektar H35n" }];
+const DEFAULT_CAMERAS = [
+  { name: "Nikon FM", format: "35mm", size: "24×36mm" },
+  { name: "Ektar H35n", format: "35mm", size: "24×18mm (half)" },
+];
 
 const DEFAULT_FILMS = [
   { name: "Kodak Portra 160", iso: 160 },
@@ -29,9 +32,20 @@ const ROLL_SCHEMA = {
   fields: [{ name: "name", type: "text", label: "Roll Name", required: true }],
 };
 
+const FORMATS = {
+  "35mm": ["24×36mm", "24×18mm (half)"],
+  "120 (Medium)": ["6×4.5", "6×6", "6×7", "6×9", "6×12", "6×17"],
+  "220 (Medium)": ["6×4.5", "6×6", "6×7", "6×9", "6×12", "6×17"],
+  Sheet: ['4×5"', '8×10"'],
+  APS: ["30×17mm"],
+  "110 (Cartridge)": ["13x17mm"],
+};
+
 const CAMERA_SCHEMA = {
   fields: [
     { name: "name", type: "text", label: "Camera Name", required: true },
+    { name: "format", type: "film-format", label: "Format", required: true },
+    { name: "size", type: "film-size", label: "Size", required: true },
   ],
 };
 

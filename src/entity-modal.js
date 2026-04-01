@@ -34,12 +34,33 @@ class EntityFormModal {
 
     const fieldsHTML = this.schema.fields
       .map((field) => {
-        const inputType = field.type === "number" ? "number" : "text";
+        const id = `${this.entityType}-${field.name}`;
         const required = field.required ? "required" : "";
+
+        if (field.type === "film-format") {
+          const options = Object.keys(FORMATS)
+            .map((f) => `<option value="${f}">${f}</option>`)
+            .join("");
+          return `
+          <div class="form-group">
+            <label for="${id}">${field.label}</label>
+            <select id="${id}" name="${field.name}" ${required}>${options}</select>
+          </div>`;
+        }
+
+        if (field.type === "film-size") {
+          return `
+          <div class="form-group">
+            <label for="${id}">${field.label}</label>
+            <select id="${id}" name="${field.name}" ${required}></select>
+          </div>`;
+        }
+
+        const inputType = field.type === "number" ? "number" : "text";
         return `
         <div class="form-group">
-          <label for="${this.entityType}-${field.name}">${field.label}</label>
-          <input type="${inputType}" id="${this.entityType}-${field.name}"
+          <label for="${id}">${field.label}</label>
+          <input type="${inputType}" id="${id}"
                  name="${field.name}" ${required} />
         </div>`;
       })
@@ -82,6 +103,38 @@ class EntityFormModal {
 
     const deleteBtn = this.element.querySelector(".delete-btn");
     deleteBtn.addEventListener("click", () => this._handleDelete());
+
+    // Wire film-format → film-size dependency
+    this._wireFormatSizeDependency();
+  }
+
+  _wireFormatSizeDependency() {
+    const formatField = this.schema.fields.find(
+      (f) => f.type === "film-format",
+    );
+    const sizeField = this.schema.fields.find((f) => f.type === "film-size");
+    if (!formatField || !sizeField) return;
+
+    const formatSelect = this.element.querySelector(
+      `#${this.entityType}-${formatField.name}`,
+    );
+    const sizeSelect = this.element.querySelector(
+      `#${this.entityType}-${sizeField.name}`,
+    );
+
+    formatSelect.addEventListener("change", () => {
+      this._populateSizeOptions(formatSelect.value, sizeSelect);
+    });
+  }
+
+  _populateSizeOptions(format, sizeSelect, currentValue = null) {
+    const sizes = FORMATS[format] || [];
+    sizeSelect.innerHTML = sizes
+      .map((s) => `<option value="${s}">${s}</option>`)
+      .join("");
+    if (currentValue && sizes.includes(currentValue)) {
+      sizeSelect.value = currentValue;
+    }
   }
 
   _collectFormData() {
@@ -97,21 +150,58 @@ class EntityFormModal {
   }
 
   _populateForm(entity) {
+    // Set format first so size options can be populated
+    const formatField = this.schema.fields.find(
+      (f) => f.type === "film-format",
+    );
+    const sizeField = this.schema.fields.find((f) => f.type === "film-size");
+
     this.schema.fields.forEach((field) => {
-      const input = this.element.querySelector(
+      if (field.type === "film-size") return; // handled after format
+      const el = this.element.querySelector(
         `#${this.entityType}-${field.name}`,
       );
-      input.value = entity[field.name] ?? "";
+      el.value = entity[field.name] ?? "";
     });
+
+    if (formatField && sizeField) {
+      const sizeSelect = this.element.querySelector(
+        `#${this.entityType}-${sizeField.name}`,
+      );
+      this._populateSizeOptions(
+        entity[formatField.name],
+        sizeSelect,
+        entity[sizeField.name],
+      );
+    }
   }
 
   _clearForm() {
     this.schema.fields.forEach((field) => {
-      const input = this.element.querySelector(
+      const el = this.element.querySelector(
         `#${this.entityType}-${field.name}`,
       );
-      input.value = "";
+      if (field.type === "film-format") {
+        el.selectedIndex = 0;
+      } else if (field.type !== "film-size") {
+        el.value = "";
+      }
     });
+
+    // Populate size options for the default (first) format
+    const formatField = this.schema.fields.find(
+      (f) => f.type === "film-format",
+    );
+    const sizeField = this.schema.fields.find((f) => f.type === "film-size");
+    if (formatField && sizeField) {
+      const formatSelect = this.element.querySelector(
+        `#${this.entityType}-${formatField.name}`,
+      );
+      const sizeSelect = this.element.querySelector(
+        `#${this.entityType}-${sizeField.name}`,
+      );
+      this._populateSizeOptions(formatSelect.value, sizeSelect);
+    }
   }
 
   _handleSubmit() {
