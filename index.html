@@ -206,30 +206,17 @@
     </header>
     <main>
       <div id="rollContainer" class="roll-selector-bar">
-        <label for="rollSelect" title="Select roll"
-          ><svg class="icon"><use href="#icon-roll"></use></svg
-        ></label>
-        <select id="rollSelect">
-          <!-- Options will be populated dynamically -->
-        </select>
-        <button id="editRollBtn" class="secondary" title="Edit roll">
-          <svg class="icon"><use href="#icon-edit"></use></svg>
-        </button>
+        <!-- Populated dynamically by EntitySelector -->
       </div>
 
-      <div class="camera-selector-bar">
-        <label for="cameraSelect" title="Select camera"
-          ><svg class="icon"><use href="#icon-camera"></use></svg
-        ></label>
-        <select id="cameraSelect">
-          <!-- Options will be populated dynamically -->
-        </select>
-        <label for="filmSelect" title="Select film"
-          ><svg class="icon"><use href="#icon-film"></use></svg
-        ></label>
-        <select id="filmSelect">
-          <!-- Options will be populated dynamically -->
-        </select>
+      <div class="entity-selector-group">
+        <div id="cameraContainer" class="entity-selector-bar">
+          <!-- Populated dynamically by EntitySelector -->
+        </div>
+
+        <div id="filmContainer" class="entity-selector-bar">
+          <!-- Populated dynamically by EntitySelector -->
+        </div>
       </div>
 
       <div id="tableContainer">
@@ -299,58 +286,9 @@
       </div>
     </div>
 
-    <!-- Create Roll Modal -->
-    <div class="modal" id="createRollModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Create New Roll</h2>
-        </div>
-        <form id="createRollForm">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="rollNameInput">Roll Name</label>
-              <input
-                type="text"
-                id="rollNameInput"
-                name="name"
-                placeholder="e.g., Summer Break"
-                required
-              />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="save-btn">Create</button>
-            <button type="button" class="secondary cancel-btn">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Edit Roll Modal -->
-    <div class="modal" id="editRollModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Edit Roll</h2>
-        </div>
-        <form id="editRollForm">
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="rollEditNameInput">Roll Name</label>
-              <input type="text" id="rollEditNameInput" name="name" required />
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="save-btn">Save</button>
-            <button type="button" class="secondary cancel-btn">Cancel</button>
-            <button type="button" class="danger delete-btn" id="deleteRollModalBtn">
-              Delete Roll
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <script src="src/config.js"></script>
+    <script src="src/entities.js"></script>
+    <script src="src/entity-modal.js"></script>
     <script src="src/rolls.js"></script>
     <script src="src/data.js"></script>
     <script src="src/table.js"></script>

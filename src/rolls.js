@@ -75,8 +75,8 @@ const RollManager = {
     const newRoll = {
       id: rollId,
       name: name,
-      camera: CAMERAS[0]?.name || "",
-      film: FILMS[0]?.name || "",
+      camera: CameraManager.getAll()[0]?.name || "",
+      film: FilmManager.getAll()[0]?.name || "",
       frames: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),

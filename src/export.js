@@ -12,14 +12,11 @@ const Export = {
       row.shutter = row.aperture.replace("s", "");
     });
 
-    const camera = CAMERAS.find(
-      (val) => val.name === SessionManager.getSelectedCamera(),
-    ).name;
-    const selectedFilm = FILMS.find(
-      (val) => val.name === SessionManager.getSelectedFilm(),
-    );
-    const film = selectedFilm.name;
-    const iso = selectedFilm.iso;
+    const camera = SessionManager.getSelectedCamera();
+    const filmName = SessionManager.getSelectedFilm();
+    const selectedFilm = FilmManager.getByName(filmName);
+    const film = filmName;
+    const iso = selectedFilm ? selectedFilm.iso : "";
     const currentRoll = RollManager.getCurrentRoll();
 
     // Add camera and film to each row
@@ -72,11 +69,12 @@ const Export = {
 
           // Extract camera and film from the first frame
           const firstFrame = data[0];
-          const camera = firstFrame.camera || CAMERAS[0]?.name || "";
-          const film = firstFrame.film || FILMS[0]?.name || "";
+          const camera =
+            firstFrame.camera || CameraManager.getAll()[0]?.name || "";
+          const film = firstFrame.film || FilmManager.getAll()[0]?.name || "";
 
           // Strip per-roll metadata from each frame, keep only schema fields
-          const schemaFieldNames = SCHEMA.fields.map((f) => f.name);
+          const schemaFieldNames = FRAME_SCHEMA.fields.map((f) => f.name);
           const frames = data.map((row) => {
             const frame = {};
             for (const key of Object.keys(row)) {

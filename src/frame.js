@@ -32,7 +32,7 @@ const FrameModal = {
   renderFormFields(rowData = null, isEditMode = false) {
     let html = "";
 
-    SCHEMA.fields.forEach((field) => {
+    FRAME_SCHEMA.fields.forEach((field) => {
       const inputId = `field-${field.name}`;
       const required = field.required ? "required" : "";
 
@@ -242,7 +242,7 @@ const FrameModal = {
 const FormValidator = {
   getFormData() {
     const formData = {};
-    SCHEMA.fields.forEach((field) => {
+    FRAME_SCHEMA.fields.forEach((field) => {
       const input = document.getElementById(`field-${field.name}`);
       if (input) {
         let value = input.value;
@@ -266,7 +266,7 @@ const FormValidator = {
     const errors = [];
 
     // Check required fields
-    SCHEMA.fields.forEach((field) => {
+    FRAME_SCHEMA.fields.forEach((field) => {
       if (
         field.required &&
         (formData[field.name] === null || formData[field.name] === "")

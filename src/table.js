@@ -17,10 +17,10 @@ let appState = {
 const UIVisibility = {
   update() {
     const hasRoll = RollManager.getCurrentRoll() !== null;
-    const cameraBar = document.querySelector(".camera-selector-bar");
+    const selectorGroup = document.querySelector(".entity-selector-group");
     const controls = document.querySelector(".controls");
 
-    if (cameraBar) cameraBar.style.display = hasRoll ? "" : "none";
+    if (selectorGroup) selectorGroup.style.display = hasRoll ? "" : "none";
     if (controls) controls.style.display = hasRoll ? "" : "none";
   },
 };
@@ -31,7 +31,7 @@ const UIVisibility = {
 const TableRenderer = {
   // Render table headers dynamically from visible fields
   renderHeaders() {
-    const visibleFields = SCHEMA.fields.filter((f) => f.visible);
+    const visibleFields = FRAME_SCHEMA.fields.filter((f) => f.visible);
     let html = "<thead><tr>";
 
     visibleFields.forEach((field) => {
@@ -46,7 +46,7 @@ const TableRenderer = {
   // Render table body with all rows
   renderTableBody() {
     const rows = RollManager.getFrames();
-    const visibleFields = SCHEMA.fields.filter((f) => f.visible);
+    const visibleFields = FRAME_SCHEMA.fields.filter((f) => f.visible);
 
     let html = "<tbody>";
     html += "<tr>";

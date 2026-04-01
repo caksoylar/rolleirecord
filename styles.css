@@ -21,7 +21,7 @@
   --color-danger: #dc3545;
 
   /* Colors - Secondary */
-  --color-secondary: #6c757d;
+  --color-secondary: #586a7b;
 
   /* Colors - Neutral (move/reorder buttons) */
   --color-neutral: #f0f0f0;
@@ -68,13 +68,6 @@
 
     --color-border: #444;
     --color-border-strong: #555;
-
-    --color-accent: #4da3ff;
-    --color-accent-ring: rgba(77, 163, 255, 0.3);
-
-    --color-danger: #e85d6c;
-
-    --color-secondary: #8a929a;
 
     --color-neutral: #3a3a3a;
     --color-neutral-disabled: #2e2e2e;
@@ -126,27 +119,28 @@ header button {
 
 /* Roll & Camera Selector Bars */
 .roll-selector-bar,
-.camera-selector-bar {
+.entity-selector-group {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 1rem;
+}
+
+.roll-selector-bar,
+.entity-selector-bar {
   display: grid;
+  grid-template-columns: auto 1fr auto;
   gap: 0.75rem;
   align-items: center;
 }
 
-.roll-selector-bar {
-  grid-template-columns: auto 1fr auto;
-}
-
-.camera-selector-bar {
-  grid-template-columns: auto 1fr;
+.entity-selector-group .entity-selector-bar + .entity-selector-bar {
+  margin-top: 0.75rem;
 }
 
 .roll-selector-bar label,
-.camera-selector-bar label {
+.entity-selector-bar label {
   font-weight: 600;
   color: var(--color-text);
   margin: 0;
@@ -154,7 +148,7 @@ header button {
 }
 
 .roll-selector-bar select,
-.camera-selector-bar select {
+.entity-selector-bar select {
   padding: 0.6rem;
 }
 
@@ -240,7 +234,7 @@ tr:last-child td {
 }
 
 .actions button,
-.roll-selector-bar button {
+.entity-edit-btn {
   padding: 0;
   font-size: var(--font-size-xs);
   aspect-ratio: 1;

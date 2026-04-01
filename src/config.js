@@ -1,13 +1,14 @@
 // ============================================================================
-// CONFIGURATION - Camera & Film Lists and Schema Definition
+// CONFIGURATION - Default data seeds and Schema Definitions
 // ============================================================================
-// Edit this file to customize cameras, films, and table fields
+// Edit this file to customize default cameras, films, and table fields
 
 /* eslint-disable no-unused-vars */
 
-const CAMERAS = [{ name: "Nikon FM" }, { name: "Ektar H35n" }];
+// Default seed data (used to populate localStorage on first load)
+const DEFAULT_CAMERAS = [{ name: "Nikon FM" }, { name: "Ektar H35n" }];
 
-const FILMS = [
+const DEFAULT_FILMS = [
   { name: "Kodak Portra 160", iso: 160 },
   { name: "Kodak Portra 400", iso: 400 },
   { name: "Kodak Portra 800", iso: 800 },
@@ -23,7 +24,25 @@ const FILMS = [
   { name: "Kentmere 400", iso: 400 },
 ];
 
-const SCHEMA = {
+// Entity schemas
+const ROLL_SCHEMA = {
+  fields: [{ name: "name", type: "text", label: "Roll Name", required: true }],
+};
+
+const CAMERA_SCHEMA = {
+  fields: [
+    { name: "name", type: "text", label: "Camera Name", required: true },
+  ],
+};
+
+const FILM_SCHEMA = {
+  fields: [
+    { name: "name", type: "text", label: "Film Name", required: true },
+    { name: "iso", type: "number", label: "ISO", required: true },
+  ],
+};
+
+const FRAME_SCHEMA = {
   fields: [
     {
       name: "id",

@@ -71,7 +71,7 @@ const OptionsDialog = {
 
   onFieldSelected(fieldName) {
     this.currentField = fieldName;
-    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
 
     // If field is camera-specific, show camera selector
     if (field && field.camera_specific) {
@@ -87,7 +87,7 @@ const OptionsDialog = {
   },
 
   showCameraSelector() {
-    // Create camera selector if it doesn't exist
+    // Create camera selector container once
     if (!this.cameraSelectContainer) {
       this.cameraSelectContainer = document.createElement("div");
       this.cameraSelectContainer.style.marginBottom = "1rem";
@@ -100,26 +100,29 @@ const OptionsDialog = {
         this.optionsContainerElement,
       );
 
-      // Populate and setup camera selector
-      const cameraSelect = document.getElementById("cameraForOptionsSelect");
-      SessionManager.getAllCameras().forEach((camera) => {
-        const option = document.createElement("option");
-        option.value = camera.name;
-        option.textContent = camera.name;
-        cameraSelect.appendChild(option);
-      });
-      cameraSelect.value = SessionManager.getSelectedCamera();
-
       // Listen for camera changes
-      cameraSelect.addEventListener("change", (e) => {
-        this.currentCamera = e.target.value;
-        const options = OptionsManager.getOptions(
-          this.currentField,
-          this.currentCamera,
-        );
-        this.renderOptionsInputs(options);
-      });
+      document
+        .getElementById("cameraForOptionsSelect")
+        .addEventListener("change", (e) => {
+          this.currentCamera = e.target.value;
+          const options = OptionsManager.getOptions(
+            this.currentField,
+            this.currentCamera,
+          );
+          this.renderOptionsInputs(options);
+        });
     }
+
+    // Repopulate camera list each time (picks up newly added cameras)
+    const cameraSelect = document.getElementById("cameraForOptionsSelect");
+    cameraSelect.innerHTML = "";
+    SessionManager.getAllCameras().forEach((camera) => {
+      const option = document.createElement("option");
+      option.value = camera.name;
+      option.textContent = camera.name;
+      cameraSelect.appendChild(option);
+    });
+    cameraSelect.value = SessionManager.getSelectedCamera();
   },
 
   hideCameraSelector() {
@@ -267,7 +270,7 @@ const OptionsDialog = {
     }
 
     // Pass camera if field is camera-specific
-    const field = SCHEMA.fields.find((f) => f.name === this.currentField);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === this.currentField);
     const camera = field && field.camera_specific ? this.currentCamera : null;
 
     const success = OptionsManager.setOptions(

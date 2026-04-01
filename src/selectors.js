@@ -1,280 +1,226 @@
 // ============================================================================
-// SELECTORS - Camera, Film, and Roll selectors + Create/Edit roll modals
+// SELECTORS - Camera, Film, and Roll selectors + entity modals
 // ============================================================================
 
 /* eslint-disable no-unused-vars */
 
 // ============================================================================
-// CAMERA SELECTOR
+// CAMERA SELECTOR - Uses EntitySelector + EntityFormModal
 // ============================================================================
+
+let cameraModal = null;
+let cameraSelector = null;
+
 const CameraSelector = {
-  element: null,
-
   init() {
-    this.element = document.getElementById("cameraSelect");
-    this.populateCameras();
-    this.element.addEventListener("change", (e) =>
-      this.onCameraSelected(e.target.value),
-    );
-  },
-
-  populateCameras() {
-    const cameras = SessionManager.getAllCameras();
-    this.element.innerHTML = "";
-
-    cameras.forEach((camera) => {
-      const option = document.createElement("option");
-      option.value = camera.name;
-      option.textContent = camera.name;
-      this.element.appendChild(option);
-    });
-
-    // Set to currently selected camera
-    this.element.value = SessionManager.getSelectedCamera();
-  },
-
-  render() {
-    this.populateCameras();
-  },
-
-  onCameraSelected(cameraName) {
-    SessionManager.setSelectedCamera(cameraName);
-    // Re-render table to show updated options for camera-specific fields
-    TableRenderer.render();
-  },
-};
-
-// ============================================================================
-// FILM SELECTOR
-// ============================================================================
-const FilmSelector = {
-  element: null,
-
-  init() {
-    this.element = document.getElementById("filmSelect");
-    this.populateFilms();
-    this.element.addEventListener("change", (e) =>
-      this.onFilmSelected(e.target.value),
-    );
-  },
-
-  populateFilms() {
-    const films = SessionManager.getAllFilms();
-    this.element.innerHTML = "";
-
-    films.forEach((film) => {
-      const option = document.createElement("option");
-      option.value = film.name;
-      option.textContent = film.name;
-      this.element.appendChild(option);
-    });
-
-    // Set to currently selected film
-    this.element.value = SessionManager.getSelectedFilm();
-  },
-
-  render() {
-    this.populateFilms();
-  },
-
-  onFilmSelected(filmName) {
-    SessionManager.setSelectedFilm(filmName);
-  },
-};
-
-// ============================================================================
-// ROLL SELECTOR
-// ============================================================================
-const RollSelector = {
-  selectElement: null,
-  containerElement: null,
-
-  init() {
-    this.containerElement = document.getElementById("rollContainer");
-    this.selectElement = document.getElementById("rollSelect");
-    this.render();
-    this.attachEventListeners();
-  },
-
-  attachEventListeners() {
-    this.selectElement.addEventListener("change", (e) => {
-      const value = e.target.value;
-
-      if (value === "create-new") {
-        CreateRollModal.open();
-        // Reset select to current roll if one exists
-        const currentRoll = RollManager.getCurrentRoll();
-        if (currentRoll) {
-          this.selectElement.value = currentRoll.id;
+    cameraModal = new EntityFormModal({
+      entityType: "Camera",
+      schema: CAMERA_SCHEMA,
+      manager: CameraManager,
+      onSave: (item, mode, oldName) => {
+        if (mode === "update" && oldName && oldName !== item.name) {
+          // Cascade rename to all rolls referencing old camera name
+          const rolls = RollManager.getRolls();
+          rolls.forEach((roll) => {
+            if (roll.camera === oldName) {
+              roll.camera = item.name;
+              RollManager.updateRoll(roll.id, roll);
+            }
+          });
+          // Update OptionsManager storage keys
+          OptionsManager.renameCameraKeys(oldName, item.name);
         }
-      } else {
-        // Switch to selected roll
-        RollManager.setCurrentRoll(value);
-        refreshAllUI();
-      }
+        if (mode === "create") {
+          // Set new camera as selected for current roll
+          SessionManager.setSelectedCamera(item.name);
+        }
+      },
+      onDelete: (entity) => {
+        if (
+          !confirm(
+            `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
+          )
+        )
+          return false;
+
+        // Reassign any rolls using this camera to the first remaining one
+        const remaining = CameraManager.getAll().filter(
+          (c) => c.id !== entity.id,
+        );
+        const fallback = remaining[0]?.name || "";
+        const rolls = RollManager.getRolls();
+        rolls.forEach((roll) => {
+          if (roll.camera === entity.name) {
+            roll.camera = fallback;
+            RollManager.updateRoll(roll.id, roll);
+          }
+        });
+        return true;
+      },
+      onAfterAction: () => refreshAllUI(),
+    });
+
+    cameraSelector = new EntitySelector({
+      containerSelector: "#cameraContainer",
+      selectId: "cameraSelect",
+      manager: CameraManager,
+      modal: cameraModal,
+      iconHref: "#icon-camera",
+      label: "Select camera",
+      addNewLabel: "+ Add new camera",
+      onSelect: (cameraId) => {
+        const camera = CameraManager.getById(cameraId);
+        if (camera) {
+          SessionManager.setSelectedCamera(camera.name);
+          TableRenderer.render();
+        }
+      },
+      getSelectedValue: () => SessionManager.getSelectedCamera(),
     });
   },
 
   render() {
-    const rolls = RollManager.getRolls();
-    const currentRoll = RollManager.getCurrentRoll();
+    if (cameraSelector) cameraSelector.render();
+  },
+};
 
-    let html = '<select id="rollSelect">';
+// ============================================================================
+// FILM SELECTOR - Uses EntitySelector + EntityFormModal
+// ============================================================================
 
-    rolls.forEach((roll) => {
-      const selected =
-        currentRoll && roll.id === currentRoll.id ? "selected" : "";
-      html += `<option value="${roll.id}" ${selected}>${escapeHtml(roll.name)}</option>`;
+let filmModal = null;
+let filmSelector = null;
+
+const FilmSelector = {
+  init() {
+    filmModal = new EntityFormModal({
+      entityType: "Film",
+      schema: FILM_SCHEMA,
+      manager: FilmManager,
+      onSave: (item, mode, oldName) => {
+        if (mode === "update" && oldName && oldName !== item.name) {
+          // Cascade rename to all rolls referencing old film name
+          const rolls = RollManager.getRolls();
+          rolls.forEach((roll) => {
+            if (roll.film === oldName) {
+              roll.film = item.name;
+              RollManager.updateRoll(roll.id, roll);
+            }
+          });
+        }
+        if (mode === "create") {
+          SessionManager.setSelectedFilm(item.name);
+        }
+      },
+      onDelete: (entity) => {
+        if (
+          !confirm(
+            `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
+          )
+        )
+          return false;
+
+        // Reassign any rolls using this film to the first remaining one
+        const remaining = FilmManager.getAll().filter(
+          (f) => f.id !== entity.id,
+        );
+        const fallback = remaining[0]?.name || "";
+        const rolls = RollManager.getRolls();
+        rolls.forEach((roll) => {
+          if (roll.film === entity.name) {
+            roll.film = fallback;
+            RollManager.updateRoll(roll.id, roll);
+          }
+        });
+        return true;
+      },
+      onAfterAction: () => refreshAllUI(),
     });
 
-    html += '<option value="create-new"';
-    if (!currentRoll) html += " selected";
-    html += ">+ Create new roll</option>";
-    html += "</select>";
+    filmSelector = new EntitySelector({
+      containerSelector: "#filmContainer",
+      selectId: "filmSelect",
+      manager: FilmManager,
+      modal: filmModal,
+      iconHref: "#icon-film",
+      label: "Select film",
+      addNewLabel: "+ Add new film",
+      onSelect: (filmId) => {
+        const film = FilmManager.getById(filmId);
+        if (film) {
+          SessionManager.setSelectedFilm(film.name);
+        }
+      },
+      getSelectedValue: () => SessionManager.getSelectedFilm(),
+    });
+  },
 
-    this.selectElement.innerHTML = "";
-    const temp = document.createElement("div");
-    temp.innerHTML = html;
-    const newSelect = temp.querySelector("select");
-    this.selectElement.replaceWith(newSelect);
-    this.selectElement = newSelect;
-    this.attachEventListeners();
+  render() {
+    if (filmSelector) filmSelector.render();
+  },
+};
+
+// ============================================================================
+// ROLL SELECTOR - Uses EntitySelector + EntityFormModal
+// ============================================================================
+
+let rollModal = null;
+let rollSelector = null;
+
+const RollSelector = {
+  init() {
+    rollModal = new EntityFormModal({
+      entityType: "Roll",
+      schema: ROLL_SCHEMA,
+      manager: RollManagerAdapter,
+      onSave: (item, mode) => {
+        if (mode === "create") {
+          RollManager.setCurrentRoll(item.id);
+        }
+      },
+      onDelete: (entity) => {
+        if (
+          !confirm(
+            `Are you sure you want to delete the roll "${entity.name}"? This cannot be undone.`,
+          )
+        )
+          return false;
+        return true;
+      },
+      onAfterAction: () => refreshAllUI(),
+    });
+
+    rollSelector = new EntitySelector({
+      containerSelector: "#rollContainer",
+      selectId: "rollSelect",
+      manager: RollManagerAdapter,
+      modal: rollModal,
+      iconHref: "#icon-roll",
+      label: "Select roll",
+      addNewLabel: "+ Create new roll",
+      onSelect: (rollId) => {
+        RollManager.setCurrentRoll(rollId);
+        refreshAllUI();
+      },
+      getSelectedValue: () => {
+        const roll = RollManager.getCurrentRoll();
+        return roll ? roll.name : "";
+      },
+    });
 
     // Auto-open create modal when no rolls exist
-    if (!currentRoll) {
-      CreateRollModal.open();
+    if (!RollManager.getCurrentRoll()) {
+      rollModal.openCreate();
     }
   },
-};
 
-// ============================================================================
-// SHARED MODAL HELPERS
-// ============================================================================
-function initModal(element, { formSelector, inputSelector, onSubmit }) {
-  const formElement = element.querySelector(formSelector);
-  const inputElement = element.querySelector(inputSelector);
-
-  if (formElement) {
-    formElement.addEventListener("submit", (e) => {
-      e.preventDefault();
-      onSubmit(inputElement.value.trim());
-    });
-  }
-
-  const cancelBtn = element.querySelector(".cancel-btn");
-  if (cancelBtn) {
-    cancelBtn.addEventListener("click", () =>
-      element.classList.remove("active"),
-    );
-  }
-
-  element.addEventListener("click", (e) => {
-    if (e.target === element) {
-      element.classList.remove("active");
+  render() {
+    if (rollSelector) {
+      rollSelector.render();
     }
-  });
-
-  return { element, inputElement };
-}
-
-// ============================================================================
-// CREATE ROLL MODAL
-// ============================================================================
-const CreateRollModal = {
-  element: null,
-  inputElement: null,
-
-  init() {
-    const modal = initModal(document.getElementById("createRollModal"), {
-      formSelector: "#createRollForm",
-      inputSelector: "#rollNameInput",
-      onSubmit: (name) => this.submit(name),
-    });
-    this.element = modal.element;
-    this.inputElement = modal.inputElement;
-  },
-
-  open() {
-    if (!this.element) return;
-    this.element.classList.add("active");
-    this.inputElement.value = "";
-    this.inputElement.focus();
-  },
-
-  close() {
-    if (!this.element) return;
-    this.element.classList.remove("active");
-  },
-
-  submit(name) {
-    if (!name) {
-      alert("Roll name cannot be empty");
-      return;
-    }
-
-    const newRoll = RollManager.createRoll(name);
-    RollManager.setCurrentRoll(newRoll.id);
-
-    refreshAllUI();
-    this.close();
-  },
-};
-
-// ============================================================================
-// EDIT ROLL MODAL
-// ============================================================================
-const EditRollModal = {
-  element: null,
-  inputElement: null,
-
-  init() {
-    const modal = initModal(document.getElementById("editRollModal"), {
-      formSelector: "#editRollForm",
-      inputSelector: "#rollEditNameInput",
-      onSubmit: (name) => this.submit(name),
-    });
-    this.element = modal.element;
-    this.inputElement = modal.inputElement;
-
-    document
-      .getElementById("deleteRollModalBtn")
-      .addEventListener("click", () => this.deleteRoll());
-  },
-
-  open() {
-    if (!this.element) return;
-    this.element.classList.add("active");
-    this.inputElement.value = RollManager.getCurrentRoll().name;
-    this.inputElement.focus();
-  },
-
-  close() {
-    if (!this.element) return;
-    this.element.classList.remove("active");
-  },
-
-  submit(name) {
-    if (!name) {
-      alert("Roll name cannot be empty");
-      return;
-    }
-
-    RollManager.renameRoll(RollManager.getCurrentRollId(), name);
-    RollSelector.render();
-    this.close();
-  },
-
-  deleteRoll() {
-    const currentRoll = RollManager.getCurrentRoll();
-    if (!currentRoll) return;
-    if (
-      confirm(
-        `Are you sure you want to delete the roll "${currentRoll.name}"? This cannot be undone.`,
-      )
-    ) {
-      this.close();
-      RollManager.deleteRoll(currentRoll.id);
-      refreshAllUI();
+    // Auto-open create modal when no rolls exist
+    if (!RollManager.getCurrentRoll() && rollModal) {
+      rollModal.openCreate();
     }
   },
 };

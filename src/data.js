@@ -7,13 +7,13 @@
 // SESSION MANAGER - manage camera and film selection (now delegates to current roll)
 // ============================================================================
 const SessionManager = {
-  // Get selected camera from current roll
   getSelectedCamera() {
     const currentRoll = RollManager.getCurrentRoll();
-    return currentRoll ? currentRoll.camera : CAMERAS[0].name;
+    return currentRoll
+      ? currentRoll.camera
+      : CameraManager.getAll()[0]?.name || "";
   },
 
-  // Set selected camera in current roll
   setSelectedCamera(cameraName) {
     const currentRoll = RollManager.getCurrentRoll();
     if (currentRoll) {
@@ -22,18 +22,15 @@ const SessionManager = {
     }
   },
 
-  // Get all available cameras
   getAllCameras() {
-    return CAMERAS;
+    return CameraManager.getAll();
   },
 
-  // Get selected film from current roll
   getSelectedFilm() {
     const currentRoll = RollManager.getCurrentRoll();
-    return currentRoll ? currentRoll.film : FILMS[0].name;
+    return currentRoll ? currentRoll.film : FilmManager.getAll()[0]?.name || "";
   },
 
-  // Set selected film in current roll
   setSelectedFilm(filmName) {
     const currentRoll = RollManager.getCurrentRoll();
     if (currentRoll) {
@@ -42,9 +39,8 @@ const SessionManager = {
     }
   },
 
-  // Get all available films
   getAllFilms() {
-    return FILMS;
+    return FilmManager.getAll();
   },
 };
 
@@ -57,7 +53,7 @@ const OptionsManager = {
 
   // Build storage key for a field, incorporating camera name if camera-specific
   _getStorageKey(fieldName, camera = null) {
-    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
     const cameraName =
       camera ||
       (field && field.camera_specific
@@ -73,12 +69,12 @@ const OptionsManager = {
 
   // Get all select fields from schema
   getSelectFields() {
-    return SCHEMA.fields.filter((f) => f.type === "select");
+    return FRAME_SCHEMA.fields.filter((f) => f.type === "select");
   },
 
   // Get options for a specific field from localStorage or defaults
   getOptions(fieldName, camera = null) {
-    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
     if (!field || field.type !== "select") {
       return [];
     }
@@ -100,7 +96,7 @@ const OptionsManager = {
 
   // Set options for a specific field in localStorage
   setOptions(fieldName, optionsArray, camera = null) {
-    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
     if (!field || field.type !== "select") {
       return false;
     }
@@ -119,16 +115,30 @@ const OptionsManager = {
 
   // Get default options from schema
   getDefaultOptions(fieldName) {
-    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
     return field && field.type === "select" ? field.options : [];
   },
 
   // Reset options to defaults
   resetOptions(fieldName, camera = null) {
-    const field = SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
     if (!field) return;
 
     localStorage.removeItem(this._getStorageKey(fieldName, camera));
+  },
+
+  // Rename camera in all option storage keys
+  renameCameraKeys(oldName, newName) {
+    const cameraFields = FRAME_SCHEMA.fields.filter((f) => f.camera_specific);
+    cameraFields.forEach((field) => {
+      const oldKey = this.OPTIONS_KEY_PREFIX + field.name + "_" + oldName;
+      const stored = localStorage.getItem(oldKey);
+      if (stored !== null) {
+        const newKey = this.OPTIONS_KEY_PREFIX + field.name + "_" + newName;
+        localStorage.setItem(newKey, stored);
+        localStorage.removeItem(oldKey);
+      }
+    });
   },
 };
 

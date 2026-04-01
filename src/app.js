@@ -3,7 +3,11 @@
 // ============================================================================
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Initialize RollManager first (creates default roll if needed)
+  // Initialize entity managers (seeds defaults on first load)
+  CameraManager.init();
+  FilmManager.init();
+
+  // Initialize RollManager (creates default roll if needed)
   RollManager.init();
 
   // Initialize modules
@@ -11,9 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   OptionsDialog.init();
   CameraSelector.init();
   FilmSelector.init();
-  CreateRollModal.init();
   RollSelector.init();
-  EditRollModal.init();
 
   // Render initial table
   TableRenderer.render();
@@ -28,9 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("settingsBtn")
     .addEventListener("click", () => OptionsDialog.open());
-  document
-    .getElementById("editRollBtn")
-    .addEventListener("click", () => EditRollModal.open());
   document.getElementById("clearAllBtn").addEventListener("click", () => {
     if (
       confirm(
