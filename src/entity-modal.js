@@ -77,6 +77,7 @@ class EntityFormModal {
           </div>
           <div class="modal-footer">
             <button type="submit" class="save-btn"></button>
+            <button type="button" class="secondary field-options-btn" style="display:none">Field Options</button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
             <button type="button" class="danger delete-btn" style="display:none">Delete</button>
           </div>
@@ -104,8 +105,27 @@ class EntityFormModal {
     const deleteBtn = this.element.querySelector(".delete-btn");
     deleteBtn.addEventListener("click", () => this._handleDelete());
 
+    // Field Options button — visible only if FRAME_SCHEMA has matching entity_specific fields
+    this.hasFieldOptions = FRAME_SCHEMA.fields.some(
+      (f) => f.entity_specific === this.entityType.toLowerCase(),
+    );
+    const fieldOptionsBtn = this.element.querySelector(".field-options-btn");
+    if (this.hasFieldOptions) {
+      fieldOptionsBtn.addEventListener("click", () => this._openFieldOptions());
+    }
+
     // Wire film-format → film-size dependency
     this._wireFormatSizeDependency();
+  }
+
+  _openFieldOptions() {
+    if (!this.editingId) return;
+    const entity = this.manager.getById(this.editingId);
+    if (!entity) return;
+    FieldOptionsDialog.open({
+      entityType: this.entityType.toLowerCase(),
+      entityName: entity[this.manager.displayField],
+    });
   }
 
   _wireFormatSizeDependency() {
@@ -257,11 +277,11 @@ class EntityFormModal {
     this.editingId = null;
     this._clearForm();
 
-    const label = this.schema.fields[0]?.label || this.entityType;
     this.element.querySelector(".modal-title").textContent =
       `New ${this.entityType}`;
     this.element.querySelector(".save-btn").textContent = "Create";
     this.element.querySelector(".delete-btn").style.display = "none";
+    this.element.querySelector(".field-options-btn").style.display = "none";
 
     this.element.classList.add("active");
     const firstInput = this.element.querySelector("input");
@@ -280,6 +300,10 @@ class EntityFormModal {
       `Edit ${this.entityType}`;
     this.element.querySelector(".save-btn").textContent = "Save";
     this.element.querySelector(".delete-btn").style.display = "";
+    this.element.querySelector(".field-options-btn").style.display = this
+      .hasFieldOptions
+      ? ""
+      : "none";
 
     this.element.classList.add("active");
     const firstInput = this.element.querySelector("input");
