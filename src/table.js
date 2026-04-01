@@ -18,10 +18,8 @@ const UIVisibility = {
   update() {
     const hasRoll = RollManager.getCurrentRoll() !== null;
     const selectorGroup = document.querySelector(".entity-selector-group");
-    const controls = document.querySelector(".controls");
 
     if (selectorGroup) selectorGroup.style.display = hasRoll ? "" : "none";
-    if (controls) controls.style.display = hasRoll ? "" : "none";
   },
 };
 

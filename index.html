@@ -224,13 +224,22 @@
       </div>
     </main>
 
-    <footer>
-      <div class="controls">
-        <button id="exportBtn" class="secondary">Export</button>
-        <button id="importBtn" class="secondary">Import</button>
-        <button id="clearAllBtn" class="danger">Clear All</button>
+    <!-- Settings Menu -->
+    <div class="modal" id="settingsMenu">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Settings</h2>
+        </div>
+        <div class="modal-body settings-actions">
+          <button id="settingsExportBtn" class="secondary">Export</button>
+          <button id="settingsImportBtn" class="secondary">Import</button>
+          <button id="settingsClearAllBtn" class="danger">Clear All</button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="secondary cancel-btn">Close</button>
+        </div>
       </div>
-    </footer>
+    </div>
 
     <!-- Frame Modal -->
     <div class="modal" id="frameModal">

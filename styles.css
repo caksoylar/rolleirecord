@@ -152,9 +152,9 @@ header button {
   padding: 0.6rem;
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+.settings-actions {
+  display: flex;
+  flex-direction: column;
   gap: 0.75rem;
 }
 
