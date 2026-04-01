@@ -122,6 +122,7 @@ class EntityFormModal {
     if (!this.editingId) return;
     const entity = this.manager.getById(this.editingId);
     if (!entity) return;
+    this.close();
     FieldOptionsDialog.open({
       entityType: this.entityType.toLowerCase(),
       entityName: entity[this.manager.displayField],
