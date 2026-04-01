@@ -76,7 +76,7 @@ const FRAME_SCHEMA = {
       visible: true,
       readonly: false,
       required: false,
-      camera_specific: true,
+      entity_specific: "camera",
       width: "23%",
       options: [
         "B",
@@ -102,7 +102,7 @@ const FRAME_SCHEMA = {
       visible: true,
       readonly: false,
       required: false,
-      camera_specific: true,
+      entity_specific: "camera",
       width: "23%",
       options: [
         "ƒ/1.8",
@@ -125,7 +125,7 @@ const FRAME_SCHEMA = {
       visible: true,
       readonly: false,
       required: false,
-      camera_specific: true,
+      entity_specific: "camera",
       width: "23%",
       options: ["35mm", "85mm"],
       defaultValue: "35mm",

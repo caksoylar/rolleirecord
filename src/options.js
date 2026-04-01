@@ -74,7 +74,7 @@ const OptionsDialog = {
     const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
 
     // If field is camera-specific, show camera selector
-    if (field && field.camera_specific) {
+    if (field && field.entity_specific === "camera") {
       this.showCameraSelector();
       this.currentCamera = SessionManager.getSelectedCamera();
       const options = OptionsManager.getOptions(fieldName, this.currentCamera);
@@ -271,7 +271,8 @@ const OptionsDialog = {
 
     // Pass camera if field is camera-specific
     const field = FRAME_SCHEMA.fields.find((f) => f.name === this.currentField);
-    const camera = field && field.camera_specific ? this.currentCamera : null;
+    const camera =
+      field && field.entity_specific === "camera" ? this.currentCamera : null;
 
     const success = OptionsManager.setOptions(
       this.currentField,

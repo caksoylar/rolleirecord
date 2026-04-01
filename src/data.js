@@ -56,12 +56,12 @@ const OptionsManager = {
     const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
     const cameraName =
       camera ||
-      (field && field.camera_specific
+      (field && field.entity_specific === "camera"
         ? SessionManager.getSelectedCamera()
         : null);
 
     let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
-    if (field && field.camera_specific && cameraName) {
+    if (field && field.entity_specific === "camera" && cameraName) {
       storageKey += "_" + cameraName;
     }
     return storageKey;
@@ -129,7 +129,9 @@ const OptionsManager = {
 
   // Rename camera in all option storage keys
   renameCameraKeys(oldName, newName) {
-    const cameraFields = FRAME_SCHEMA.fields.filter((f) => f.camera_specific);
+    const cameraFields = FRAME_SCHEMA.fields.filter(
+      (f) => f.entity_specific === "camera",
+    );
     cameraFields.forEach((field) => {
       const oldKey = this.OPTIONS_KEY_PREFIX + field.name + "_" + oldName;
       const stored = localStorage.getItem(oldKey);

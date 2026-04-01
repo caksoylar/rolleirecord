@@ -42,9 +42,10 @@ const FrameModal = {
           ? rowData[field.name] || field.defaultValue
           : field.defaultValue;
         // Pass current camera to OptionsManager if field is camera-specific
-        const camera = field.camera_specific
-          ? SessionManager.getSelectedCamera()
-          : null;
+        const camera =
+          field.entity_specific === "camera"
+            ? SessionManager.getSelectedCamera()
+            : null;
         const dynamicOptions = OptionsManager.getOptions(field.name, camera);
         html += `
                             <div class="form-group">
