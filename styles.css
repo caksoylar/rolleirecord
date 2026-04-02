@@ -92,6 +92,17 @@ h1 {
   color: var(--color-text);
 }
 
+#updateBanner {
+  background-color: var(--color-accent);
+  color: var(--color-btn-text);
+  text-align: center;
+  padding: 0.5rem;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  border-radius: var(--radius);
+  margin-bottom: 0.5rem;
+}
+
 header {
   display: flex;
   justify-content: space-between;

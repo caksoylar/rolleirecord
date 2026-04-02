@@ -14,6 +14,9 @@
     <link rel="manifest" href="site.webmanifest" />
   </head>
   <body>
+    <div id="updateBanner" style="display:none" onclick="location.reload()">
+      Update available — tap to reload
+    </div>
     <header>
       <h1>Rolleirecord</h1>
       <button id="settingsBtn" title="Options">
@@ -113,7 +116,16 @@
 
     <script>
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js');
+        navigator.serviceWorker.register('./sw.js').then(function(reg) {
+          reg.addEventListener('updatefound', function() {
+            var newWorker = reg.installing;
+            newWorker.addEventListener('statechange', function() {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                document.getElementById('updateBanner').style.display = '';
+              }
+            });
+          });
+        });
       }
     </script>
     <script src="src/config.js"></script>
