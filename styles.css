@@ -291,9 +291,9 @@ tr:last-child td {
 }
 
 .settings-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
   gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .form-group {
@@ -342,17 +342,13 @@ select {
 }
 
 .modal-footer {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
   gap: 0.75rem;
 }
 
-.modal-footer button {
-  width: 100%;
-}
-
-#settingsMenu .modal-footer {
-  display: block;
+.modal-footer button,
+.settings-actions button {
+  flex: 1;
 }
 
 .field-options-btn {
