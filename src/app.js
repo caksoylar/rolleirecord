@@ -31,8 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // SETTINGS MENU - App-level actions (Export, Import, Clear All)
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
 const SettingsMenu = {
   element: null,
 

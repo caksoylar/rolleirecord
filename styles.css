@@ -1,38 +1,37 @@
 :root {
   /* Colors - Surfaces */
-  --color-bg: #f5f5f5;
-  --color-surface: white;
-  --color-surface-alt: #f8f9fa;
+  --color-bg: #e5ebf1;
+  --color-surface: #f6f6f9;
+  --color-surface-alt: #f0f0f3;
 
   /* Colors - Text */
-  --color-text: #333;
-  --color-text-secondary: #555;
-  --color-text-muted: #666;
+  --color-text: #434951;
+  --color-text-secondary: #535c65;
+  --color-text-muted: #6d7782;
 
   /* Colors - Borders */
-  --color-border: #ddd;
-  --color-border-strong: #ccc;
+  --color-border: #d0dae4;
 
   /* Colors - Accent (primary buttons, focus rings) */
-  --color-accent: #007bff;
-  --color-accent-ring: rgba(0, 123, 255, 0.25);
+  --color-accent: #007cc3;
+  --color-accent-ring: #2b7ab244;
 
   /* Colors - Danger */
-  --color-danger: #dc3545;
+  --color-danger: #bc4d61;
 
   /* Colors - Secondary */
-  --color-secondary: #586a7b;
+  --color-secondary: #535c65;
 
   /* Colors - Neutral (move/reorder buttons) */
-  --color-neutral: #f0f0f0;
-  --color-neutral-disabled: #f9f9f9;
+  --color-neutral: #e5ebf1;
+  --color-neutral-disabled: #fbffff;
 
   /* Colors - Overlay */
   --color-backdrop: rgba(0, 0, 0, 0.5);
   --color-shadow: rgba(0, 0, 0, 0.1);
 
   /* Colors - Button text (always light, even in dark mode) */
-  --color-btn-text: white;
+  --color-btn-text: #fbffff;
 
   /* Typography */
   --font-family: system-ui, -apple-system, sans-serif;
@@ -58,19 +57,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --color-bg: #1a1a1a;
-    --color-surface: #2a2a2a;
-    --color-surface-alt: #333;
+    --color-bg: #2c2d30;
+    --color-surface: #363a3e;
+    --color-surface-alt: #2c2d30;
 
-    --color-text: #e0e0e0;
-    --color-text-secondary: #b0b0b0;
-    --color-text-muted: #888;
+    --color-text: #cbd2d9;
+    --color-text-secondary: #afb7c0;
+    --color-text-muted: #8c95a0;
 
-    --color-border: #444;
-    --color-border-strong: #555;
-
-    --color-neutral: #3a3a3a;
-    --color-neutral-disabled: #2e2e2e;
+    --color-border: #535c65;
+    --color-neutral: #363a3e;
+    --color-neutral-disabled: #2c2d30;
 
     --color-backdrop: rgba(0, 0, 0, 0.7);
     --color-shadow: rgba(0, 0, 0, 0.3);
@@ -383,7 +380,7 @@ select {
 }
 
 .option-input-group button {
-  padding: 0.75rem 1rem;
+  padding: 0.75rem;
   font-size: var(--font-size-xs);
   min-height: auto;
 }
@@ -394,7 +391,7 @@ select {
   font-size: var(--font-size-base);
   background-color: var(--color-neutral);
   color: var(--color-text);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border);
   cursor: pointer;
   transition: opacity var(--transition-speed);
 }
