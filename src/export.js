@@ -67,11 +67,21 @@ const Export = {
             return;
           }
 
-          // Extract camera and film from the first frame
+          // Extract camera and film from the first frame, resolve to known entities
           const firstFrame = data[0];
-          const camera =
-            firstFrame.camera || CameraManager.getAll()[0]?.[CameraManager.displayField] || "";
-          const film = firstFrame.film || FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
+          const importedCamera = firstFrame.camera || "";
+          const importedFilm = firstFrame.film || "";
+
+          // Use imported name if it matches a known entity, otherwise fall back to first available
+          const matchedCamera = CameraManager.getByName(importedCamera);
+          const camera = matchedCamera
+            ? importedCamera
+            : CameraManager.getAll()[0]?.[CameraManager.displayField] || "";
+
+          const matchedFilm = FilmManager.getByName(importedFilm);
+          const film = matchedFilm
+            ? importedFilm
+            : FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
 
           // Strip per-roll metadata from each frame, keep only schema fields
           const schemaFieldNames = FRAME_SCHEMA.fields.map((f) => f.name);

@@ -68,6 +68,9 @@ const SettingsMenu = {
           )
         ) {
           localStorage.clear();
+          CameraManager.init();
+          FilmManager.init();
+          RollManager.init();
           this.close();
           refreshAllUI();
         }
