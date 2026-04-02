@@ -18,27 +18,27 @@ const CameraSelector = {
       schema: CAMERA_SCHEMA,
       manager: CameraManager,
       onSave: (item, mode, oldName) => {
-        if (mode === "update" && oldName && oldName !== item.name) {
+        if (mode === "update" && oldName && oldName !== item[CameraManager.displayField]) {
           // Cascade rename to all rolls referencing old camera name
           const rolls = RollManager.getRolls();
           rolls.forEach((roll) => {
             if (roll.camera === oldName) {
-              roll.camera = item.name;
+              roll.camera = item[CameraManager.displayField];
               RollManager.updateRoll(roll.id, roll);
             }
           });
           // Update OptionsManager storage keys
-          OptionsManager.renameCameraKeys(oldName, item.name);
+          OptionsManager.renameCameraKeys(oldName, item[CameraManager.displayField]);
         }
         if (mode === "create") {
           // Set new camera as selected for current roll
-          SessionManager.setSelectedCamera(item.name);
+          SessionManager.setSelectedCamera(item[CameraManager.displayField]);
         }
       },
       onDelete: (entity) => {
         if (
           !confirm(
-            `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
+            `Are you sure you want to delete "${entity[CameraManager.displayField]}"? This cannot be undone.`,
           )
         )
           return false;
@@ -47,10 +47,10 @@ const CameraSelector = {
         const remaining = CameraManager.getAll().filter(
           (c) => c.id !== entity.id,
         );
-        const fallback = remaining[0]?.name || "";
+        const fallback = remaining[0]?.[CameraManager.displayField] || "";
         const rolls = RollManager.getRolls();
         rolls.forEach((roll) => {
-          if (roll.camera === entity.name) {
+          if (roll.camera === entity[CameraManager.displayField]) {
             roll.camera = fallback;
             RollManager.updateRoll(roll.id, roll);
           }
@@ -71,7 +71,7 @@ const CameraSelector = {
       onSelect: (cameraId) => {
         const camera = CameraManager.getById(cameraId);
         if (camera) {
-          SessionManager.setSelectedCamera(camera.name);
+          SessionManager.setSelectedCamera(camera[CameraManager.displayField]);
           TableRenderer.render();
         }
       },
@@ -98,24 +98,24 @@ const FilmSelector = {
       schema: FILM_SCHEMA,
       manager: FilmManager,
       onSave: (item, mode, oldName) => {
-        if (mode === "update" && oldName && oldName !== item.name) {
+        if (mode === "update" && oldName && oldName !== item[FilmManager.displayField]) {
           // Cascade rename to all rolls referencing old film name
           const rolls = RollManager.getRolls();
           rolls.forEach((roll) => {
             if (roll.film === oldName) {
-              roll.film = item.name;
+              roll.film = item[FilmManager.displayField];
               RollManager.updateRoll(roll.id, roll);
             }
           });
         }
         if (mode === "create") {
-          SessionManager.setSelectedFilm(item.name);
+          SessionManager.setSelectedFilm(item[FilmManager.displayField]);
         }
       },
       onDelete: (entity) => {
         if (
           !confirm(
-            `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
+            `Are you sure you want to delete "${entity[FilmManager.displayField]}"? This cannot be undone.`,
           )
         )
           return false;
@@ -124,10 +124,10 @@ const FilmSelector = {
         const remaining = FilmManager.getAll().filter(
           (f) => f.id !== entity.id,
         );
-        const fallback = remaining[0]?.name || "";
+        const fallback = remaining[0]?.[FilmManager.displayField] || "";
         const rolls = RollManager.getRolls();
         rolls.forEach((roll) => {
-          if (roll.film === entity.name) {
+          if (roll.film === entity[FilmManager.displayField]) {
             roll.film = fallback;
             RollManager.updateRoll(roll.id, roll);
           }
@@ -148,7 +148,7 @@ const FilmSelector = {
       onSelect: (filmId) => {
         const film = FilmManager.getById(filmId);
         if (film) {
-          SessionManager.setSelectedFilm(film.name);
+          SessionManager.setSelectedFilm(film[FilmManager.displayField]);
         }
       },
       getSelectedValue: () => SessionManager.getSelectedFilm(),
@@ -181,7 +181,7 @@ const RollSelector = {
       onDelete: (entity) => {
         if (
           !confirm(
-            `Are you sure you want to delete the roll "${entity.name}"? This cannot be undone.`,
+            `Are you sure you want to delete the roll "${entity[RollManagerAdapter.displayField]}"? This cannot be undone.`,
           )
         )
           return false;
@@ -204,7 +204,7 @@ const RollSelector = {
       },
       getSelectedValue: () => {
         const roll = RollManager.getCurrentRoll();
-        return roll ? roll.name : "";
+        return roll ? roll["roll-name"] : "";
       },
     });
 

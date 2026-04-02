@@ -7,24 +7,24 @@
 
 // Default seed data (used to populate localStorage on first load)
 const DEFAULT_CAMERAS = [
-  { name: "Nikon FM", format: "35mm", size: "24×36mm" },
-  { name: "Ektar H35n", format: "35mm", size: "24×18mm (half)" },
+  { "camera-name": "Nikon FM", format: "35mm", size: "24×36mm" },
+  { "camera-name": "Ektar H35n", format: "35mm", size: "24×18mm (half)" },
 ];
 
 const DEFAULT_FILMS = [
-  { name: "Kodak Portra 160", iso: 160 },
-  { name: "Kodak Portra 400", iso: 400 },
-  { name: "Kodak Portra 800", iso: 800 },
-  { name: "Kodacolor 100", iso: 100 },
-  { name: "Kodacolor 200", iso: 200 },
-  { name: "Kodak Ultramax 400", iso: 400 },
-  { name: "Kodak Ektar 100", iso: 100 },
-  { name: "Fujifilm Superia 400", iso: 400 },
-  { name: "Ilford HP5 Plus", iso: 400 },
-  { name: "Kodak Gold 200", iso: 200 },
-  { name: "Kentmere 100", iso: 100 },
-  { name: "Kentmere 200", iso: 200 },
-  { name: "Kentmere 400", iso: 400 },
+  { "film-name": "Kodak Portra 160", iso: 160 },
+  { "film-name": "Kodak Portra 400", iso: 400 },
+  { "film-name": "Kodak Portra 800", iso: 800 },
+  { "film-name": "Kodacolor 100", iso: 100 },
+  { "film-name": "Kodacolor 200", iso: 200 },
+  { "film-name": "Kodak Ultramax 400", iso: 400 },
+  { "film-name": "Kodak Ektar 100", iso: 100 },
+  { "film-name": "Fujifilm Superia 400", iso: 400 },
+  { "film-name": "Ilford HP5 Plus", iso: 400 },
+  { "film-name": "Kodak Gold 200", iso: 200 },
+  { "film-name": "Kentmere 100", iso: 100 },
+  { "film-name": "Kentmere 200", iso: 200 },
+  { "film-name": "Kentmere 400", iso: 400 },
 ];
 
 // Entity schemas

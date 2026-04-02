@@ -88,19 +88,19 @@ const CameraManager = new EntityManager({
   storageKey: "cameras",
   counterKey: "camera-counter",
   defaults: DEFAULT_CAMERAS,
-  displayField: "name",
+  displayField: "camera-name",
 });
 
 const FilmManager = new EntityManager({
   storageKey: "films",
   counterKey: "film-counter",
   defaults: DEFAULT_FILMS,
-  displayField: "name",
+  displayField: "film-name",
 });
 
 // Adapter to make RollManager compatible with EntityFormModal/EntitySelector
 const RollManagerAdapter = {
-  displayField: "name",
+  displayField: "roll-name",
 
   getAll() {
     return RollManager.getRolls();
@@ -111,18 +111,18 @@ const RollManagerAdapter = {
   },
 
   getByName(name) {
-    return RollManager.getRolls().find((r) => r.name === name) || null;
+    return RollManager.getRolls().find((r) => r["roll-name"] === name) || null;
   },
 
   create(data) {
-    return RollManager.createRoll(data.name);
+    return RollManager.createRoll(data["roll-name"]);
   },
 
   update(id, data) {
     const roll = RollManager.getRollById(id);
     if (!roll) return null;
-    const oldName = roll.name;
-    RollManager.renameRoll(id, data.name);
+    const oldName = roll["roll-name"];
+    RollManager.renameRoll(id, data["roll-name"]);
     return { item: RollManager.getRollById(id), oldName };
   },
 

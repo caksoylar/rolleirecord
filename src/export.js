@@ -38,7 +38,7 @@ const Export = {
 
     // Use roll name in filename, replace special characters with underscores
     const rollName = currentRoll
-      ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
+      ? currentRoll["roll-name"].replace(/[^a-z0-9]/gi, "_")
       : "export";
     link.href = url;
     link.download = `${rollName}-${timestamp}.json`;
@@ -70,8 +70,8 @@ const Export = {
           // Extract camera and film from the first frame
           const firstFrame = data[0];
           const camera =
-            firstFrame.camera || CameraManager.getAll()[0]?.name || "";
-          const film = firstFrame.film || FilmManager.getAll()[0]?.name || "";
+            firstFrame.camera || CameraManager.getAll()[0]?.[CameraManager.displayField] || "";
+          const film = firstFrame.film || FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
 
           // Strip per-roll metadata from each frame, keep only schema fields
           const schemaFieldNames = FRAME_SCHEMA.fields.map((f) => f.name);
