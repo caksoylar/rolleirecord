@@ -295,6 +295,11 @@
       </div>
     </div>
 
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js');
+      }
+    </script>
     <script src="src/config.js"></script>
     <script src="src/entities.js"></script>
     <script src="src/entity-modal.js"></script>
