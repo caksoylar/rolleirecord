@@ -91,8 +91,8 @@ const FieldOptionsDialog = {
                                 value="${escapeHtml(option)}"
                                 data-index="${index}"
                             />
-                            <button type="button" class="move-option-btn up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up"><svg class="icon"><use href="#icon-up"></use></svg></button>
-                            <button type="button" class="move-option-btn down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down"><svg class="icon"><use href="#icon-down"></use></svg></button>
+                            <button type="button" class="move-option-btn secondary up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up"><svg class="icon"><use href="#icon-up"></use></svg></button>
+                            <button type="button" class="move-option-btn secondary down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down"><svg class="icon"><use href="#icon-down"></use></svg></button>
                             <button type="button" class="remove-option-btn danger" data-index="${index}" title="Remove"><svg class="icon"><use href="#icon-delete"></use></svg></button>
                         </div>
                     `;
