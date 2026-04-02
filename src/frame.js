@@ -76,7 +76,7 @@ const FrameModal = {
           html += `
                             <div class="form-group">
                                 <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <div style="display: flex; gap: 0.5rem;">
                                     <input 
                                         type="text"
                                         id="${inputId}"
@@ -121,7 +121,7 @@ const FrameModal = {
         html += `
                             <div class="form-group">
                                 <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                <div style="display: flex; gap: 0.5rem;">
                                     <input 
                                         type="datetime-local"
                                         id="${inputId}"
