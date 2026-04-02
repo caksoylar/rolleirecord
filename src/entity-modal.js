@@ -108,6 +108,8 @@ class EntityFormModal {
 
     const importBtn = this.element.querySelector(".import-btn");
     importBtn.addEventListener("click", () => {
+      this._mandatory = false;
+      this.close();
       Export.importFromJSON();
     });
 
