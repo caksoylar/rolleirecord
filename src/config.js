@@ -29,7 +29,7 @@ const DEFAULT_FILMS = [
 
 // Entity schemas
 const ROLL_SCHEMA = {
-  fields: [{ name: "name", type: "text", label: "Roll Name", required: true }],
+  fields: [{ name: "roll-name", type: "text", label: "Roll Name", required: true }],
 };
 
 const FORMATS = {
@@ -43,7 +43,7 @@ const FORMATS = {
 
 const CAMERA_SCHEMA = {
   fields: [
-    { name: "name", type: "text", label: "Camera Name", required: true },
+    { name: "camera-name", type: "text", label: "Camera Name", required: true },
     { name: "format", type: "film-format", label: "Format", required: true },
     { name: "size", type: "film-size", label: "Size", required: true },
   ],
@@ -51,7 +51,7 @@ const CAMERA_SCHEMA = {
 
 const FILM_SCHEMA = {
   fields: [
-    { name: "name", type: "text", label: "Film Name", required: true },
+    { name: "film-name", type: "text", label: "Film Name", required: true },
     { name: "iso", type: "number", label: "ISO", required: true },
   ],
 };
