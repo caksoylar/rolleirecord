@@ -210,7 +210,7 @@ const RollSelector = {
 
     // Auto-open create modal when no rolls exist
     if (!RollManager.getCurrentRoll()) {
-      rollModal.openCreate();
+      rollModal.openCreate({ mandatory: true });
     }
   },
 
@@ -220,7 +220,7 @@ const RollSelector = {
     }
     // Auto-open create modal when no rolls exist
     if (!RollManager.getCurrentRoll() && rollModal) {
-      rollModal.openCreate();
+      rollModal.openCreate({ mandatory: true });
     }
   },
 };

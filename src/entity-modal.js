@@ -79,6 +79,7 @@ class EntityFormModal {
           <div class="modal-footer">
             <button type="submit" class="save-btn"></button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
+            <button type="button" class="secondary import-btn" style="display:none">Import</button>
             <button type="button" class="danger delete-btn" style="display:none">Delete</button>
           </div>
         </form>
@@ -99,11 +100,16 @@ class EntityFormModal {
       .addEventListener("click", () => this.close());
 
     this.element.addEventListener("click", (e) => {
-      if (e.target === this.element) this.close();
+      if (e.target === this.element && !this._mandatory) this.close();
     });
 
     const deleteBtn = this.element.querySelector(".delete-btn");
     deleteBtn.addEventListener("click", () => this._handleDelete());
+
+    const importBtn = this.element.querySelector(".import-btn");
+    importBtn.addEventListener("click", () => {
+      Export.importFromJSON();
+    });
 
     // Field Options button — visible only if FRAME_SCHEMA has matching entity_specific fields
     this.hasFieldOptions = FRAME_SCHEMA.fields.some(
@@ -273,16 +279,27 @@ class EntityFormModal {
     this.onAfterAction();
   }
 
-  openCreate() {
+  openCreate(options = {}) {
     this.mode = "create";
     this.editingId = null;
     this._clearForm();
+    this._mandatory = options.mandatory || false;
 
     this.element.querySelector(".modal-title").textContent =
       `New ${this.entityType}`;
     this.element.querySelector(".save-btn").textContent = "Create";
     this.element.querySelector(".delete-btn").style.display = "none";
     this.element.querySelector(".field-options-btn").style.display = "none";
+
+    const cancelBtn = this.element.querySelector(".cancel-btn");
+    const importBtn = this.element.querySelector(".import-btn");
+    if (this._mandatory) {
+      cancelBtn.style.display = "none";
+      importBtn.style.display = "";
+    } else {
+      cancelBtn.style.display = "";
+      importBtn.style.display = "none";
+    }
 
     this.element.classList.add("active");
     const firstInput = this.element.querySelector("input");
@@ -295,12 +312,15 @@ class EntityFormModal {
 
     this.mode = "edit";
     this.editingId = entityId;
+    this._mandatory = false;
     this._populateForm(entity);
 
     this.element.querySelector(".modal-title").textContent =
       `Edit ${this.entityType}`;
     this.element.querySelector(".save-btn").textContent = "Save";
     this.element.querySelector(".delete-btn").style.display = "";
+    this.element.querySelector(".cancel-btn").style.display = "";
+    this.element.querySelector(".import-btn").style.display = "none";
     this.element.querySelector(".field-options-btn").style.display = this
       .hasFieldOptions
       ? ""
