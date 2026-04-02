@@ -372,11 +372,11 @@ class EntitySelector {
   _buildDOM() {
     this.container.innerHTML = `
       <label title="${this.label}">
-        <svg class="icon"><use href="${this.iconHref}"></use></svg>
+        <svg class="icon"><use href="icons.svg${this.iconHref}"></use></svg>
       </label>
       <select id="${this.selectId}"></select>
       <button type="button" class="secondary entity-edit-btn" title="Edit">
-        <svg class="icon"><use href="#icon-edit"></use></svg>
+        <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
       </button>`;
 
     this.selectElement = this.container.querySelector("select");

@@ -51,7 +51,7 @@ const TableRenderer = {
     visibleFields.forEach((_field) => {
       html += `<td></td>`;
     });
-    html += `<td class="actions"><button onclick="UI.openAddModal()" title="Add new"><svg class="icon"><use href="#icon-add"></use></svg></button></td>`;
+    html += `<td class="actions"><button onclick="UI.openAddModal()" title="Add new"><svg class="icon"><use href="icons.svg#icon-add"></use></svg></button></td>`;
     html += "</tr>";
 
     rows
@@ -65,7 +65,7 @@ const TableRenderer = {
         });
 
         html += `<td class="actions">
-                        <button class="secondary" onclick="UI.openEditModal(${row.id})" title="Edit"><svg class="icon"><use href="#icon-edit"></use></svg></button>
+                        <button class="secondary" onclick="UI.openEditModal(${row.id})" title="Edit"><svg class="icon"><use href="icons.svg#icon-edit"></use></svg></button>
                     </td></tr>`;
       });
 
