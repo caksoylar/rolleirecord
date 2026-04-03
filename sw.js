@@ -2,6 +2,7 @@ const CACHE_NAME = 'rolleirecord-v1';
 const ASSETS = [
   './',
   './index.html',
+  './icons.svg',
   './styles.css',
   './site.webmanifest',
   './favicon.svg',
