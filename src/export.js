@@ -7,10 +7,6 @@
 const Export = {
   exportToJSON() {
     const rows = RollManager.getFrames();
-    rows.forEach((row) => {
-      row.aperture = row.aperture.replace("ƒ/", "");
-      row.shutter = row.aperture.replace("s", "");
-    });
 
     const camera = SessionManager.getSelectedCamera();
     const filmName = SessionManager.getSelectedFilm();
@@ -91,18 +87,6 @@ const Export = {
               if (schemaFieldNames.includes(key)) {
                 frame[key] = row[key];
               }
-            }
-            // Restore ƒ/ prefix on aperture if it was stripped during export
-            if (frame.aperture && !frame.aperture.startsWith("ƒ/")) {
-              frame.aperture = "ƒ/" + frame.aperture;
-            }
-            // Restore suffix on aperture if it was stripped during export
-            if (
-              frame.shutter &&
-              !frame.shutter.endsWith("s") &&
-              frame.shutter !== "B"
-            ) {
-              frame.shutter += "s";
             }
             return frame;
           });
