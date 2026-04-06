@@ -74,6 +74,46 @@ const FieldOptionsDialog = {
     this.currentField = fieldName;
     const options = OptionsManager.getOptions(fieldName, this.entityName);
     this.renderOptionsInputs(options);
+    this.renderVisibilityToggle(fieldName);
+  },
+
+  renderVisibilityToggle(fieldName) {
+    const container = document.getElementById("visibilityToggle");
+    if (!container) return;
+
+    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
+    if (!field || !field.hideable) {
+      container.style.display = "none";
+      this._setOptionsEnabled(true);
+      return;
+    }
+
+    container.style.display = "";
+    const isHidden = CameraManager.isFieldHidden(
+      fieldName,
+      this.entityName,
+    );
+    container.innerHTML = `
+      <label class="toggle-row">
+        <input type="checkbox" id="fieldVisibleToggle" ${isHidden ? "" : "checked"} />
+        <span>Enabled</span>
+      </label>
+    `;
+
+    this._setOptionsEnabled(!isHidden);
+
+    container.querySelector("#fieldVisibleToggle").addEventListener("change", (e) => {
+      CameraManager.toggleHiddenField(fieldName, this.entityName);
+      this._setOptionsEnabled(e.target.checked);
+      TableRenderer.render();
+    });
+  },
+
+  _setOptionsEnabled(enabled) {
+    const optionsList = this.dialogElement.querySelector(".options-list");
+    if (!optionsList) return;
+    optionsList.style.opacity = enabled ? "" : "0.4";
+    optionsList.style.pointerEvents = enabled ? "" : "none";
   },
 
   renderOptionsInputs(options) {

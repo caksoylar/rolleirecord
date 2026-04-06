@@ -31,8 +31,14 @@ const FrameModal = {
   // Render form fields based on schema
   renderFormFields(rowData = null, isEditMode = false) {
     let html = "";
+    const camera = SessionManager.getSelectedCamera();
 
     FRAME_SCHEMA.fields.forEach((field) => {
+      // Skip hideable fields that are hidden for this camera
+      if (field.hideable && CameraManager.isFieldHidden(field.name, camera)) {
+        return;
+      }
+
       const inputId = `field-${field.name}`;
       const required = field.required ? "required" : "";
 

@@ -91,6 +91,30 @@ const CameraManager = new EntityManager({
   displayField: "camera-name",
 });
 
+CameraManager.getHiddenFields = function (cameraName) {
+  if (!cameraName) return [];
+  const camera = this.getByName(cameraName);
+  return (camera && camera["hidden-fields"]) || [];
+};
+
+CameraManager.isFieldHidden = function (fieldName, cameraName) {
+  return this.getHiddenFields(cameraName).includes(fieldName);
+};
+
+CameraManager.toggleHiddenField = function (fieldName, cameraName) {
+  const hidden = this.getHiddenFields(cameraName);
+  const index = hidden.indexOf(fieldName);
+  if (index === -1) {
+    hidden.push(fieldName);
+  } else {
+    hidden.splice(index, 1);
+  }
+  const camera = this.getByName(cameraName);
+  if (!camera) return;
+  camera["hidden-fields"] = hidden;
+  this.update(camera.id, camera);
+};
+
 const FilmManager = new EntityManager({
   storageKey: "films",
   counterKey: "film-counter",

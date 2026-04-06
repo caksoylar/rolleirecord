@@ -233,6 +233,10 @@ tr:last-child td {
   aspect-ratio: 1;
 }
 
+td.actions {
+  text-overflow: clip;
+}
+
 /* SVG Icons */
 .icon {
   width: 1.2em;
@@ -318,6 +322,10 @@ select {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   transition: border-color var(--transition-speed);
+}
+
+input:not([type="checkbox"]),
+select {
   -webkit-appearance: none;
   appearance: none;
 }
@@ -390,6 +398,20 @@ select {
   cursor: not-allowed;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+}
+
+.toggle-row input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  accent-color: var(--color-accent);
 }
 
 /* Empty State */

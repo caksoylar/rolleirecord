@@ -15,13 +15,17 @@ const Export = {
     const iso = selectedFilm ? selectedFilm.iso : "";
     const currentRoll = RollManager.getCurrentRoll();
 
-    // Add camera and film to each row
-    const enrichedData = rows.map((row) => ({
-      ...row,
-      camera,
-      film,
-      iso,
-    }));
+    // Add camera and film to each row, omit null/undefined fields
+    const enrichedData = rows.map((row) => {
+      const clean = {};
+      for (const [key, val] of Object.entries(row)) {
+        if (val != null) clean[key] = val; // eslint-disable-line eqeqeq
+      }
+      clean.camera = camera;
+      clean.film = film;
+      clean.iso = iso;
+      return clean;
+    });
 
     const jsonString = JSON.stringify(enrichedData, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });

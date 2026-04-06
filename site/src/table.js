@@ -27,13 +27,32 @@ const UIVisibility = {
 // TABLE RENDERING
 // ============================================================================
 const TableRenderer = {
+  // Get visible fields, excluding per-camera hidden fields
+  getVisibleFields() {
+    const camera = SessionManager.getSelectedCamera();
+    return FRAME_SCHEMA.fields.filter(
+      (f) => f.visible && !(f.hideable && CameraManager.isFieldHidden(f.name, camera)),
+    );
+  },
+
   // Render table headers dynamically from visible fields
   renderHeaders() {
-    const visibleFields = FRAME_SCHEMA.fields.filter((f) => f.visible);
+    const visibleFields = this.getVisibleFields();
+
+    // Normalize widths so visible columns always fill the same proportion
+    const TARGET_TOTAL = 85;
+    const rawTotal = visibleFields.reduce(
+      (sum, f) => sum + (parseFloat(f.width) || 0),
+      0,
+    );
+    const scale = rawTotal > 0 ? TARGET_TOTAL / rawTotal : 1;
+
     let html = "<thead><tr>";
 
     visibleFields.forEach((field) => {
-      const w = field.width ? ` style="width:${field.width}"` : "";
+      const w = field.width
+        ? ` style="width:${(parseFloat(field.width) * scale).toFixed(1)}%"`
+        : "";
       html += `<th${w}>${field.header || field.label}</th>`;
     });
 
@@ -44,7 +63,7 @@ const TableRenderer = {
   // Render table body with all rows
   renderTableBody() {
     const rows = RollManager.getFrames();
-    const visibleFields = FRAME_SCHEMA.fields.filter((f) => f.visible);
+    const visibleFields = this.getVisibleFields();
 
     let html = "<tbody>";
     html += "<tr>";
@@ -60,7 +79,7 @@ const TableRenderer = {
         html += "<tr>";
 
         visibleFields.forEach((field) => {
-          const value = row[field.name] === null ? "" : row[field.name];
+          const value = row[field.name] == null ? "" : row[field.name]; // eslint-disable-line eqeqeq
           html += `<td>${escapeHtml(String(value))}</td>`;
         });
 

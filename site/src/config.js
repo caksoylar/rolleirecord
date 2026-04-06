@@ -7,7 +7,12 @@
 
 // Default seed data (used to populate localStorage on first load)
 const DEFAULT_CAMERAS = [
-  { "camera-name": "Nikon FM", format: "35mm", size: "24×36mm" },
+  {
+    "camera-name": "Nikon FM",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["exposure_comp"],
+  },
   { "camera-name": "Ektar H35n", format: "35mm", size: "24×18mm (half)" },
 ];
 
@@ -66,7 +71,7 @@ const FRAME_SCHEMA = {
       visible: true,
       readonly: false,
       required: true,
-      width: "12%",
+      width: "10%",
     },
     {
       name: "shutter",
@@ -77,7 +82,7 @@ const FRAME_SCHEMA = {
       readonly: false,
       required: false,
       entity_specific: "camera",
-      width: "23%",
+      width: "20%",
       options: [
         "B",
         "1s",
@@ -103,7 +108,7 @@ const FRAME_SCHEMA = {
       readonly: false,
       required: false,
       entity_specific: "camera",
-      width: "23%",
+      width: "20%",
       options: [
         "ƒ/1.8",
         "ƒ/2",
@@ -126,9 +131,23 @@ const FRAME_SCHEMA = {
       readonly: false,
       required: false,
       entity_specific: "camera",
-      width: "23%",
+      width: "20%",
       options: ["35mm", "85mm"],
       defaultValue: "35mm",
+    },
+    {
+      name: "exposure_comp",
+      type: "select",
+      label: "Exposure Comp.",
+      header: "±",
+      visible: true,
+      readonly: false,
+      required: false,
+      hideable: true,
+      entity_specific: "camera",
+      width: "15%",
+      options: ["-2", "-1.5", "-1", "-0.5", "0", "+0.5", "+1", "+1.5", "+2"],
+      defaultValue: "0",
     },
     {
       name: "notes",
