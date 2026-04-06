@@ -37,19 +37,24 @@ const DEFAULT_CAMERAS = [
     size: "24×36mm",
     "hidden-fields": ["exposure_comp"],
   },
-  { "camera-name": "Contax T2", format: "35mm", size: "24×36mm" },
+  {
+    "camera-name": "Contax T2",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["lens"],
+  },
   {
     "camera-name": "Olympus Stylus Epic",
     format: "35mm",
     size: "24×36mm",
-    "hidden-fields": ["exposure_comp"],
+    "hidden-fields": ["exposure_comp", "lens"],
   },
   // 35mm point & shoot / half-frame
   {
     "camera-name": "Ektar H35n",
     format: "35mm",
     size: "24×18mm (half)",
-    "hidden-fields": ["exposure_comp"],
+    "hidden-fields": ["exposure_comp", "lens"],
   },
   // Medium format
   {
@@ -271,6 +276,26 @@ const FRAME_SCHEMA = {
       custom_value: true,
       options: ["-2", "-1.5", "-1", "-0.5", "0", "+0.5", "+1", "+1.5", "+2"],
       defaultValue: "0",
+    },
+    {
+      name: "lens",
+      type: "select",
+      label: "Lens",
+      visible: false,
+      readonly: false,
+      required: false,
+      hideable: true,
+      entity_specific: "camera",
+      options: [
+        "50mm f/1.8",
+        "50mm f/1.4",
+        "35mm f/2",
+        "28mm f/2.8",
+        "85mm f/1.8",
+        "105mm f/2.5",
+        "135mm f/2.8",
+      ],
+      defaultValue: "50mm f/1.8",
     },
     {
       name: "notes",
