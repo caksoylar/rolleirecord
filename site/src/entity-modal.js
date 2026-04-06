@@ -71,7 +71,7 @@ class EntityFormModal {
         <div class="modal-header">
           <h2 class="modal-title"></h2>
         </div>
-        <form class="entity-form">
+        <form class="entity-form" autocomplete="off">
           <div class="modal-body">
             ${fieldsHTML}
           </div>
