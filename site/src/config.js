@@ -183,8 +183,8 @@ const FRAME_SCHEMA = {
       required: false,
       entity_specific: "camera",
       width: "20%",
-      options: ["35mm", "85mm"],
-      defaultValue: "35mm",
+      options: ["24mm", "28mm", "35mm", "40mm", "50mm", "55mm", "85mm", "105mm", "135mm", "200mm"],
+      defaultValue: "50mm",
     },
     {
       name: "exposure_comp",
