@@ -31,19 +31,56 @@ const DEFAULT_CAMERAS = [
 ];
 
 const DEFAULT_FILMS = [
-  { "film-name": "Kodak Portra 160", iso: 160 },
-  { "film-name": "Kodak Portra 400", iso: 400 },
-  { "film-name": "Kodak Portra 800", iso: 800 },
+  // Kodak color
+  { "film-name": "Kodak Ektacolor Pro 160", iso: 160 },
+  { "film-name": "Kodak Ektacolor Pro 400", iso: 400 },
+  { "film-name": "Kodak Ektacolor Pro 800", iso: 800 },
+  { "film-name": "Kodak Ektar 100", iso: 100 },
+  { "film-name": "Kodak Gold 200", iso: 200 },
+  { "film-name": "Kodak Ultramax 400", iso: 400 },
   { "film-name": "Kodacolor 100", iso: 100 },
   { "film-name": "Kodacolor 200", iso: 200 },
-  { "film-name": "Kodak Ultramax 400", iso: 400 },
-  { "film-name": "Kodak Ektar 100", iso: 100 },
-  { "film-name": "Fujifilm Superia 400", iso: 400 },
+  // Kodak slide
+  { "film-name": "Kodak Ektachrome E100", iso: 100 },
+  // Kodak B&W
+  { "film-name": "Kodak Ektapan 100", iso: 100 },
+  { "film-name": "Kodak Ektapan 400", iso: 400 },
+  { "film-name": "Kodak Ektapan P3200", iso: 3200 },
+  // Kodak cinema
+  { "film-name": "Kodak Vision3 50D", iso: 50 },
+  { "film-name": "Kodak Vision3 250D", iso: 250 },
+  { "film-name": "Kodak Vision3 200T", iso: 200 },
+  { "film-name": "Kodak Vision3 500T", iso: 500 },
+  // Ilford B&W
   { "film-name": "Ilford HP5 Plus", iso: 400 },
-  { "film-name": "Kodak Gold 200", iso: 200 },
+  { "film-name": "Ilford Delta 100", iso: 100 },
+  { "film-name": "Ilford Delta 400", iso: 400 },
+  { "film-name": "Ilford Delta 3200", iso: 3200 },
+  { "film-name": "Ilford FP4 Plus", iso: 125 },
+  { "film-name": "Ilford XP2 Super", iso: 400 },
+  { "film-name": "Ilford Pan F Plus", iso: 50 },
+  // Kentmere B&W
   { "film-name": "Kentmere 100", iso: 100 },
   { "film-name": "Kentmere 200", iso: 200 },
   { "film-name": "Kentmere 400", iso: 400 },
+  // Foma B&W
+  { "film-name": "Fomapan 100", iso: 100 },
+  { "film-name": "Fomapan 200", iso: 200 },
+  { "film-name": "Fomapan 400", iso: 400 },
+  // CineStill
+  { "film-name": "CineStill 50D", iso: 50 },
+  { "film-name": "CineStill 400D", iso: 400 },
+  { "film-name": "CineStill 800T", iso: 800 },
+  // Fujifilm color
+  { "film-name": "Fujifilm Superia 400", iso: 400 },
+  { "film-name": "Fujifilm C200", iso: 200 },
+  { "film-name": "Fujifilm Pro 400H", iso: 400 },
+  // Fujifilm slide
+  { "film-name": "Fujifilm Velvia 50", iso: 50 },
+  { "film-name": "Fujifilm Velvia 100", iso: 100 },
+  { "film-name": "Fujifilm Provia 100F", iso: 100 },
+  // Fujifilm B&W
+  { "film-name": "Fujifilm Neopan Acros 100 II", iso: 100 },
 ];
 
 // Entity schemas
