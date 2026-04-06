@@ -7,13 +7,27 @@
 
 // Default seed data (used to populate localStorage on first load)
 const DEFAULT_CAMERAS = [
-  {
-    "camera-name": "Nikon FM",
-    format: "35mm",
-    size: "24×36mm",
-    "hidden-fields": ["exposure_comp"],
-  },
-  { "camera-name": "Ektar H35n", format: "35mm", size: "24×18mm (half)" },
+  // 35mm SLRs
+  { "camera-name": "Nikon FM", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Nikon FE2", format: "35mm", size: "24×36mm" },
+  { "camera-name": "Nikon F3", format: "35mm", size: "24×36mm" },
+  { "camera-name": "Canon AE-1", format: "35mm", size: "24×36mm" },
+  { "camera-name": "Pentax K1000", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Minolta X-700", format: "35mm", size: "24×36mm" },
+  { "camera-name": "Olympus OM-1", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  // 35mm rangefinders & compacts
+  { "camera-name": "Leica M6", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Contax T2", format: "35mm", size: "24×36mm" },
+  { "camera-name": "Olympus Stylus Epic", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  // 35mm point & shoot / half-frame
+  { "camera-name": "Ektar H35n", format: "35mm", size: "24×18mm (half)", "hidden-fields": ["exposure_comp"] },
+  // Medium format
+  { "camera-name": "Hasselblad 500C/M", format: "120 (Medium)", size: "6×6", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Mamiya RB67", format: "120 (Medium)", size: "6×7", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Rolleiflex 2.8F", format: "120 (Medium)", size: "6×6", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Pentax 67", format: "120 (Medium)", size: "6×7", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Fuji GW690III", format: "120 (Medium)", size: "6×9", "hidden-fields": ["exposure_comp"] },
+  { "camera-name": "Pentax 645", format: "120 (Medium)", size: "6×4.5" },
 ];
 
 const DEFAULT_FILMS = [
