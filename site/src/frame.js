@@ -249,7 +249,15 @@ const FrameModal = {
 const FormValidator = {
   getFormData() {
     const formData = {};
+    const camera = SessionManager.getSelectedCamera();
+
     FRAME_SCHEMA.fields.forEach((field) => {
+      // Hidden fields save as null
+      if (field.hideable && CameraManager.isFieldHidden(field.name, camera)) {
+        formData[field.name] = null;
+        return;
+      }
+
       const input = document.getElementById(`field-${field.name}`);
       if (input) {
         let value = input.value;
