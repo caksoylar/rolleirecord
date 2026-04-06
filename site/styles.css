@@ -80,7 +80,7 @@ body {
   background-color: var(--color-bg);
   padding: 0.8rem;
   line-height: 1.5;
-  max-width: 100%;
+  max-width: 600px;
   margin: 0 auto;
   min-height: 100vh;
   display: grid;
@@ -259,6 +259,7 @@ td.actions {
   padding: 0;
   overflow-y: auto;
   align-items: flex-end;
+  justify-content: center;
 }
 
 .modal.active {
@@ -268,6 +269,7 @@ td.actions {
 .modal-content {
   background-color: var(--color-surface);
   width: 100%;
+  max-width: 600px;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding: 1.5rem;
   margin-top: auto;
