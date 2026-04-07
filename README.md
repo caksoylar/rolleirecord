@@ -1,4 +1,4 @@
-# 🔴 rollei(re)cord
+# 🔴rollei(re)cord
 
 Simple metadata recorder companion for film camera users. Access at https://caksoylar.github.io/rolleirecord/.
 
