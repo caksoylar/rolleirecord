@@ -77,6 +77,7 @@
 body {
   font-family: var(--font-family);
   font-size: 16px;
+  color: var(--color-text);
   background-color: var(--color-bg);
   padding: 0.8rem;
   line-height: 1.5;
@@ -89,7 +90,6 @@ body {
 
 h1 {
   font-size: var(--font-size-xl);
-  color: var(--color-text);
 }
 
 #updateBanner {
@@ -121,20 +121,20 @@ header button {
 
 /* Selector Bars */
 .roll-selector-bar,
+.entity-selector-bar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.roll-selector-bar,
 .entity-selector-group {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 1rem;
-}
-
-.roll-selector-bar,
-.entity-selector-bar {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 0.75rem;
-  align-items: center;
 }
 
 .entity-selector-group .entity-selector-bar + .entity-selector-bar {
@@ -144,7 +144,6 @@ header button {
 .roll-selector-bar label,
 .entity-selector-bar label {
   font-weight: 600;
-  color: var(--color-text);
   margin: 0;
   font-size: var(--font-size-lg);
 }
@@ -208,7 +207,6 @@ td {
 th {
   background-color: var(--color-surface-alt);
   font-weight: 600;
-  color: var(--color-text);
   font-size: var(--font-size-sm);
 }
 
@@ -283,7 +281,6 @@ td.actions {
 
 .modal-header h2 {
   font-size: var(--font-size-lg);
-  color: var(--color-text);
   margin: 0;
 }
 
@@ -302,7 +299,6 @@ td.actions {
 }
 
 .form-group {
-  margin-bottom: 1.25rem;
   display: contents;
 }
 
@@ -325,7 +321,6 @@ label {
   margin-bottom: 0.5rem;
   font-weight: 600;
   font-size: var(--font-size-sm);
-  color: var(--color-text);
 }
 
 input,
