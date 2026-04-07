@@ -306,6 +306,20 @@ td.actions {
   display: contents;
 }
 
+.custom-input-wrap {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.custom-input-wrap input {
+  flex: 1;
+}
+
+.custom-input-wrap .custom-cancel-btn {
+  flex: 0 0 auto;
+  padding: 0.5rem 0.75rem;
+}
+
 label {
   display: block;
   margin-bottom: 0.5rem;

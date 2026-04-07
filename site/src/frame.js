@@ -53,25 +53,45 @@ const FrameModal = {
             ? SessionManager.getSelectedCamera()
             : null;
         const dynamicOptions = OptionsManager.getOptions(field.name, camera);
+        const isCustom = field.custom_value && currentValue && !dynamicOptions.includes(currentValue);
+
         html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <select 
-                                    id="${inputId}"
-                                    name="${field.name}"
-                                    ${required}
-                                >
-                        `;
+          <div class="form-group">
+            <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+            <div class="custom-select-wrap">
+              <select
+                id="${inputId}"
+                name="${field.name}"
+                ${required}
+                ${isCustom ? 'style="display:none"' : ""}
+              >
+        `;
 
         dynamicOptions.forEach((option) => {
-          const selected = option === currentValue ? "selected" : "";
+          const selected = !isCustom && option === currentValue ? "selected" : "";
           html += `<option value="${escapeHtml(option)}" ${selected}>${escapeHtml(option)}</option>`;
         });
 
-        html += `
-                                </select>
-                            </div>
-                        `;
+        if (field.custom_value) {
+          html += `<option value="__custom__" ${isCustom ? "selected" : ""}>Custom\u2026</option>`;
+        }
+
+        html += `</select>`;
+
+        if (field.custom_value) {
+          html += `
+              <div class="custom-input-wrap" ${isCustom ? "" : 'style="display:none"'}>
+                <input type="text"
+                  class="custom-value-input"
+                  value="${isCustom ? escapeHtml(currentValue) : ""}"
+                  placeholder="Enter value"
+                />
+                <button type="button" class="secondary custom-cancel-btn" title="Back to list"><svg class="icon"><use href="icons.svg#icon-close"></use></svg></button>
+              </div>
+          `;
+        }
+
+        html += `</div></div>`;
       } else if (field.name === "location") {
         // Special handling for location field
         const value = isEditMode ? rowData[field.name] || "" : "";
@@ -163,6 +183,30 @@ const FrameModal = {
     });
 
     this.bodyElement.innerHTML = html;
+
+    // Wire up custom value select/input toggles
+    this.bodyElement.querySelectorAll(".custom-select-wrap").forEach((wrap) => {
+      const select = wrap.querySelector("select");
+      const customWrap = wrap.querySelector(".custom-input-wrap");
+      if (!select || !customWrap) return;
+
+      select.addEventListener("change", () => {
+        if (select.value === "__custom__") {
+          select.style.display = "none";
+          customWrap.style.display = "";
+          customWrap.querySelector("input").focus();
+        }
+      });
+
+      const cancelBtn = customWrap.querySelector(".custom-cancel-btn");
+      cancelBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        customWrap.style.display = "none";
+        select.style.display = "";
+        select.value = select.options[0].value;
+      });
+    });
 
     const refreshDateBtn = document.getElementById("refresh-date-btn");
     if (refreshDateBtn) {
@@ -261,6 +305,13 @@ const FormValidator = {
       const input = document.getElementById(`field-${field.name}`);
       if (input) {
         let value = input.value;
+
+        // For custom_value selects, read from the text input if active
+        if (field.custom_value && value === "__custom__") {
+          const wrap = input.closest(".custom-select-wrap");
+          const customInput = wrap && wrap.querySelector(".custom-value-input");
+          value = customInput ? customInput.value.trim() : "";
+        }
 
         // Only trim for text/number inputs, not select
         if (field.type !== "select") {

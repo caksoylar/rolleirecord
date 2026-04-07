@@ -134,6 +134,7 @@ const FRAME_SCHEMA = {
       required: false,
       entity_specific: "camera",
       width: "20%",
+      custom_value: true,
       options: [
         "B",
         "1s",
@@ -160,6 +161,7 @@ const FRAME_SCHEMA = {
       required: false,
       entity_specific: "camera",
       width: "20%",
+      custom_value: true,
       options: [
         "ƒ/1.8",
         "ƒ/2",
@@ -183,6 +185,7 @@ const FRAME_SCHEMA = {
       required: false,
       entity_specific: "camera",
       width: "20%",
+      custom_value: true,
       options: ["24mm", "28mm", "35mm", "40mm", "50mm", "55mm", "85mm", "105mm", "135mm", "200mm"],
       defaultValue: "50mm",
     },
@@ -197,6 +200,7 @@ const FRAME_SCHEMA = {
       hideable: true,
       entity_specific: "camera",
       width: "15%",
+      custom_value: true,
       options: ["-2", "-1.5", "-1", "-0.5", "0", "+0.5", "+1", "+1.5", "+2"],
       defaultValue: "0",
     },
