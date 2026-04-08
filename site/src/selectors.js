@@ -18,7 +18,11 @@ const CameraSelector = {
       schema: CAMERA_SCHEMA,
       manager: CameraManager,
       onSave: (item, mode, oldName) => {
-        if (mode === "update" && oldName && oldName !== item[CameraManager.displayField]) {
+        if (
+          mode === "update" &&
+          oldName &&
+          oldName !== item[CameraManager.displayField]
+        ) {
           // Cascade rename to all rolls referencing old camera name
           const rolls = RollManager.getRolls();
           rolls.forEach((roll) => {
@@ -28,7 +32,10 @@ const CameraSelector = {
             }
           });
           // Update OptionsManager storage keys
-          OptionsManager.renameCameraKeys(oldName, item[CameraManager.displayField]);
+          OptionsManager.renameCameraKeys(
+            oldName,
+            item[CameraManager.displayField],
+          );
         }
         if (mode === "create") {
           // Set new camera as selected for current roll
@@ -98,7 +105,11 @@ const FilmSelector = {
       schema: FILM_SCHEMA,
       manager: FilmManager,
       onSave: (item, mode, oldName) => {
-        if (mode === "update" && oldName && oldName !== item[FilmManager.displayField]) {
+        if (
+          mode === "update" &&
+          oldName &&
+          oldName !== item[FilmManager.displayField]
+        ) {
           // Cascade rename to all rolls referencing old film name
           const rolls = RollManager.getRolls();
           rolls.forEach((roll) => {

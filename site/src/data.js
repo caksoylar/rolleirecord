@@ -28,7 +28,9 @@ const SessionManager = {
 
   getSelectedFilm() {
     const currentRoll = RollManager.getCurrentRoll();
-    return currentRoll ? currentRoll.film : FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
+    return currentRoll
+      ? currentRoll.film
+      : FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
   },
 
   setSelectedFilm(filmName) {

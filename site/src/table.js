@@ -31,7 +31,9 @@ const TableRenderer = {
   getVisibleFields() {
     const camera = SessionManager.getSelectedCamera();
     return FRAME_SCHEMA.fields.filter(
-      (f) => f.visible && !(f.hideable && CameraManager.isFieldHidden(f.name, camera)),
+      (f) =>
+        f.visible &&
+        !(f.hideable && CameraManager.isFieldHidden(f.name, camera)),
     );
   },
 

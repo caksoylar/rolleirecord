@@ -6,15 +6,24 @@
     <meta name="color-scheme" content="light dark" />
     <title>Rolleirecord</title>
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" type="image/png" href="assets/favicon-96x96.png" sizes="96x96" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/favicon-96x96.png"
+      sizes="96x96"
+    />
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
     <link rel="shortcut icon" href="assets/favicon.ico" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/apple-touch-icon.png"
+    />
     <meta name="apple-mobile-web-app-title" content="Rolleirecord" />
     <link rel="manifest" href="assets/site.webmanifest" />
   </head>
   <body>
-    <div id="updateBanner" style="display:none" onclick="location.reload()">
+    <div id="updateBanner" style="display: none" onclick="location.reload()">
       Update available — tap to reload
     </div>
     <header>
@@ -128,13 +137,16 @@
     </div>
 
     <script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').then(function(reg) {
-          reg.addEventListener('updatefound', function() {
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").then(function (reg) {
+          reg.addEventListener("updatefound", function () {
             var newWorker = reg.installing;
-            newWorker.addEventListener('statechange', function() {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                document.getElementById('updateBanner').style.display = '';
+            newWorker.addEventListener("statechange", function () {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                document.getElementById("updateBanner").style.display = "";
               }
             });
           });

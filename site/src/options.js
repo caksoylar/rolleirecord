@@ -89,10 +89,7 @@ const FieldOptionsDialog = {
     }
 
     container.style.display = "";
-    const isHidden = CameraManager.isFieldHidden(
-      fieldName,
-      this.entityName,
-    );
+    const isHidden = CameraManager.isFieldHidden(fieldName, this.entityName);
     container.innerHTML = `
       <label class="toggle-row">
         <input type="checkbox" id="fieldVisibleToggle" ${isHidden ? "" : "checked"} />
@@ -102,11 +99,13 @@ const FieldOptionsDialog = {
 
     this._setOptionsEnabled(!isHidden);
 
-    container.querySelector("#fieldVisibleToggle").addEventListener("change", (e) => {
-      CameraManager.toggleHiddenField(fieldName, this.entityName);
-      this._setOptionsEnabled(e.target.checked);
-      TableRenderer.render();
-    });
+    container
+      .querySelector("#fieldVisibleToggle")
+      .addEventListener("change", (e) => {
+        CameraManager.toggleHiddenField(fieldName, this.entityName);
+        this._setOptionsEnabled(e.target.checked);
+        TableRenderer.render();
+      });
   },
 
   _setOptionsEnabled(enabled) {

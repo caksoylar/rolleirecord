@@ -8,25 +8,80 @@
 // Default seed data (used to populate localStorage on first load)
 const DEFAULT_CAMERAS = [
   // 35mm SLRs
-  { "camera-name": "Nikon FM", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Nikon FM",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["exposure_comp"],
+  },
   { "camera-name": "Nikon FE2", format: "35mm", size: "24×36mm" },
   { "camera-name": "Nikon F3", format: "35mm", size: "24×36mm" },
   { "camera-name": "Canon AE-1", format: "35mm", size: "24×36mm" },
-  { "camera-name": "Pentax K1000", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Pentax K1000",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["exposure_comp"],
+  },
   { "camera-name": "Minolta X-700", format: "35mm", size: "24×36mm" },
-  { "camera-name": "Olympus OM-1", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Olympus OM-1",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["exposure_comp"],
+  },
   // 35mm rangefinders & compacts
-  { "camera-name": "Leica M6", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Leica M6",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["exposure_comp"],
+  },
   { "camera-name": "Contax T2", format: "35mm", size: "24×36mm" },
-  { "camera-name": "Olympus Stylus Epic", format: "35mm", size: "24×36mm", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Olympus Stylus Epic",
+    format: "35mm",
+    size: "24×36mm",
+    "hidden-fields": ["exposure_comp"],
+  },
   // 35mm point & shoot / half-frame
-  { "camera-name": "Ektar H35n", format: "35mm", size: "24×18mm (half)", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Ektar H35n",
+    format: "35mm",
+    size: "24×18mm (half)",
+    "hidden-fields": ["exposure_comp"],
+  },
   // Medium format
-  { "camera-name": "Hasselblad 500C/M", format: "120 (Medium)", size: "6×6", "hidden-fields": ["exposure_comp"] },
-  { "camera-name": "Mamiya RB67", format: "120 (Medium)", size: "6×7", "hidden-fields": ["exposure_comp"] },
-  { "camera-name": "Rolleiflex 2.8F", format: "120 (Medium)", size: "6×6", "hidden-fields": ["exposure_comp"] },
-  { "camera-name": "Pentax 67", format: "120 (Medium)", size: "6×7", "hidden-fields": ["exposure_comp"] },
-  { "camera-name": "Fuji GW690III", format: "120 (Medium)", size: "6×9", "hidden-fields": ["exposure_comp"] },
+  {
+    "camera-name": "Hasselblad 500C/M",
+    format: "120 (Medium)",
+    size: "6×6",
+    "hidden-fields": ["exposure_comp"],
+  },
+  {
+    "camera-name": "Mamiya RB67",
+    format: "120 (Medium)",
+    size: "6×7",
+    "hidden-fields": ["exposure_comp"],
+  },
+  {
+    "camera-name": "Rolleiflex 2.8F",
+    format: "120 (Medium)",
+    size: "6×6",
+    "hidden-fields": ["exposure_comp"],
+  },
+  {
+    "camera-name": "Pentax 67",
+    format: "120 (Medium)",
+    size: "6×7",
+    "hidden-fields": ["exposure_comp"],
+  },
+  {
+    "camera-name": "Fuji GW690III",
+    format: "120 (Medium)",
+    size: "6×9",
+    "hidden-fields": ["exposure_comp"],
+  },
   { "camera-name": "Pentax 645", format: "120 (Medium)", size: "6×4.5" },
 ];
 
@@ -85,7 +140,9 @@ const DEFAULT_FILMS = [
 
 // Entity schemas
 const ROLL_SCHEMA = {
-  fields: [{ name: "roll-name", type: "text", label: "Roll Name", required: true }],
+  fields: [
+    { name: "roll-name", type: "text", label: "Roll Name", required: true },
+  ],
 };
 
 const FORMATS = {
@@ -186,7 +243,18 @@ const FRAME_SCHEMA = {
       entity_specific: "camera",
       width: "20%",
       custom_value: true,
-      options: ["24mm", "28mm", "35mm", "40mm", "50mm", "55mm", "85mm", "105mm", "135mm", "200mm"],
+      options: [
+        "24mm",
+        "28mm",
+        "35mm",
+        "40mm",
+        "50mm",
+        "55mm",
+        "85mm",
+        "105mm",
+        "135mm",
+        "200mm",
+      ],
       defaultValue: "50mm",
     },
     {

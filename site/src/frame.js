@@ -53,7 +53,10 @@ const FrameModal = {
             ? SessionManager.getSelectedCamera()
             : null;
         const dynamicOptions = OptionsManager.getOptions(field.name, camera);
-        const isCustom = field.custom_value && currentValue && !dynamicOptions.includes(currentValue);
+        const isCustom =
+          field.custom_value &&
+          currentValue &&
+          !dynamicOptions.includes(currentValue);
 
         html += `
           <div class="form-group">
@@ -68,7 +71,8 @@ const FrameModal = {
         `;
 
         dynamicOptions.forEach((option) => {
-          const selected = !isCustom && option === currentValue ? "selected" : "";
+          const selected =
+            !isCustom && option === currentValue ? "selected" : "";
           html += `<option value="${escapeHtml(option)}" ${selected}>${escapeHtml(option)}</option>`;
         });
 
