@@ -84,7 +84,7 @@ const TableRenderer = {
         });
 
         html += `<td class="actions">
-                        <button class="secondary" onclick="UI.openEditModal(${row.id})" title="Edit"><svg class="icon"><use href="icons.svg#icon-edit"></use></svg></button>
+                        <button class="secondary" onclick="UI.openEditModal(${Number(row.id)})" title="Edit"><svg class="icon"><use href="icons.svg#icon-edit"></use></svg></button>
                     </td></tr>`;
       });
 

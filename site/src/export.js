@@ -84,13 +84,22 @@ const Export = {
             : FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
 
           // Strip per-roll metadata from each frame, keep only schema fields
-          const schemaFieldNames = FRAME_SCHEMA.fields.map((f) => f.name);
+          const schemaFields = FRAME_SCHEMA.fields;
+          const schemaFieldNames = schemaFields.map((f) => f.name);
           const frames = data.map((row) => {
             const frame = {};
             for (const key of Object.keys(row)) {
-              if (schemaFieldNames.includes(key)) {
-                frame[key] = row[key];
+              if (!schemaFieldNames.includes(key)) continue;
+              const field = schemaFields.find((f) => f.name === key);
+              let val = row[key];
+              // Coerce types to match schema
+              if (field.type === "number") {
+                val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
+                if (isNaN(val)) val = null;
+              } else if (val != null) { // eslint-disable-line eqeqeq
+                val = String(val);
               }
+              frame[key] = val;
             }
             return frame;
           });
