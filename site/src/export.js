@@ -96,8 +96,8 @@ const Export = {
               if (field.type === "number") {
                 val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
                 if (isNaN(val)) val = null;
+                // eslint-disable-next-line eqeqeq
               } else if (val != null) {
-                // eslint-disable-line eqeqeq
                 val = String(val);
               }
               frame[key] = val;
