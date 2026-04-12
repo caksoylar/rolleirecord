@@ -39,7 +39,7 @@ const FrameModal = {
         return;
       }
 
-      const inputId = `field-${field.name}`;
+      const inputId = `field-${safeInputId(field.name)}`;
       const required = field.required ? "required" : "";
 
       if (field.type === "select") {
@@ -64,7 +64,7 @@ const FrameModal = {
             <div class="custom-select-wrap">
               <select
                 id="${inputId}"
-                name="${field.name}"
+                name="${safeInputId(field.name)}"
                 ${required}
                 ${isCustom ? 'style="display:none"' : ""}
               >
@@ -110,7 +110,7 @@ const FrameModal = {
                                     <input 
                                         type="text"
                                         id="${inputId}"
-                                        name="${field.name}"
+                                        name="${safeInputId(field.name)}"
                                         value="${escapeHtml(String(value))}"
                                         ${required}
                                         ${field.readonly ? "readonly" : ""}
@@ -132,7 +132,7 @@ const FrameModal = {
                                 <input 
                                     type="text"
                                     id="${inputId}"
-                                    name="${field.name}"
+                                    name="${safeInputId(field.name)}"
                                     value="${escapeHtml(String(value))}"
                                     ${required}
                                     ${field.readonly ? "readonly" : ""}
@@ -155,7 +155,7 @@ const FrameModal = {
                                     <input 
                                         type="datetime-local"
                                         id="${inputId}"
-                                        name="${field.name}"
+                                        name="${safeInputId(field.name)}"
                                         value="${escapeHtml(String(value))}"
                                         ${required}
                                         ${field.readonly ? "readonly" : ""}
@@ -176,7 +176,7 @@ const FrameModal = {
                                 <input 
                                     type="${field.type === "number" ? "number" : "text"}"
                                     id="${inputId}"
-                                    name="${field.name}"
+                                    name="${safeInputId(field.name)}"
                                     value="${escapeHtml(String(value))}"
                                     ${required}
                                     ${field.readonly ? "readonly" : ""}
@@ -306,7 +306,7 @@ const FormValidator = {
         return;
       }
 
-      const input = document.getElementById(`field-${field.name}`);
+      const input = document.getElementById(`field-${safeInputId(field.name)}`);
       if (input) {
         let value = input.value;
 

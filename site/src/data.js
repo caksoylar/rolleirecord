@@ -11,7 +11,7 @@ const SessionManager = {
     const currentRoll = RollManager.getCurrentRoll();
     return currentRoll
       ? currentRoll.camera
-      : CameraManager.getAll()[0]?.[CameraManager.displayField] || "";
+      : CameraManager.getAll()[0]?.name || "";
   },
 
   setSelectedCamera(cameraName) {
@@ -28,9 +28,7 @@ const SessionManager = {
 
   getSelectedFilm() {
     const currentRoll = RollManager.getCurrentRoll();
-    return currentRoll
-      ? currentRoll.film
-      : FilmManager.getAll()[0]?.[FilmManager.displayField] || "";
+    return currentRoll ? currentRoll.film : FilmManager.getAll()[0]?.name || "";
   },
 
   setSelectedFilm(filmName) {

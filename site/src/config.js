@@ -5,149 +5,153 @@
 
 /* eslint-disable no-unused-vars */
 
+// Sanitize field names for HTML id/name attributes to prevent iOS Safari
+// autofill from triggering on fields containing the word "name".
+function safeInputId(fieldName) {
+  return fieldName.replace(/name/gi, "label");
+}
+
 // Default seed data (used to populate localStorage on first load)
 const DEFAULT_CAMERAS = [
   // 35mm SLRs
   {
-    "camera-name": "Nikon FM",
+    name: "Nikon FM",
     format: "35mm",
     size: "24×36mm",
     "hidden-fields": ["exposure_comp"],
   },
-  { "camera-name": "Nikon FE2", format: "35mm", size: "24×36mm" },
-  { "camera-name": "Nikon F3", format: "35mm", size: "24×36mm" },
-  { "camera-name": "Canon AE-1", format: "35mm", size: "24×36mm" },
+  { name: "Nikon FE2", format: "35mm", size: "24×36mm" },
+  { name: "Nikon F3", format: "35mm", size: "24×36mm" },
+  { name: "Canon AE-1", format: "35mm", size: "24×36mm" },
   {
-    "camera-name": "Pentax K1000",
+    name: "Pentax K1000",
     format: "35mm",
     size: "24×36mm",
     "hidden-fields": ["exposure_comp"],
   },
-  { "camera-name": "Minolta X-700", format: "35mm", size: "24×36mm" },
+  { name: "Minolta X-700", format: "35mm", size: "24×36mm" },
   {
-    "camera-name": "Olympus OM-1",
+    name: "Olympus OM-1",
     format: "35mm",
     size: "24×36mm",
     "hidden-fields": ["exposure_comp"],
   },
   // 35mm rangefinders & compacts
   {
-    "camera-name": "Leica M6",
+    name: "Leica M6",
     format: "35mm",
     size: "24×36mm",
     "hidden-fields": ["exposure_comp"],
   },
   {
-    "camera-name": "Contax T2",
+    name: "Contax T2",
     format: "35mm",
     size: "24×36mm",
     "hidden-fields": ["lens"],
   },
   {
-    "camera-name": "Olympus Stylus Epic",
+    name: "Olympus Stylus Epic",
     format: "35mm",
     size: "24×36mm",
     "hidden-fields": ["exposure_comp", "lens"],
   },
   // 35mm point & shoot / half-frame
   {
-    "camera-name": "Ektar H35n",
+    name: "Ektar H35n",
     format: "35mm",
     size: "24×18mm (half)",
     "hidden-fields": ["exposure_comp", "lens"],
   },
   // Medium format
   {
-    "camera-name": "Hasselblad 500C/M",
+    name: "Hasselblad 500C/M",
     format: "120 (Medium)",
     size: "6×6",
     "hidden-fields": ["exposure_comp"],
   },
   {
-    "camera-name": "Mamiya RB67",
+    name: "Mamiya RB67",
     format: "120 (Medium)",
     size: "6×7",
     "hidden-fields": ["exposure_comp"],
   },
   {
-    "camera-name": "Rolleiflex 2.8F",
+    name: "Rolleiflex 2.8F",
     format: "120 (Medium)",
     size: "6×6",
     "hidden-fields": ["exposure_comp"],
   },
   {
-    "camera-name": "Pentax 67",
+    name: "Pentax 67",
     format: "120 (Medium)",
     size: "6×7",
     "hidden-fields": ["exposure_comp"],
   },
   {
-    "camera-name": "Fuji GW690III",
+    name: "Fuji GW690III",
     format: "120 (Medium)",
     size: "6×9",
     "hidden-fields": ["exposure_comp"],
   },
-  { "camera-name": "Pentax 645", format: "120 (Medium)", size: "6×4.5" },
+  { name: "Pentax 645", format: "120 (Medium)", size: "6×4.5" },
 ];
 
 const DEFAULT_FILMS = [
   // Kodak color
-  { "film-name": "Kodak Ektacolor Pro 160", iso: 160 },
-  { "film-name": "Kodak Ektacolor Pro 400", iso: 400 },
-  { "film-name": "Kodak Ektacolor Pro 800", iso: 800 },
-  { "film-name": "Kodak Ektar 100", iso: 100 },
-  { "film-name": "Kodak Gold 200", iso: 200 },
-  { "film-name": "Kodak Ultramax 400", iso: 400 },
-  { "film-name": "Kodacolor 100", iso: 100 },
-  { "film-name": "Kodacolor 200", iso: 200 },
+  { name: "Kodak Ektacolor Pro 160", iso: 160 },
+  { name: "Kodak Ektacolor Pro 400", iso: 400 },
+  { name: "Kodak Ektacolor Pro 800", iso: 800 },
+  { name: "Kodak Ektar 100", iso: 100 },
+  { name: "Kodak Gold 200", iso: 200 },
+  { name: "Kodak Ultramax 400", iso: 400 },
+  { name: "Kodacolor 100", iso: 100 },
+  { name: "Kodacolor 200", iso: 200 },
   // Kodak slide
-  { "film-name": "Kodak Ektachrome E100", iso: 100 },
+  { name: "Kodak Ektachrome E100", iso: 100 },
   // Kodak B&W
-  { "film-name": "Kodak Ektapan 100", iso: 100 },
-  { "film-name": "Kodak Ektapan 400", iso: 400 },
-  { "film-name": "Kodak Ektapan P3200", iso: 3200 },
+  { name: "Kodak Ektapan 100", iso: 100 },
+  { name: "Kodak Ektapan 400", iso: 400 },
+  { name: "Kodak Ektapan P3200", iso: 3200 },
   // Kodak cinema
-  { "film-name": "Kodak Vision3 50D", iso: 50 },
-  { "film-name": "Kodak Vision3 250D", iso: 250 },
-  { "film-name": "Kodak Vision3 200T", iso: 200 },
-  { "film-name": "Kodak Vision3 500T", iso: 500 },
+  { name: "Kodak Vision3 50D", iso: 50 },
+  { name: "Kodak Vision3 250D", iso: 250 },
+  { name: "Kodak Vision3 200T", iso: 200 },
+  { name: "Kodak Vision3 500T", iso: 500 },
   // Ilford B&W
-  { "film-name": "Ilford HP5 Plus", iso: 400 },
-  { "film-name": "Ilford Delta 100", iso: 100 },
-  { "film-name": "Ilford Delta 400", iso: 400 },
-  { "film-name": "Ilford Delta 3200", iso: 3200 },
-  { "film-name": "Ilford FP4 Plus", iso: 125 },
-  { "film-name": "Ilford XP2 Super", iso: 400 },
-  { "film-name": "Ilford Pan F Plus", iso: 50 },
+  { name: "Ilford HP5 Plus", iso: 400 },
+  { name: "Ilford Delta 100", iso: 100 },
+  { name: "Ilford Delta 400", iso: 400 },
+  { name: "Ilford Delta 3200", iso: 3200 },
+  { name: "Ilford FP4 Plus", iso: 125 },
+  { name: "Ilford XP2 Super", iso: 400 },
+  { name: "Ilford Pan F Plus", iso: 50 },
   // Kentmere B&W
-  { "film-name": "Kentmere 100", iso: 100 },
-  { "film-name": "Kentmere 200", iso: 200 },
-  { "film-name": "Kentmere 400", iso: 400 },
+  { name: "Kentmere 100", iso: 100 },
+  { name: "Kentmere 200", iso: 200 },
+  { name: "Kentmere 400", iso: 400 },
   // Foma B&W
-  { "film-name": "Fomapan 100", iso: 100 },
-  { "film-name": "Fomapan 200", iso: 200 },
-  { "film-name": "Fomapan 400", iso: 400 },
+  { name: "Fomapan 100", iso: 100 },
+  { name: "Fomapan 200", iso: 200 },
+  { name: "Fomapan 400", iso: 400 },
   // CineStill
-  { "film-name": "CineStill 50D", iso: 50 },
-  { "film-name": "CineStill 400D", iso: 400 },
-  { "film-name": "CineStill 800T", iso: 800 },
+  { name: "CineStill 50D", iso: 50 },
+  { name: "CineStill 400D", iso: 400 },
+  { name: "CineStill 800T", iso: 800 },
   // Fujifilm color
-  { "film-name": "Fujifilm Superia 400", iso: 400 },
-  { "film-name": "Fujifilm C200", iso: 200 },
-  { "film-name": "Fujifilm Pro 400H", iso: 400 },
+  { name: "Fujifilm Superia 400", iso: 400 },
+  { name: "Fujifilm C200", iso: 200 },
+  { name: "Fujifilm Pro 400H", iso: 400 },
   // Fujifilm slide
-  { "film-name": "Fujifilm Velvia 50", iso: 50 },
-  { "film-name": "Fujifilm Velvia 100", iso: 100 },
-  { "film-name": "Fujifilm Provia 100F", iso: 100 },
+  { name: "Fujifilm Velvia 50", iso: 50 },
+  { name: "Fujifilm Velvia 100", iso: 100 },
+  { name: "Fujifilm Provia 100F", iso: 100 },
   // Fujifilm B&W
-  { "film-name": "Fujifilm Neopan Acros 100 II", iso: 100 },
+  { name: "Fujifilm Neopan Acros 100 II", iso: 100 },
 ];
 
 // Entity schemas
 const ROLL_SCHEMA = {
-  fields: [
-    { name: "roll-name", type: "text", label: "Roll Name", required: true },
-  ],
+  fields: [{ name: "name", type: "text", label: "Roll Name", required: true }],
 };
 
 const FORMATS = {
@@ -161,7 +165,7 @@ const FORMATS = {
 
 const CAMERA_SCHEMA = {
   fields: [
-    { name: "camera-name", type: "text", label: "Camera Name", required: true },
+    { name: "name", type: "text", label: "Camera Name", required: true },
     { name: "format", type: "film-format", label: "Format", required: true },
     { name: "size", type: "film-size", label: "Size", required: true },
   ],
@@ -169,7 +173,7 @@ const CAMERA_SCHEMA = {
 
 const FILM_SCHEMA = {
   fields: [
-    { name: "film-name", type: "text", label: "Film Name", required: true },
+    { name: "name", type: "text", label: "Film Name", required: true },
     { name: "iso", type: "number", label: "ISO", required: true },
   ],
 };

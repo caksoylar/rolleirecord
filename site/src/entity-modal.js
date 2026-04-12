@@ -34,7 +34,7 @@ class EntityFormModal {
 
     const fieldsHTML = this.schema.fields
       .map((field) => {
-        const id = `${this.entityType}-${field.name}`;
+        const id = `${this.entityType}-${safeInputId(field.name)}`;
         const required = field.required ? "required" : "";
 
         if (field.type === "film-format") {
@@ -44,7 +44,7 @@ class EntityFormModal {
           return `
           <div class="form-group">
             <label for="${id}">${field.label}</label>
-            <select id="${id}" name="${field.name}" ${required}>${options}</select>
+            <select id="${id}" name="${safeInputId(field.name)}" ${required}>${options}</select>
           </div>`;
         }
 
@@ -52,7 +52,7 @@ class EntityFormModal {
           return `
           <div class="form-group">
             <label for="${id}">${field.label}</label>
-            <select id="${id}" name="${field.name}" ${required}></select>
+            <select id="${id}" name="${safeInputId(field.name)}" ${required}></select>
           </div>`;
         }
 
@@ -61,7 +61,7 @@ class EntityFormModal {
         <div class="form-group">
           <label for="${id}">${field.label}</label>
           <input type="${inputType}" id="${id}"
-                 name="${field.name}" ${required} />
+                 name="${safeInputId(field.name)}" ${required} />
         </div>`;
       })
       .join("");
@@ -133,7 +133,7 @@ class EntityFormModal {
     this.close();
     FieldOptionsDialog.open({
       entityType: this.entityType.toLowerCase(),
-      entityName: entity[this.manager.displayField],
+      entityName: entity.name,
     });
   }
 
@@ -145,10 +145,10 @@ class EntityFormModal {
     if (!formatField || !sizeField) return;
 
     const formatSelect = this.element.querySelector(
-      `#${this.entityType}-${formatField.name}`,
+      `#${this.entityType}-${safeInputId(formatField.name)}`,
     );
     const sizeSelect = this.element.querySelector(
-      `#${this.entityType}-${sizeField.name}`,
+      `#${this.entityType}-${safeInputId(sizeField.name)}`,
     );
 
     formatSelect.addEventListener("change", () => {
@@ -170,7 +170,7 @@ class EntityFormModal {
     const data = {};
     this.schema.fields.forEach((field) => {
       const input = this.element.querySelector(
-        `#${this.entityType}-${field.name}`,
+        `#${this.entityType}-${safeInputId(field.name)}`,
       );
       data[field.name] =
         field.type === "number" ? Number(input.value) : input.value.trim();
@@ -188,14 +188,14 @@ class EntityFormModal {
     this.schema.fields.forEach((field) => {
       if (field.type === "film-size") return; // handled after format
       const el = this.element.querySelector(
-        `#${this.entityType}-${field.name}`,
+        `#${this.entityType}-${safeInputId(field.name)}`,
       );
       el.value = entity[field.name] ?? "";
     });
 
     if (formatField && sizeField) {
       const sizeSelect = this.element.querySelector(
-        `#${this.entityType}-${sizeField.name}`,
+        `#${this.entityType}-${safeInputId(sizeField.name)}`,
       );
       this._populateSizeOptions(
         entity[formatField.name],
@@ -208,7 +208,7 @@ class EntityFormModal {
   _clearForm() {
     this.schema.fields.forEach((field) => {
       const el = this.element.querySelector(
-        `#${this.entityType}-${field.name}`,
+        `#${this.entityType}-${safeInputId(field.name)}`,
       );
       if (field.type === "film-format") {
         el.selectedIndex = 0;
@@ -224,10 +224,10 @@ class EntityFormModal {
     const sizeField = this.schema.fields.find((f) => f.type === "film-size");
     if (formatField && sizeField) {
       const formatSelect = this.element.querySelector(
-        `#${this.entityType}-${formatField.name}`,
+        `#${this.entityType}-${safeInputId(formatField.name)}`,
       );
       const sizeSelect = this.element.querySelector(
-        `#${this.entityType}-${sizeField.name}`,
+        `#${this.entityType}-${safeInputId(sizeField.name)}`,
       );
       this._populateSizeOptions(formatSelect.value, sizeSelect);
     }
@@ -267,7 +267,7 @@ class EntityFormModal {
       const canDelete = this.onDelete(entity);
       if (!canDelete) return;
     } else {
-      const displayName = entity[this.manager.displayField];
+      const displayName = entity.name;
       if (
         !confirm(
           `Are you sure you want to delete "${displayName}"? This cannot be undone.`,
@@ -421,7 +421,7 @@ class EntitySelector {
     items.forEach((item) => {
       const selected =
         selectedItem && item.id === selectedItem.id ? "selected" : "";
-      html += `<option value="${item.id}" ${selected}>${escapeHtml(item[this.manager.displayField])}</option>`;
+      html += `<option value="${item.id}" ${selected}>${escapeHtml(item.name)}</option>`;
     });
     html += `<option value="__create_new__">${escapeHtml(this.addNewLabel)}</option>`;
 

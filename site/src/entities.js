@@ -5,11 +5,10 @@
 /* eslint-disable no-unused-vars */
 
 class EntityManager {
-  constructor({ storageKey, counterKey, defaults, displayField = "name" }) {
+  constructor({ storageKey, counterKey, defaults }) {
     this.storageKey = storageKey;
     this.counterKey = counterKey;
     this.defaults = defaults;
-    this.displayField = displayField;
   }
 
   init() {
@@ -39,9 +38,7 @@ class EntityManager {
   }
 
   getByName(name) {
-    return (
-      this.getAll().find((item) => item[this.displayField] === name) || null
-    );
+    return this.getAll().find((item) => item.name === name) || null;
   }
 
   getNextId() {
@@ -63,7 +60,7 @@ class EntityManager {
     const items = this.getAll();
     const item = items.find((i) => i.id === id);
     if (!item) return null;
-    const oldName = item[this.displayField];
+    const oldName = item.name;
     Object.assign(item, data);
     this.saveAll(items);
     return { item, oldName };
@@ -79,7 +76,7 @@ class EntityManager {
 
   getDisplayName(id) {
     const item = this.getById(id);
-    return item ? item[this.displayField] : null;
+    return item ? item.name : null;
   }
 }
 
@@ -88,7 +85,6 @@ const CameraManager = new EntityManager({
   storageKey: "cameras",
   counterKey: "camera-counter",
   defaults: DEFAULT_CAMERAS,
-  displayField: "camera-name",
 });
 
 CameraManager.getHiddenFields = function (cameraName) {
@@ -119,13 +115,10 @@ const FilmManager = new EntityManager({
   storageKey: "films",
   counterKey: "film-counter",
   defaults: DEFAULT_FILMS,
-  displayField: "film-name",
 });
 
 // Adapter to make RollManager compatible with EntityFormModal/EntitySelector
 const RollManagerAdapter = {
-  displayField: "roll-name",
-
   getAll() {
     return RollManager.getRolls();
   },
@@ -135,18 +128,18 @@ const RollManagerAdapter = {
   },
 
   getByName(name) {
-    return RollManager.getRolls().find((r) => r["roll-name"] === name) || null;
+    return RollManager.getRolls().find((r) => r.name === name) || null;
   },
 
   create(data) {
-    return RollManager.createRoll(data["roll-name"]);
+    return RollManager.createRoll(data.name);
   },
 
   update(id, data) {
     const roll = RollManager.getRollById(id);
     if (!roll) return null;
-    const oldName = roll["roll-name"];
-    RollManager.renameRoll(id, data["roll-name"]);
+    const oldName = roll.name;
+    RollManager.renameRoll(id, data.name);
     return { item: RollManager.getRollById(id), oldName };
   },
 

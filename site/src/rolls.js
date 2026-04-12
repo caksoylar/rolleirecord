@@ -74,9 +74,9 @@ const RollManager = {
     // Create roll with defaults
     const newRoll = {
       id: rollId,
-      "roll-name": name,
-      camera: CameraManager.getAll()[0]?.[CameraManager.displayField] || "",
-      film: FilmManager.getAll()[0]?.[FilmManager.displayField] || "",
+      name: name,
+      camera: CameraManager.getAll()[0]?.name || "",
+      film: FilmManager.getAll()[0]?.name || "",
       frames: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -118,7 +118,7 @@ const RollManager = {
     const roll = rolls.find((r) => r.id === rollId);
 
     if (roll) {
-      roll["roll-name"] = newName;
+      roll.name = newName;
       roll.updatedAt = new Date().toISOString();
       this.saveRolls(rolls);
     }
