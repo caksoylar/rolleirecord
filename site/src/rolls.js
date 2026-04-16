@@ -7,6 +7,7 @@ const RollManager = {
   ROLLS_KEY: "rolls",
   CURRENT_ROLL_KEY: "current-roll-id",
   ROLL_ID_COUNTER_KEY: "roll-counter",
+  DEFAULT_FRAME_COUNT: ROLL_SCHEMA.fields.find((val) => val.name === "frameCount")?.defaultValue,
 
   // Initialize rollmanager
   init() {
@@ -64,7 +65,8 @@ const RollManager = {
   },
 
   // Create new roll
-  createRoll(name) {
+  createRoll(name, frameCount) {
+    frameCount = frameCount ?? this.DEFAULT_FRAME_COUNT;
     const rolls = this.getRolls();
 
     // Generate unique roll ID
@@ -74,6 +76,7 @@ const RollManager = {
     const newRoll = {
       id: rollId,
       name: name,
+      frameCount: frameCount,
       camera: CameraManager.getAll()[0]?.name || "",
       film: FilmManager.getAll()[0]?.name || "",
       frames: [],
@@ -213,9 +216,15 @@ const RollManager = {
 
   // Get highest existing frame ID in current roll
   getLastFrameId() {
-    const frames = this.getFrames();
-    if (frames.length === 0) return null;
-    const ids = frames.map((f) => f.id).filter((id) => typeof id === "number");
+    return this.getMaxFrameId(this.getCurrentRoll());
+  },
+
+  // Get highest frame ID for a given roll
+  getMaxFrameId(roll) {
+    if (!roll || roll.frames.length === 0) return null;
+    const ids = roll.frames
+      .map((f) => f.id)
+      .filter((id) => typeof id === "number");
     return ids.length === 0 ? null : Math.max(...ids);
   },
 

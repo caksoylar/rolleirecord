@@ -153,7 +153,16 @@ const DEFAULT_FILMS = [
 // Entity schemas
 // eslint-disable-next-line no-unused-vars
 const ROLL_SCHEMA = {
-  fields: [{ name: "name", type: "text", label: "Roll Name", required: true }],
+  fields: [
+    { name: "name", type: "text", label: "Roll Name", required: true },
+    {
+      name: "frameCount",
+      type: "number",
+      label: "Frame Count",
+      required: false,
+      defaultValue: 36,
+    },
+  ],
 };
 
 // eslint-disable-next-line no-unused-vars

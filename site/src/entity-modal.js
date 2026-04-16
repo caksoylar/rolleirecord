@@ -172,7 +172,11 @@ class EntityFormModal {
         `#${this.entityType}-${safeInputId(field.name)}`,
       );
       data[field.name] =
-        field.type === "number" ? Number(input.value) : input.value.trim();
+        field.type === "number"
+          ? input.value === ""
+            ? null
+            : Number(input.value)
+          : input.value.trim();
     });
     return data;
   }
@@ -212,7 +216,7 @@ class EntityFormModal {
       if (field.type === "film-format") {
         el.selectedIndex = 0;
       } else if (field.type !== "film-size") {
-        el.value = "";
+        el.value = field.defaultValue ?? "";
       }
     });
 
@@ -353,6 +357,7 @@ class EntitySelector {
     addNewLabel,
     onSelect,
     getSelectedValue,
+    formatLabel,
   }) {
     this.container = document.querySelector(containerSelector);
     this.selectId = selectId;
@@ -363,6 +368,7 @@ class EntitySelector {
     this.addNewLabel = addNewLabel || "+ Add new";
     this.onSelect = onSelect || (() => {});
     this.getSelectedValue = getSelectedValue;
+    this.formatLabel = formatLabel || ((item) => item.name);
 
     this._buildDOM();
     this.render();
@@ -421,7 +427,7 @@ class EntitySelector {
     items.forEach((item) => {
       const selected =
         selectedItem && item.id === selectedItem.id ? "selected" : "";
-      html += `<option value="${item.id}" ${selected}>${escapeHtml(item.name)}</option>`;
+      html += `<option value="${item.id}" ${selected}>${escapeHtml(this.formatLabel(item))}</option>`;
     });
     html += `<option value="__create_new__">${escapeHtml(this.addNewLabel)}</option>`;
 

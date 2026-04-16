@@ -502,6 +502,7 @@ const ModalFlows = {
 
     FrameModal.close();
     TableRenderer.render();
+    RollSelector.render();
   },
 
   closeModal() {

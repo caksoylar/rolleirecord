@@ -207,6 +207,13 @@ const RollSelector = {
         const roll = RollManager.getCurrentRoll();
         return roll ? roll.name : "";
       },
+      formatLabel: (roll) => {
+        const maxId = RollManager.getMaxFrameId(roll);
+        const progress = maxId != null ? `${maxId}` : "0"; // eslint-disable-line eqeqeq
+        return roll.frameCount
+          ? `${roll.name} (${progress}/${roll.frameCount})`
+          : roll.name;
+      },
     });
 
     // Auto-open create modal when no rolls exist
