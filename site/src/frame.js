@@ -2,11 +2,16 @@
 // FRAME MODAL - Add/edit frame dialog, validation, and form flows
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
+// APPLICATION STATE
+let appState = {
+  mode: null, // 'add' or 'edit'
+  currentRowId: null,
+};
 
 // ============================================================================
 // MODAL DIALOG MANAGEMENT
 // ============================================================================
+
 const FrameModal = {
   element: null,
   bodyElement: null,
@@ -294,6 +299,7 @@ const FrameModal = {
 // ============================================================================
 // FORM VALIDATION
 // ============================================================================
+
 const FormValidator = {
   getFormData() {
     const formData = {};
@@ -391,6 +397,7 @@ const FormValidator = {
 // ============================================================================
 // MODAL FLOWS AND FORM SUBMISSION
 // ============================================================================
+
 const ModalFlows = {
   // Handle add new row
   async openAddModal() {
@@ -505,6 +512,7 @@ const ModalFlows = {
 // ============================================================================
 // USER INTERFACE HANDLERS (called from onclick in HTML)
 // ============================================================================
+// eslint-disable-next-line no-unused-vars
 const UI = {
   openAddModal() {
     ModalFlows.openAddModal();

@@ -2,8 +2,7 @@
 // FIELD OPTIONS DIALOG - Edit field options (shutter speeds, apertures, etc.)
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
+// eslint-disable-next-line no-unused-vars
 const FieldOptionsDialog = {
   dialogElement: null,
   fieldSelectElement: null,

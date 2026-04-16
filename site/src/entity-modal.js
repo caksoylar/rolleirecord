@@ -2,8 +2,7 @@
 // ENTITY MODAL - Schema-driven create/edit/delete modal for any entity type
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
+// eslint-disable-next-line no-unused-vars
 class EntityFormModal {
   constructor({
     entityType,
@@ -342,6 +341,7 @@ class EntityFormModal {
 // ENTITY SELECTOR - Reusable select + edit button + "add new" for any entity
 // ============================================================================
 
+// eslint-disable-next-line no-unused-vars
 class EntitySelector {
   constructor({
     containerSelector,

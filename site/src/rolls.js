@@ -2,8 +2,7 @@
 // ROLL MANAGER - Multi-roll management system
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
+// eslint-disable-next-line no-unused-vars
 const RollManager = {
   ROLLS_KEY: "rolls",
   CURRENT_ROLL_KEY: "current-roll-id",

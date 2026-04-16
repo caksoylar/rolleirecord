@@ -2,8 +2,6 @@
 // SELECTORS - Camera, Film, and Roll selectors + entity modals
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
 // ============================================================================
 // CAMERA SELECTOR - Uses EntitySelector + EntityFormModal
 // ============================================================================
@@ -11,6 +9,7 @@
 let cameraModal = null;
 let cameraSelector = null;
 
+// eslint-disable-next-line no-unused-vars
 const CameraSelector = {
   init() {
     cameraModal = new EntityFormModal({
@@ -91,6 +90,7 @@ const CameraSelector = {
 let filmModal = null;
 let filmSelector = null;
 
+// eslint-disable-next-line no-unused-vars
 const FilmSelector = {
   init() {
     filmModal = new EntityFormModal({
@@ -167,6 +167,7 @@ const FilmSelector = {
 let rollModal = null;
 let rollSelector = null;
 
+// eslint-disable-next-line no-unused-vars
 const RollSelector = {
   init() {
     rollModal = new EntityFormModal({

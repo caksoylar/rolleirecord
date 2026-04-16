@@ -3,15 +3,15 @@
 // ============================================================================
 // Edit this file to customize default cameras, films, and table fields
 
-/* eslint-disable no-unused-vars */
-
 // Sanitize field names for HTML id/name attributes to prevent iOS Safari
 // autofill from triggering on fields containing the word "name".
+// eslint-disable-next-line no-unused-vars
 function safeInputId(fieldName) {
   return fieldName.replace(/name/gi, "label");
 }
 
 // Default seed data (used to populate localStorage on first load)
+// eslint-disable-next-line no-unused-vars
 const DEFAULT_CAMERAS = [
   // 35mm SLRs
   {
@@ -96,6 +96,7 @@ const DEFAULT_CAMERAS = [
   { name: "Pentax 645", format: "120 (Medium)", size: "6×4.5" },
 ];
 
+// eslint-disable-next-line no-unused-vars
 const DEFAULT_FILMS = [
   // Kodak color
   { name: "Kodak Ektacolor Pro 160", iso: 160 },
@@ -150,10 +151,12 @@ const DEFAULT_FILMS = [
 ];
 
 // Entity schemas
+// eslint-disable-next-line no-unused-vars
 const ROLL_SCHEMA = {
   fields: [{ name: "name", type: "text", label: "Roll Name", required: true }],
 };
 
+// eslint-disable-next-line no-unused-vars
 const FORMATS = {
   "35mm": ["24×36mm", "24×18mm (half)"],
   "120 (Medium)": ["6×4.5", "6×6", "6×7", "6×9", "6×12", "6×17"],
@@ -163,6 +166,7 @@ const FORMATS = {
   "110 (Cartridge)": ["13x17mm"],
 };
 
+// eslint-disable-next-line no-unused-vars
 const CAMERA_SCHEMA = {
   fields: [
     { name: "name", type: "text", label: "Camera Name", required: true },
@@ -171,6 +175,7 @@ const CAMERA_SCHEMA = {
   ],
 };
 
+// eslint-disable-next-line no-unused-vars
 const FILM_SCHEMA = {
   fields: [
     { name: "name", type: "text", label: "Film Name", required: true },
@@ -178,6 +183,7 @@ const FILM_SCHEMA = {
   ],
 };
 
+// eslint-disable-next-line no-unused-vars
 const FRAME_SCHEMA = {
   fields: [
     {

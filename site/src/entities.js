@@ -2,8 +2,6 @@
 // ENTITY MANAGER - Generic localStorage-backed CRUD for cameras, films, etc.
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
 class EntityManager {
   constructor({ storageKey, counterKey, defaults }) {
     this.storageKey = storageKey;
@@ -81,6 +79,7 @@ class EntityManager {
 }
 
 // Singleton instances
+
 const CameraManager = new EntityManager({
   storageKey: "cameras",
   counterKey: "camera-counter",
@@ -111,6 +110,7 @@ CameraManager.toggleHiddenField = function (fieldName, cameraName) {
   this.update(camera.id, camera);
 };
 
+// eslint-disable-next-line no-unused-vars
 const FilmManager = new EntityManager({
   storageKey: "films",
   counterKey: "film-counter",
@@ -118,6 +118,7 @@ const FilmManager = new EntityManager({
 });
 
 // Adapter to make RollManager compatible with EntityFormModal/EntitySelector
+// eslint-disable-next-line no-unused-vars
 const RollManagerAdapter = {
   getAll() {
     return RollManager.getRolls();

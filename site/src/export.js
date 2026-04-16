@@ -2,8 +2,7 @@
 // EXPORT & IMPORT - JSON file I/O for rolls
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
+// eslint-disable-next-line no-unused-vars
 const Export = {
   _getFrameData() {
     const rows = RollManager.getFrames();

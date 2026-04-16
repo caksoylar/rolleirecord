@@ -2,10 +2,9 @@
 // DATA LAYER - Session management, options management, and data persistence
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
 // SESSION MANAGER - manage camera and film selection (now delegates to current roll)
 // ============================================================================
+
 const SessionManager = {
   getSelectedCamera() {
     const currentRoll = RollManager.getCurrentRoll();
@@ -47,6 +46,7 @@ const SessionManager = {
 // ============================================================================
 // OPTIONS MANAGER - localStorage for dynamic select field options
 // ============================================================================
+// eslint-disable-next-line no-unused-vars
 const OptionsManager = {
   OPTIONS_KEY_PREFIX: "fieldOptions_",
   CAMERAS_PREFIX: "cameras",
@@ -146,6 +146,7 @@ const OptionsManager = {
 
 // LOCATION MANAGER - Geolocation API wrapper
 // ============================================================================
+// eslint-disable-next-line no-unused-vars
 const LocationManager = {
   getLocation() {
     return new Promise((resolve, reject) => {

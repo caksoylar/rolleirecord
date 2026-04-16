@@ -2,18 +2,10 @@
 // TABLE RENDERING & UI VISIBILITY
 // ============================================================================
 
-/* eslint-disable no-unused-vars */
-
-// APPLICATION STATE
-// ============================================================================
-let appState = {
-  mode: null, // 'add' or 'edit'
-  currentRowId: null,
-};
-
 // ============================================================================
 // UI VISIBILITY - Show/hide elements based on roll state
 // ============================================================================
+
 const UIVisibility = {
   update() {
     const hasRoll = RollManager.getCurrentRoll() !== null;
@@ -26,6 +18,7 @@ const UIVisibility = {
 // ============================================================================
 // TABLE RENDERING
 // ============================================================================
+
 const TableRenderer = {
   // Get visible fields, excluding per-camera hidden fields
   getVisibleFields() {
@@ -113,12 +106,14 @@ const TableRenderer = {
 // ============================================================================
 // UTILITY FUNCTIONS
 // ============================================================================
+
 function escapeHtml(text) {
   const div = document.createElement("div");
   div.textContent = text;
   return div.innerHTML;
 }
 
+// eslint-disable-next-line no-unused-vars
 function refreshAllUI() {
   RollSelector.render();
   TableRenderer.render();

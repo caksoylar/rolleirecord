@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
-
 /**
  * Convert app metadata fields to exiftool tag names.
  */
+// eslint-disable-next-line no-unused-vars
 function buildExifTags(meta) {
   const frameId = String(meta.id).padStart(2, "0");
   const tags = { SourceFile: `frame_${frameId}.jpg` };
