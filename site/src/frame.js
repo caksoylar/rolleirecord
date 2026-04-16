@@ -172,6 +172,19 @@ const FrameModal = {
                                 </div>
                             </div>
                         `;
+      } else if (field.type === "checkbox") {
+        const checked = rowData ? rowData[field.name] === true : !!field.defaultValue;
+        html += `
+                            <div class="form-group">
+                                <label for="${inputId}">${field.label}</label>
+                                <input 
+                                    type="checkbox"
+                                    id="${inputId}"
+                                    name="${safeInputId(field.name)}"
+                                    ${checked ? "checked" : ""}
+                                />
+                            </div>
+                        `;
       } else {
         // Render text or number input
         const value = rowData ? rowData[field.name] || "" : "";
@@ -330,6 +343,10 @@ const FormValidator = {
 
         if (field.type === "number") {
           value = value === "" ? null : parseInt(value, 10);
+        }
+
+        if (field.type === "checkbox") {
+          value = input.checked;
         }
 
         formData[field.name] = value;

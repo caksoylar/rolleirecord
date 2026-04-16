@@ -325,6 +325,15 @@ const FRAME_SCHEMA = {
       required: false,
     },
     {
+      name: "flash",
+      type: "checkbox",
+      label: "Flash",
+      visible: false,
+      readonly: false,
+      required: false,
+      defaultValue: false,
+    },
+    {
       name: "date",
       type: "datetime",
       label: "Date",

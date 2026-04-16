@@ -101,6 +101,8 @@ const Export = {
               if (field.type === "number") {
                 val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
                 if (isNaN(val)) val = null;
+              } else if (field.type === "checkbox") {
+                val = val === true || val === "true";
                 // eslint-disable-next-line eqeqeq
               } else if (val != null) {
                 val = String(val);

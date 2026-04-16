@@ -52,6 +52,11 @@ function buildExifTags(meta) {
     tags["ExposureCompensation"] = String(meta.exposure_comp);
   }
 
+  // Flash: EXIF Flash tag — 0 = No Flash, 1 = Fired
+  if (meta.flash != null) { // eslint-disable-line eqeqeq
+    tags["Flash"] = meta.flash ? "1" : "0";
+  }
+
   // Lens make & model (split first word as Make, like camera)
   if (meta.lens) {
     const parts = String(meta.lens).trim().split(" ");
