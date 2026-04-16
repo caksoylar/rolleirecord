@@ -55,6 +55,14 @@ class EntityFormModal {
           </div>`;
         }
 
+        if (field.type === "textarea") {
+          return `
+          <div class="form-group">
+            <label for="${id}">${field.label}</label>
+            <textarea id="${id}" name="${safeInputId(field.name)}" ${required} rows="3"></textarea>
+          </div>`;
+        }
+
         const inputType = field.type === "number" ? "number" : "text";
         return `
         <div class="form-group">

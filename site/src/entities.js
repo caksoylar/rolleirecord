@@ -133,7 +133,10 @@ const RollManagerAdapter = {
   },
 
   create(data) {
-    return RollManager.createRoll(data.name, data.frameCount);
+    const roll = RollManager.createRoll(data.name, data.frameCount);
+    roll.notes = data.notes || "";
+    RollManager.updateRoll(roll.id, roll);
+    return roll;
   },
 
   update(id, data) {
@@ -142,6 +145,7 @@ const RollManagerAdapter = {
     const oldName = roll.name;
     RollManager.renameRoll(id, data.name);
     roll.frameCount = data.frameCount || null;
+    roll.notes = data.notes || "";
     RollManager.updateRoll(id, roll);
     return { item: RollManager.getRollById(id), oldName };
   },

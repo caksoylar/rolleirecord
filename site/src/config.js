@@ -162,6 +162,12 @@ const ROLL_SCHEMA = {
       required: false,
       defaultValue: 36,
     },
+    {
+      name: "notes",
+      type: "textarea",
+      label: "Notes",
+      required: false,
+    },
   ],
 };
 
