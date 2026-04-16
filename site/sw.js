@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rolleirecord-v6';
+const CACHE_NAME = 'rolleirecord-v7';
 const ASSETS = [
   './',
   './index.html',
@@ -11,17 +11,18 @@ const ASSETS = [
   './assets/apple-touch-icon.png',
   './assets/web-app-manifest-192x192.png',
   './assets/web-app-manifest-512x512.png',
+  './src/app.js',
   './src/config.js',
+  './src/data.js',
   './src/entities.js',
   './src/entity-modal.js',
-  './src/rolls.js',
-  './src/data.js',
-  './src/table.js',
-  './src/selectors.js',
+  './src/exif.js',
   './src/export.js',
   './src/frame.js',
   './src/options.js',
-  './src/app.js',
+  './src/rolls.js',
+  './src/selectors.js',
+  './src/table.js',
 ];
 
 // Cache all assets on install

@@ -60,6 +60,13 @@ const SettingsMenu = {
       });
 
     document
+      .getElementById("settingsExportCSVBtn")
+      .addEventListener("click", () => {
+        this.close();
+        Export.exportToExiftoolCSV();
+      });
+
+    document
       .getElementById("settingsClearAllBtn")
       .addEventListener("click", () => {
         if (

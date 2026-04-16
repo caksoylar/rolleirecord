@@ -5,15 +5,12 @@
 /* eslint-disable no-unused-vars */
 
 const Export = {
-  exportToJSON() {
+  _getFrameData() {
     const rows = RollManager.getFrames();
 
     const camera = SessionManager.getSelectedCamera();
-    const filmName = SessionManager.getSelectedFilm();
-    const selectedFilm = FilmManager.getByName(filmName);
-    const film = filmName;
-    const iso = selectedFilm ? selectedFilm.iso : "";
-    const currentRoll = RollManager.getCurrentRoll();
+    const film = SessionManager.getSelectedFilm();
+    const iso = FilmManager.getByName(film)?.iso ?? "";
 
     // Add camera and film to each row, omit null/undefined fields
     const enrichedData = rows.map((row) => {
@@ -26,9 +23,12 @@ const Export = {
       clean.iso = iso;
       return clean;
     });
+    return enrichedData;
+  },
 
-    const jsonString = JSON.stringify(enrichedData, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
+  _downloadFile(content, mimeType, extension) {
+    const currentRoll = RollManager.getCurrentRoll();
+    const blob = new Blob([content], { type: mimeType });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     const timestamp = new Date()
@@ -41,11 +41,17 @@ const Export = {
       ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
       : "export";
     link.href = url;
-    link.download = `${rollName}-${timestamp}.json`;
+    link.download = `${rollName}-${timestamp}.${extension}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  },
+
+  exportToJSON() {
+    const data = this._getFrameData();
+    const jsonString = JSON.stringify(data, null, 2);
+    this._downloadFile(jsonString, "application/json", "json");
   },
 
   importFromJSON() {
@@ -131,5 +137,27 @@ const Export = {
     });
 
     input.click();
+  },
+
+  exportToExiftoolCSV() {
+    const data = this._getFrameData().sort((f1, f2) => f1.id - f2.id);
+    const exif = data.map(buildExifTags);
+
+    const keys = [...new Set(exif.flatMap((obj) => Object.keys(obj)))];
+
+    const toCsvLine = (obj) =>
+      keys
+        .map((key) => {
+          const val = obj[key] ?? "";
+          // Wrap in quotes if value contains comma, quote, or newline
+          return /[,"\n]/.test(String(val))
+            ? `"${String(val).replace(/"/g, '""')}"`
+            : val;
+        })
+        .join(",");
+
+    const csvString = [keys.join(","), ...exif.map(toCsvLine)].join("\n");
+
+    this._downloadFile(csvString, "text/csv", "csv");
   },
 };
