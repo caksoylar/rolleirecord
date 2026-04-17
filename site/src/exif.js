@@ -53,7 +53,8 @@ function buildExifTags(meta) {
   }
 
   // Flash: EXIF Flash tag — 0 = No Flash, 1 = Fired
-  if (meta.flash != null) { // eslint-disable-line eqeqeq
+  // eslint-disable-next-line eqeqeq
+  if (meta.flash != null) {
     tags["Flash"] = meta.flash ? "1" : "0";
   }
 

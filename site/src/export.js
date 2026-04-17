@@ -120,7 +120,11 @@ const Export = {
         try {
           const data = JSON.parse(event.target.result);
 
-          if (!data || typeof data !== "object" || !Array.isArray(data.frames)) {
+          if (
+            !data ||
+            typeof data !== "object" ||
+            !Array.isArray(data.frames)
+          ) {
             alert("Invalid file: expected a JSON object with a frames array.");
             return;
           }
@@ -129,11 +133,10 @@ const Export = {
           const camera = data.camera
             ? CameraManager.upsertByName(data.camera)
             : null;
-          const film = data.film
-            ? FilmManager.upsertByName(data.film)
-            : null;
+          const film = data.film ? FilmManager.upsertByName(data.film) : null;
 
-          const cameraName = camera?.name || CameraManager.getAll()[0]?.name || "";
+          const cameraName =
+            camera?.name || CameraManager.getAll()[0]?.name || "";
           const filmName = film?.name || FilmManager.getAll()[0]?.name || "";
 
           const frames = Export._coerceFrames(data.frames);

@@ -88,7 +88,8 @@ class EntityManager {
     // Check if any properties differ (ignore `id`)
     const { id: _id, ...importProps } = data;
     const needsUpdate = Object.keys(importProps).some(
-      (key) => JSON.stringify(existing[key]) !== JSON.stringify(importProps[key]),
+      (key) =>
+        JSON.stringify(existing[key]) !== JSON.stringify(importProps[key]),
     );
     if (needsUpdate) {
       this.update(existing.id, importProps);

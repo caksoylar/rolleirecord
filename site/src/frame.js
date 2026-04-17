@@ -173,7 +173,9 @@ const FrameModal = {
                             </div>
                         `;
       } else if (field.type === "checkbox") {
-        const checked = rowData ? rowData[field.name] === true : !!field.defaultValue;
+        const checked = rowData
+          ? rowData[field.name] === true
+          : !!field.defaultValue;
         html += `
                             <div class="form-group">
                                 <label for="${inputId}">${field.label}</label>
