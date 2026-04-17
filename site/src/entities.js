@@ -134,19 +134,16 @@ const RollManagerAdapter = {
 
   create(data) {
     const roll = RollManager.createRoll(data.name, data.frameCount);
-    roll.notes = data.notes || "";
-    RollManager.updateRoll(roll.id, roll);
-    return roll;
+    const { name: _n, frameCount: _fc, ...rest } = data;
+    RollManager.updateRoll(roll.id, rest);
+    return RollManager.getRollById(roll.id);
   },
 
   update(id, data) {
     const roll = RollManager.getRollById(id);
     if (!roll) return null;
     const oldName = roll.name;
-    RollManager.renameRoll(id, data.name);
-    roll.frameCount = data.frameCount || null;
-    roll.notes = data.notes || "";
-    RollManager.updateRoll(id, roll);
+    RollManager.updateRoll(id, data);
     return { item: RollManager.getRollById(id), oldName };
   },
 
