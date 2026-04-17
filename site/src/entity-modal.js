@@ -117,7 +117,7 @@ class EntityFormModal {
     importBtn.addEventListener("click", () => {
       this._mandatory = false;
       this.close();
-      Export.importFromJSON();
+      Export.importBackup();
     });
 
     // Field Options button — visible only if FRAME_SCHEMA has matching entity_specific fields

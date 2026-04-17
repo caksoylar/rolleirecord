@@ -1,5 +1,5 @@
 // ============================================================================
-// EXPORT & IMPORT - JSON file I/O for rolls
+// EXPORT & IMPORT - I/O for rolls
 // ============================================================================
 
 const Export = {
@@ -86,7 +86,7 @@ const Export = {
     URL.revokeObjectURL(url);
   },
 
-  exportToJSON() {
+  exportBackup() {
     const roll = RollManager.getCurrentRoll();
     if (!roll) return;
 
@@ -106,7 +106,7 @@ const Export = {
     this._downloadFile(jsonString, "application/json", "json");
   },
 
-  importFromJSON() {
+  importBackup() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".json,application/json";

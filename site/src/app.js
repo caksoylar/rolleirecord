@@ -49,14 +49,14 @@ const SettingsMenu = {
       .getElementById("settingsExportBtn")
       .addEventListener("click", () => {
         this.close();
-        Export.exportToJSON();
+        Export.exportBackup();
       });
 
     document
       .getElementById("settingsImportBtn")
       .addEventListener("click", () => {
         this.close();
-        Export.importFromJSON();
+        Export.importBackup();
       });
 
     document
