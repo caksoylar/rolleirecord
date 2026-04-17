@@ -76,6 +76,26 @@ class EntityManager {
     const item = this.getById(id);
     return item ? item.name : null;
   }
+
+  // Find entity by name; create if missing, update if properties differ.
+  // Returns the entity. The `data` object should include `name`.
+  upsertByName(data) {
+    if (!data || !data.name) return null;
+    const existing = this.getByName(data.name);
+    if (!existing) {
+      return this.create(data);
+    }
+    // Check if any properties differ (ignore `id`)
+    const { id: _id, ...importProps } = data;
+    const needsUpdate = Object.keys(importProps).some(
+      (key) => JSON.stringify(existing[key]) !== JSON.stringify(importProps[key]),
+    );
+    if (needsUpdate) {
+      this.update(existing.id, importProps);
+      return this.getById(existing.id);
+    }
+    return existing;
+  }
 }
 
 // Singleton instances

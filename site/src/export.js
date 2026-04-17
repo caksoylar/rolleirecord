@@ -2,17 +2,15 @@
 // EXPORT & IMPORT - JSON file I/O for rolls
 // ============================================================================
 
-// eslint-disable-next-line no-unused-vars
 const Export = {
+  // Build clean frame data for CSV export (flat rows with camera/film/iso)
   _getFrameData() {
     const rows = RollManager.getFrames();
-
     const camera = SessionManager.getSelectedCamera();
     const film = SessionManager.getSelectedFilm();
     const iso = FilmManager.getByName(film)?.iso ?? "";
 
-    // Add camera and film to each row, omit null/undefined fields
-    const enrichedData = rows.map((row) => {
+    return rows.map((row) => {
       const clean = {};
       for (const [key, val] of Object.entries(row)) {
         if (val != null) clean[key] = val; // eslint-disable-line eqeqeq
@@ -22,7 +20,49 @@ const Export = {
       clean.iso = iso;
       return clean;
     });
-    return enrichedData;
+  },
+
+  // Strip internal id, keep only entity-relevant properties
+  _cleanEntity(entity) {
+    if (!entity) return {};
+    const { id: _id, ...rest } = entity;
+    return rest;
+  },
+
+  // Coerce raw frame objects to match FRAME_SCHEMA types, strip nulls
+  _coerceFrames(rawFrames) {
+    const schemaFields = FRAME_SCHEMA.fields;
+    const schemaFieldNames = schemaFields.map((f) => f.name);
+    return rawFrames.map((row) => {
+      const frame = {};
+      for (const key of Object.keys(row)) {
+        if (!schemaFieldNames.includes(key)) continue;
+        const field = schemaFields.find((f) => f.name === key);
+        let val = row[key];
+        if (field.type === "number") {
+          val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
+          if (isNaN(val)) val = null;
+        } else if (field.type === "checkbox") {
+          val = val === true || val === "true";
+          // eslint-disable-next-line eqeqeq
+        } else if (val != null) {
+          val = String(val);
+        }
+        if (val != null) frame[key] = val; // eslint-disable-line eqeqeq
+      }
+      return frame;
+    });
+  },
+
+  // Append numeric suffix if a roll with this name already exists
+  _deduplicateRollName(name) {
+    const existingNames = RollManager.getRolls().map((r) => r.name);
+    if (!existingNames.includes(name)) return name;
+    let suffix = 2;
+    while (existingNames.includes(`${name} (${suffix})`)) {
+      suffix++;
+    }
+    return `${name} (${suffix})`;
   },
 
   _downloadFile(content, mimeType, extension) {
@@ -35,7 +75,6 @@ const Export = {
       .replace(/[:.]/g, "-")
       .slice(0, -5);
 
-    // Use roll name in filename, replace special characters with underscores
     const rollName = currentRoll
       ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
       : "export";
@@ -48,7 +87,21 @@ const Export = {
   },
 
   exportToJSON() {
-    const data = this._getFrameData();
+    const roll = RollManager.getCurrentRoll();
+    if (!roll) return;
+
+    const cameraName = SessionManager.getSelectedCamera();
+    const filmName = SessionManager.getSelectedFilm();
+
+    const data = {
+      name: roll.name,
+      frameCount: roll.frameCount ?? null,
+      notes: roll.notes || "",
+      camera: this._cleanEntity(CameraManager.getByName(cameraName)),
+      film: this._cleanEntity(FilmManager.getByName(filmName)),
+      frames: Export._coerceFrames(roll.frames),
+    };
+
     const jsonString = JSON.stringify(data, null, 2);
     this._downloadFile(jsonString, "application/json", "json");
   },
@@ -67,67 +120,46 @@ const Export = {
         try {
           const data = JSON.parse(event.target.result);
 
-          if (!Array.isArray(data) || data.length === 0) {
-            alert("Invalid file: expected a non-empty JSON array of frames.");
+          if (!data || typeof data !== "object" || !Array.isArray(data.frames)) {
+            alert("Invalid file: expected a JSON object with a frames array.");
             return;
           }
 
-          // Extract camera and film from the first frame, resolve to known entities
-          const firstFrame = data[0];
-          const importedCamera = firstFrame.camera || "";
-          const importedFilm = firstFrame.film || "";
+          // Reconcile camera and film entities
+          const camera = data.camera
+            ? CameraManager.upsertByName(data.camera)
+            : null;
+          const film = data.film
+            ? FilmManager.upsertByName(data.film)
+            : null;
 
-          // Use imported name if it matches a known entity, otherwise fall back to first available
-          const matchedCamera = CameraManager.getByName(importedCamera);
-          const camera = matchedCamera
-            ? importedCamera
-            : CameraManager.getAll()[0]?.name || "";
+          const cameraName = camera?.name || CameraManager.getAll()[0]?.name || "";
+          const filmName = film?.name || FilmManager.getAll()[0]?.name || "";
 
-          const matchedFilm = FilmManager.getByName(importedFilm);
-          const film = matchedFilm
-            ? importedFilm
-            : FilmManager.getAll()[0]?.name || "";
+          const frames = Export._coerceFrames(data.frames);
 
-          // Strip per-roll metadata from each frame, keep only schema fields
-          const schemaFields = FRAME_SCHEMA.fields;
-          const schemaFieldNames = schemaFields.map((f) => f.name);
-          const frames = data.map((row) => {
-            const frame = {};
-            for (const key of Object.keys(row)) {
-              if (!schemaFieldNames.includes(key)) continue;
-              const field = schemaFields.find((f) => f.name === key);
-              let val = row[key];
-              // Coerce types to match schema
-              if (field.type === "number") {
-                val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
-                if (isNaN(val)) val = null;
-              } else if (field.type === "checkbox") {
-                val = val === true || val === "true";
-                // eslint-disable-next-line eqeqeq
-              } else if (val != null) {
-                val = String(val);
-              }
-              frame[key] = val;
-            }
-            return frame;
+          // Use roll name from data, fall back to filename
+          let rollName = data.name;
+          if (!rollName) {
+            const baseName = file.name.replace(/\.json$/i, "");
+            rollName = baseName
+              .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
+              .replace(/_/g, " ");
+          }
+          rollName = Export._deduplicateRollName(rollName || "Imported Roll");
+
+          const newRoll = RollManagerAdapter.create({
+            name: rollName,
+            frameCount: data.frameCount,
+            notes: data.notes || "",
           });
-
-          // Derive roll name from filename (strip extension and timestamp)
-          const baseName = file.name.replace(/\.json$/i, "");
-          const rollName = baseName
-            .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
-            .replace(/_/g, " ");
-
-          // Create new roll and populate it
-          const newRoll = RollManager.createRoll(rollName || "Imported Roll");
           RollManager.setCurrentRoll(newRoll.id);
           RollManager.updateRoll(newRoll.id, {
-            camera,
-            film,
+            camera: cameraName,
+            film: filmName,
             frames,
           });
 
-          // Refresh all UI
           refreshAllUI();
         } catch (err) {
           alert("Failed to import: " + err.message);
