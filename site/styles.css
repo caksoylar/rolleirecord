@@ -292,10 +292,28 @@ td.actions {
   align-items: center;
 }
 
+.settings-section {
+  margin-bottom: 1rem;
+}
+
+.settings-section h3 {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.settings-caption {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
 .settings-actions {
   display: flex;
   gap: 0.75rem;
-  margin-bottom: 1rem;
 }
 
 .form-group {

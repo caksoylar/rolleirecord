@@ -68,19 +68,37 @@
         <div class="modal-header">
           <h2>Settings</h2>
         </div>
-        <div class="settings-actions">
-          <button id="settingsExportBtn" class="secondary">
-            Export Backup
-          </button>
-          <button id="settingsImportBtn" class="secondary">
-            Import Backup
-          </button>
+        <div class="settings-section">
+          <h3>Backup &amp; Restore</h3>
+          <div class="settings-actions">
+            <button id="settingsExportBtn" class="secondary">
+              Export Backup
+            </button>
+            <button id="settingsImportBtn" class="secondary">
+              Import Backup
+            </button>
+          </div>
         </div>
-        <div class="settings-actions">
-          <button id="settingsExportCSVBtn" class="secondary">
-            Export CSV
-          </button>
-          <button id="settingsClearAllBtn" class="danger">Clear All</button>
+        <div class="settings-section">
+          <h3>Export Metadata</h3>
+          <p class="settings-caption">
+            For use with exiftool to embed metadata in scanned photos. Edit the
+            SourceFile column to match your filenames, then call
+            <code>exiftool -csv=&lt;exported&gt;.csv &lt;files&gt;</code>.
+          </p>
+          <div class="settings-actions">
+            <button id="settingsExportCSVBtn" class="secondary">
+              Export CSV
+            </button>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>Developer</h3>
+          <div class="settings-actions">
+            <button id="settingsClearAllBtn" class="danger">
+              Clear All Data
+            </button>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="secondary cancel-btn">Close</button>
