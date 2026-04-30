@@ -32,7 +32,7 @@ function buildExifTags(meta) {
 
   // Shutter speed (e.g. "1/125" or "1s")
   if (meta.shutter) {
-    const val = String(meta.shutter).replace(/^s/, "");
+    const val = String(meta.shutter).replace(/s$/, "");
     tags["ExposureTime"] = val;
   }
 
