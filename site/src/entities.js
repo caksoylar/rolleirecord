@@ -10,15 +10,30 @@ class EntityManager {
   }
 
   init() {
-    const existing = localStorage.getItem(this.storageKey);
-    if (!existing) {
-      // Seed from defaults on first load
+    const stored = localStorage.getItem(this.storageKey);
+    if (!stored) {
+      // First load: seed entirely from defaults
       const seeded = this.defaults.map((item, i) => ({
         ...item,
         id: `${this.storageKey}-${i + 1}`,
       }));
       this.saveAll(seeded);
       localStorage.setItem(this.counterKey, String(this.defaults.length));
+      return;
+    }
+
+    // Merge: add any new defaults not already present by name
+    const items = JSON.parse(stored);
+    const existingNames = new Set(items.map((item) => item.name));
+    let added = 0;
+    for (const def of this.defaults) {
+      if (!existingNames.has(def.name)) {
+        items.push({ ...def, id: this.getNextId() });
+        added++;
+      }
+    }
+    if (added > 0) {
+      this.saveAll(items);
     }
   }
 
