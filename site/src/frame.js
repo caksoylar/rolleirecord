@@ -48,16 +48,22 @@ const FrameModal = {
       const required = field.required ? "required" : "";
 
       if (field.type === "select") {
-        // Render select dropdown
-        const currentValue = rowData
-          ? rowData[field.name] || field.defaultValue
-          : field.defaultValue;
         // Pass current camera to OptionsManager if field is camera-specific
         const camera =
           field.entity_specific === "camera"
             ? SessionManager.getSelectedCamera()
             : null;
         const dynamicOptions = OptionsManager.getOptions(field.name, camera);
+
+        // Use schema default if it's in the options list, otherwise fall back to first option
+        const effectiveDefault =
+          dynamicOptions.length > 0 &&
+          !dynamicOptions.includes(field.defaultValue)
+            ? dynamicOptions[0]
+            : field.defaultValue;
+        const currentValue = rowData
+          ? rowData[field.name] || effectiveDefault
+          : effectiveDefault;
         const isCustom =
           field.custom_value &&
           currentValue &&
