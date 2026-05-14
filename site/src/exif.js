@@ -75,6 +75,10 @@ function buildExifTags(meta) {
   }
 
   // Focal length (e.g. "85mm" or "85")
+  // Note: we write FocalLength (actual physical focal length) only.
+  // FocalLengthIn35mmFormat is intentionally omitted — computing it requires
+  // a per-format crop factor that we don't have reliably for user-added cameras
+  // and medium format bodies where the relationship to 35mm varies widely.
   if (meta.focal_length) {
     const val = String(meta.focal_length).replace(/mm$/i, "");
     tags["FocalLength"] = val;
