@@ -20,12 +20,12 @@ const UIVisibility = {
 // ============================================================================
 
 const TableRenderer = {
-  // Get visible fields, excluding per-camera hidden fields
+  // Get column fields (those with column_width), excluding per-camera hidden fields
   getVisibleFields() {
     const camera = SessionManager.getSelectedCamera();
     return FRAME_SCHEMA.fields.filter(
       (f) =>
-        f.visible &&
+        f.column_width &&
         !(f.hideable && CameraManager.isFieldHidden(f.name, camera)),
     );
   },
@@ -37,7 +37,7 @@ const TableRenderer = {
     // Normalize widths so visible columns always fill the same proportion
     const TARGET_TOTAL = 85;
     const rawTotal = visibleFields.reduce(
-      (sum, f) => sum + (parseFloat(f.width) || 0),
+      (sum, f) => sum + (parseFloat(f.column_width) || 0),
       0,
     );
     const scale = rawTotal > 0 ? TARGET_TOTAL / rawTotal : 1;
@@ -45,9 +45,7 @@ const TableRenderer = {
     let html = "<thead><tr>";
 
     visibleFields.forEach((field) => {
-      const w = field.width
-        ? ` style="width:${(parseFloat(field.width) * scale).toFixed(1)}%"`
-        : "";
+      const w = ` style="width:${(parseFloat(field.column_width) * scale).toFixed(1)}%"`;
       html += `<th${w}>${field.header || field.label}</th>`;
     });
 
