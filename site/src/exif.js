@@ -31,13 +31,13 @@ function buildExifTags(meta) {
   }
 
   // Shutter speed (e.g. "1/125" or "1s")
-  if (meta.shutter) {
+  if (meta.shutter && !/^auto$/i.test(meta.shutter)) {
     const val = String(meta.shutter).replace(/s$/, "");
     tags["ExposureTime"] = val;
   }
 
   // Aperture (e.g. "ƒ/5.6" or "5.6")
-  if (meta.aperture) {
+  if (meta.aperture && !/^auto$/i.test(meta.aperture)) {
     const val = String(meta.aperture).replace(/^[ƒf]\//, "");
     tags["FNumber"] = val;
   }
@@ -78,6 +78,35 @@ function buildExifTags(meta) {
   if (meta.focal_length) {
     const val = String(meta.focal_length).replace(/mm$/i, "");
     tags["FocalLength"] = val;
+  }
+
+  // Exposure program / shooting mode
+  if (meta.mode) {
+    // Map common shorthand values to EXIF ExposureProgram numeric codes.
+    // Numeric values are passed through directly if already valid.
+    const MODE_MAP = {
+      M: 1,
+      Manual: 1,
+      P: 2,
+      Program: 2,
+      Auto: 2,
+      A: 3,
+      Av: 3,
+      "Aperture-priority": 3,
+      Bokeh: 3,
+      S: 4,
+      Tv: 4,
+      "Shutter-priority": 4,
+      Slow: 5,
+      Night: 5,
+    };
+    const VALID_CODES = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
+    const numeric = Number(meta.mode);
+    if (!isNaN(numeric) && VALID_CODES.has(numeric)) {
+      tags["ExposureProgram"] = String(numeric);
+    } else {
+      tags["ExposureProgram"] = String(MODE_MAP[meta.mode] ?? 0);
+    }
   }
 
   // GPS coordinates
