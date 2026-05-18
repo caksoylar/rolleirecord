@@ -10,8 +10,10 @@ const UIVisibility = {
   update() {
     const hasRoll = RollManager.getCurrentRoll() !== null;
     const selectorGroup = document.querySelector(".entity-selector-group");
+    const addFab = document.getElementById("addFrameFab");
 
     if (selectorGroup) selectorGroup.style.display = hasRoll ? "" : "none";
+    if (addFab) addFab.style.display = hasRoll ? "" : "none";
   },
 };
 
@@ -35,7 +37,7 @@ const TableRenderer = {
     const visibleFields = this.getVisibleFields();
 
     // Normalize widths so visible columns always fill the same proportion
-    const TARGET_TOTAL = 85;
+    const TARGET_TOTAL = 100;
     const rawTotal = visibleFields.reduce(
       (sum, f) => sum + (parseFloat(f.column_width) || 0),
       0,
@@ -49,7 +51,7 @@ const TableRenderer = {
       html += `<th${w}>${field.header || field.label}</th>`;
     });
 
-    html += "<th>⁝</th></tr></thead>";
+    html += "</tr></thead>";
     return html;
   },
 
@@ -59,17 +61,11 @@ const TableRenderer = {
     const visibleFields = this.getVisibleFields();
 
     let html = "<tbody>";
-    html += "<tr>";
-    visibleFields.forEach((_field) => {
-      html += `<td></td>`;
-    });
-    html += `<td class="actions"><button onclick="UI.openAddModal()" title="Add new"><svg class="icon"><use href="icons.svg#icon-add"></use></svg></button></td>`;
-    html += "</tr>";
 
     rows
       .sort((r1, r2) => r2.id - r1.id)
       .forEach((row) => {
-        html += "<tr>";
+        html += `<tr onclick="UI.openEditModal(${Number(row.id)})" style="cursor:pointer">`;
 
         visibleFields.forEach((field) => {
           const raw = row[field.name] == null ? "" : row[field.name]; // eslint-disable-line eqeqeq
@@ -78,9 +74,7 @@ const TableRenderer = {
           html += `<td>${escapeHtml(String(value))}</td>`;
         });
 
-        html += `<td class="actions">
-                        <button class="secondary" onclick="UI.openEditModal(${Number(row.id)})" title="Edit"><svg class="icon"><use href="icons.svg#icon-edit"></use></svg></button>
-                    </td></tr>`;
+        html += "</tr>";
       });
 
     html += "</tbody>";

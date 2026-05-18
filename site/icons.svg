@@ -14,7 +14,7 @@
     />
     <line x1="136" y1="64" x2="192" y2="120" />
   </symbol>
-  <!-- Phosphor icons, plus-circle -->
+  <!-- Phosphor icons, plus -->
   <symbol
     id="icon-add"
     viewBox="0 0 256 256"
@@ -24,9 +24,8 @@
     stroke-linejoin="round"
     stroke-width="24"
   >
-    <circle cx="128" cy="128" r="96" />
-    <line x1="88" y1="128" x2="168" y2="128" />
-    <line x1="128" y1="88" x2="128" y2="168" />
+    <line x1="40" y1="128" x2="216" y2="128" />
+    <line x1="128" y1="40" x2="128" y2="216" />
   </symbol>
   <!-- Phosphor icons, trash-simple -->
   <symbol

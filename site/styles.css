@@ -224,15 +224,14 @@ tr:last-child td {
   border-bottom: none;
 }
 
-.actions button,
 .entity-edit-btn {
   padding: 0;
   font-size: var(--font-size-xs);
   aspect-ratio: 1;
 }
 
-td.actions {
-  text-overflow: clip;
+tbody tr[onclick]:hover {
+  background-color: var(--color-surface-alt);
 }
 
 /* SVG Icons */
@@ -242,6 +241,21 @@ td.actions {
   fill: none;
   stroke: currentColor;
   vertical-align: text-top;
+}
+
+/* Floating Action Button */
+#addFrameFab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  min-width: unset;
+  min-height: unset;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 3px 8px var(--color-shadow);
+  z-index: 100;
 }
 
 /* Modal & Dialog Overlays */

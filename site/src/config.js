@@ -214,7 +214,7 @@ const FRAME_SCHEMA = {
       header: "#",
       readonly: false,
       required: true,
-      column_width: "10%",
+      column_width: "15%",
     },
     {
       name: "shutter",
@@ -224,7 +224,7 @@ const FRAME_SCHEMA = {
       readonly: false,
       required: false,
       entity_specific: "camera",
-      column_width: "20%",
+      column_width: "25%",
       custom_value: true,
       options: [
         "B",
@@ -251,7 +251,7 @@ const FRAME_SCHEMA = {
       readonly: false,
       required: false,
       entity_specific: "camera",
-      column_width: "20%",
+      column_width: "25%",
       custom_value: true,
       options: [
         "ƒ/1.8",
@@ -352,7 +352,7 @@ const FRAME_SCHEMA = {
       type: "datetime",
       label: "Date",
       header: "◷",
-      column_width: "25%",
+      column_width: "35%",
       readonly: false,
       required: false,
     },
