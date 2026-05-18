@@ -78,8 +78,9 @@ const Export = {
     const rollName = currentRoll
       ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
       : "export";
+    const frameCount = currentRoll ? (currentRoll.frames?.length ?? 0) : 0;
     link.href = url;
-    link.download = `${rollName}-${timestamp}.${extension}`;
+    link.download = `${rollName}_${frameCount}-${timestamp}.${extension}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
