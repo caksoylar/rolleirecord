@@ -193,6 +193,24 @@ const FrameModal = {
                                 />
                             </div>
                         `;
+      } else if (field.name === "notes") {
+        const value = rowData ? rowData[field.name] || "" : "";
+        html += `
+                            <div class="form-group">
+                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+                                <div class="notes-field-wrap">
+                                    <input
+                                        type="text"
+                                        id="${inputId}"
+                                        name="${safeInputId(field.name)}"
+                                        value="${escapeHtml(String(value))}"
+                                        ${required}
+                                        ${field.readonly ? "readonly" : ""}
+                                    />
+                                    <button type="button" class="secondary notes-clear-btn" title="Clear"><svg class="icon"><use href="icons.svg#icon-close"></use></svg></button>
+                                </div>
+                            </div>
+                        `;
       } else {
         // Render text or number input
         const value = rowData ? rowData[field.name] || "" : "";
@@ -213,6 +231,16 @@ const FrameModal = {
     });
 
     this.bodyElement.innerHTML = html;
+
+    // Wire up notes clear button
+    const notesClearBtn = this.bodyElement.querySelector(".notes-clear-btn");
+    if (notesClearBtn) {
+      notesClearBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        notesClearBtn.closest("div").querySelector("input, textarea").value =
+          "";
+      });
+    }
 
     // Wire up custom value select/input toggles
     this.bodyElement.querySelectorAll(".custom-select-wrap").forEach((wrap) => {

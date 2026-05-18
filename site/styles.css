@@ -334,16 +334,19 @@ tbody tr[onclick]:hover {
   display: contents;
 }
 
-.custom-input-wrap {
+.custom-input-wrap,
+.notes-field-wrap {
   display: flex;
   gap: 0.5rem;
 }
 
-.custom-input-wrap input {
+.custom-input-wrap input,
+.notes-field-wrap input {
   flex: 1;
 }
 
-.custom-input-wrap .custom-cancel-btn {
+.custom-input-wrap .custom-cancel-btn,
+.notes-clear-btn {
   flex: 0 0 auto;
   padding: 0.5rem 0.75rem;
 }
