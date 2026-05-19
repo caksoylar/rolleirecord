@@ -425,14 +425,15 @@ const FormValidator = {
       const date = new Date(dateStr);
       if (!dtLocal.test(dateStr) || isNaN(date.getTime())) {
         errors.push(
-          "Date must be a valid date string (e.g., 2026-01-12T12:35:02-07:00)",
+          "Date must be a valid date string (e.g., 2026-01-12T14:35)",
         );
       }
-      // Add timezone information and convert to ISO8601
+      // Add timezone information and convert to ISO8601.
+      // Use the offset at the entered date (not now) to handle DST correctly.
       const pad = (n) => String(n).padStart(2, "0");
 
       const seconds = "00";
-      const tzOffset = -new Date().getTimezoneOffset();
+      const tzOffset = -new Date(dateStr).getTimezoneOffset();
       const sign = tzOffset >= 0 ? "+" : "-";
       const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
       const tzMinutes = pad(Math.abs(tzOffset) % 60);
