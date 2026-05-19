@@ -30,8 +30,8 @@ function buildExifTags(meta) {
     }
   }
 
-  // Shutter speed (e.g. "1/125" or "1s")
-  if (meta.shutter && !/^auto$/i.test(meta.shutter)) {
+  // Shutter speed (e.g. "1/125" or "1s"). Bulb ("B") has no numeric representation.
+  if (meta.shutter && !/^(auto|b)$/i.test(meta.shutter)) {
     const val = String(meta.shutter).replace(/s$/, "");
     tags["ExposureTime"] = val;
   }
