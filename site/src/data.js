@@ -182,8 +182,8 @@ const LocationManager = {
   },
 
   formatCoordinatesWithAccuracy(lat, lng, accuracy) {
+    // eslint-disable-next-line eqeqeq
     if (accuracy == null) {
-      // eslint-disable-line eqeqeq
       return this.formatCoordinates(lat, lng);
     }
     const accuracyMeters = Math.round(accuracy);
