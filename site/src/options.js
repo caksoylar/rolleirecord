@@ -206,7 +206,8 @@ const FieldOptionsDialog = {
     this.renderOptionsInputs([...currentOptions, ""]);
 
     // Focus the newly added input
-    const inputs = this.optionsContainerElement.querySelectorAll(".option-input");
+    const inputs =
+      this.optionsContainerElement.querySelectorAll(".option-input");
     inputs[inputs.length - 1]?.focus();
   },
 
