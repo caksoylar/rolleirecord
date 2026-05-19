@@ -102,6 +102,7 @@ const RollManager = {
     const rolls = this.getRolls();
 
     const filtered = rolls.filter((r) => r.id !== rollId);
+    if (filtered.length === rolls.length) return false;
     this.saveRolls(filtered);
 
     // If deleted roll was current, switch to first remaining or clear
