@@ -7,9 +7,7 @@ const RollManager = {
   ROLLS_KEY: "rolls",
   CURRENT_ROLL_KEY: "current-roll-id",
   ROLL_ID_COUNTER_KEY: "roll-counter",
-  DEFAULT_FRAME_COUNT: ROLL_SCHEMA.fields.find(
-    (val) => val.name === "frameCount",
-  )?.defaultValue,
+  DEFAULT_FRAME_COUNT,
 
   // Initialize rollmanager
   init() {

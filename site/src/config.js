@@ -11,6 +11,11 @@ function safeInputId(fieldName) {
 }
 
 // Default seed data (used to populate localStorage on first load)
+const DEFAULT_FRAME_COUNT = 36;
+
+// Shared hidden-fields for fully manual cameras (no auto mode or exposure comp)
+const MANUAL_CAMERA_HIDDEN = ["mode", "exposure_comp"];
+
 // eslint-disable-next-line no-unused-vars
 const DEFAULT_CAMERAS = [
   // 35mm SLRs
@@ -18,7 +23,7 @@ const DEFAULT_CAMERAS = [
     name: "Nikon FM",
     format: "35mm",
     size: "24×36mm",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   { name: "Nikon FE2", format: "35mm", size: "24×36mm" },
   { name: "Nikon F3", format: "35mm", size: "24×36mm" },
@@ -27,21 +32,21 @@ const DEFAULT_CAMERAS = [
     name: "Pentax K1000",
     format: "35mm",
     size: "24×36mm",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   { name: "Minolta X-700", format: "35mm", size: "24×36mm" },
   {
     name: "Olympus OM-1",
     format: "35mm",
     size: "24×36mm",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   // 35mm rangefinders & compacts
   {
     name: "Leica M6",
     format: "35mm",
     size: "24×36mm",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   {
     name: "Contax T2",
@@ -53,14 +58,14 @@ const DEFAULT_CAMERAS = [
     name: "Olympus Stylus Epic",
     format: "35mm",
     size: "24×36mm",
-    "hidden-fields": ["mode", "exposure_comp", "lens"],
+    "hidden-fields": [...MANUAL_CAMERA_HIDDEN, "lens"],
   },
   // 35mm point & shoot / half-frame
   {
     name: "Ektar H35n",
     format: "35mm",
     size: "24×18mm (half)",
-    "hidden-fields": ["mode", "exposure_comp", "lens"],
+    "hidden-fields": [...MANUAL_CAMERA_HIDDEN, "lens"],
   },
   {
     name: "Pentax 17",
@@ -73,31 +78,31 @@ const DEFAULT_CAMERAS = [
     name: "Hasselblad 500C/M",
     format: "120 (Medium)",
     size: "6×6",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   {
     name: "Mamiya RB67",
     format: "120 (Medium)",
     size: "6×7",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   {
     name: "Rolleiflex 2.8F",
     format: "120 (Medium)",
     size: "6×6",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   {
     name: "Pentax 67",
     format: "120 (Medium)",
     size: "6×7",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   {
     name: "Fuji GW690III",
     format: "120 (Medium)",
     size: "6×9",
-    "hidden-fields": ["mode", "exposure_comp"],
+    "hidden-fields": MANUAL_CAMERA_HIDDEN,
   },
   { name: "Pentax 645", format: "120 (Medium)", size: "6×4.5" },
 ];
@@ -165,14 +170,12 @@ const ROLL_SCHEMA = {
       name: "frameCount",
       type: "number",
       label: "Frame Count",
-      required: false,
-      defaultValue: 36,
+      defaultValue: DEFAULT_FRAME_COUNT,
     },
     {
       name: "notes",
       type: "textarea",
       label: "Notes",
-      required: false,
     },
   ],
 };
@@ -184,7 +187,7 @@ const FORMATS = {
   "220 (Medium)": ["6×4.5", "6×6", "6×7", "6×9", "6×12", "6×17"],
   Sheet: ['4×5"', '8×10"'],
   APS: ["30×17mm"],
-  "110 (Cartridge)": ["13x17mm"],
+  "110 (Cartridge)": ["13×17mm"],
 };
 
 // eslint-disable-next-line no-unused-vars
@@ -212,7 +215,6 @@ const FRAME_SCHEMA = {
       type: "number",
       label: "Frame #",
       header: "#",
-      readonly: false,
       required: true,
       column_width: "15%",
     },
@@ -221,8 +223,6 @@ const FRAME_SCHEMA = {
       type: "select",
       label: "Shutter Speed",
       header: "S",
-      readonly: false,
-      required: false,
       entity_specific: "camera",
       column_width: "25%",
       custom_value: true,
@@ -248,8 +248,6 @@ const FRAME_SCHEMA = {
       type: "select",
       label: "Aperture",
       header: "A",
-      readonly: false,
-      required: false,
       entity_specific: "camera",
       column_width: "25%",
       custom_value: true,
@@ -271,10 +269,9 @@ const FRAME_SCHEMA = {
       name: "focal_length",
       type: "select",
       label: "Focal Length",
-      readonly: false,
-      required: false,
       entity_specific: "camera",
       custom_value: true,
+      // form-only: no column_width/header so it doesn't appear as a table column
       options: [
         "24mm",
         "28mm",
@@ -293,11 +290,9 @@ const FRAME_SCHEMA = {
       name: "mode",
       type: "select",
       label: "Shooting Mode",
-      readonly: false,
-      required: false,
       hideable: true,
       entity_specific: "camera",
-      custom_value: false,
+      // custom_value intentionally omitted (false): mode is a fixed enum
       options: ["P", "S", "A", "M"],
       defaultValue: "P",
     },
@@ -305,8 +300,6 @@ const FRAME_SCHEMA = {
       name: "exposure_comp",
       type: "select",
       label: "Exposure Comp.",
-      readonly: false,
-      required: false,
       hideable: true,
       entity_specific: "camera",
       custom_value: true,
@@ -317,8 +310,6 @@ const FRAME_SCHEMA = {
       name: "lens",
       type: "select",
       label: "Lens",
-      readonly: false,
-      required: false,
       hideable: true,
       entity_specific: "camera",
       options: [
@@ -334,17 +325,13 @@ const FRAME_SCHEMA = {
     },
     {
       name: "notes",
-      type: "text",
+      type: "text", // single-line by design for brief field notes; roll notes use textarea
       label: "Notes",
-      readonly: false,
-      required: false,
     },
     {
       name: "flash",
       type: "checkbox",
       label: "Flash",
-      readonly: false,
-      required: false,
       defaultValue: false,
     },
     {
@@ -353,15 +340,11 @@ const FRAME_SCHEMA = {
       label: "Date",
       header: "◷",
       column_width: "35%",
-      readonly: false,
-      required: false,
     },
     {
       name: "location",
       type: "text",
       label: "Location",
-      readonly: false,
-      required: false,
     },
   ],
 };
