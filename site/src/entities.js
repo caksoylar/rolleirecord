@@ -115,35 +115,38 @@ class EntityManager {
 
 // Singleton instances
 
-const CameraManager = new EntityManager({
+class CameraEntityManager extends EntityManager {
+  getHiddenFields(cameraName) {
+    if (!cameraName) return [];
+    const camera = this.getByName(cameraName);
+    return (camera && camera["hidden-fields"]) || [];
+  }
+
+  isFieldHidden(fieldName, cameraName) {
+    return this.getHiddenFields(cameraName).includes(fieldName);
+  }
+
+  toggleHiddenField(fieldName, cameraName) {
+    const camera = this.getByName(cameraName);
+    if (!camera) return;
+    const hidden = camera["hidden-fields"] || [];
+    const index = hidden.indexOf(fieldName);
+    if (index === -1) {
+      hidden.push(fieldName);
+    } else {
+      hidden.splice(index, 1);
+    }
+    camera["hidden-fields"] = hidden;
+    this.update(camera.id, camera);
+  }
+}
+
+// eslint-disable-next-line no-unused-vars
+const CameraManager = new CameraEntityManager({
   storageKey: "cameras",
   counterKey: "camera-counter",
   defaults: DEFAULT_CAMERAS,
 });
-
-CameraManager.getHiddenFields = function (cameraName) {
-  if (!cameraName) return [];
-  const camera = this.getByName(cameraName);
-  return (camera && camera["hidden-fields"]) || [];
-};
-
-CameraManager.isFieldHidden = function (fieldName, cameraName) {
-  return this.getHiddenFields(cameraName).includes(fieldName);
-};
-
-CameraManager.toggleHiddenField = function (fieldName, cameraName) {
-  const camera = this.getByName(cameraName);
-  if (!camera) return;
-  const hidden = camera["hidden-fields"] || [];
-  const index = hidden.indexOf(fieldName);
-  if (index === -1) {
-    hidden.push(fieldName);
-  } else {
-    hidden.splice(index, 1);
-  }
-  camera["hidden-fields"] = hidden;
-  this.update(camera.id, camera);
-};
 
 // eslint-disable-next-line no-unused-vars
 const FilmManager = new EntityManager({
