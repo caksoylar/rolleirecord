@@ -116,10 +116,12 @@ function buildExifTags(meta) {
   // GPS coordinates
   if (meta.location) {
     const [latitude, longitude] = meta.location.split(/, */).map(parseFloat);
-    tags["GPSLatitude"] = latitude.toFixed(5);
-    tags["GPSLatitudeRef"] = latitude >= 0 ? "N" : "S";
-    tags["GPSLongitude"] = longitude.toFixed(5);
-    tags["GPSLongitudeRef"] = longitude >= 0 ? "E" : "W";
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      tags["GPSLatitude"] = latitude.toFixed(5);
+      tags["GPSLatitudeRef"] = latitude >= 0 ? "N" : "S";
+      tags["GPSLongitude"] = longitude.toFixed(5);
+      tags["GPSLongitudeRef"] = longitude >= 0 ? "E" : "W";
+    }
   }
 
   // Notes → UserComment

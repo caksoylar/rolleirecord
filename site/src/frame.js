@@ -156,7 +156,7 @@ const FrameModal = {
       } else if (field.name === "date") {
         // Special handling for date field
         const value = isEditMode
-          ? rowData[field.name].substring(0, 16) || ""
+          ? (rowData[field.name] || "").substring(0, 16)
           : "";
 
         html += `
@@ -328,11 +328,11 @@ const FrameModal = {
     appState.currentRowId = mode === "add" ? null : rowId;
 
     if (mode === "add") {
-      this.titleElement.textContent = "Add New Row";
+      this.titleElement.textContent = "Add Frame";
       const refData = RollManager.getFrameById(rowId);
       this.renderFormFields(refData, false);
     } else {
-      this.titleElement.textContent = "Edit Row";
+      this.titleElement.textContent = "Edit Frame";
       const rowData = RollManager.getFrameById(rowId);
       this.renderFormFields(rowData, true);
     }

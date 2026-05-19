@@ -206,14 +206,8 @@ const FieldOptionsDialog = {
     this.renderOptionsInputs([...currentOptions, ""]);
 
     // Focus the newly added input
-    setTimeout(() => {
-      const newInput = this.optionsContainerElement.querySelector(
-        ".option-input:last-child",
-      );
-      if (newInput) {
-        newInput.focus();
-      }
-    }, 50);
+    const inputs = this.optionsContainerElement.querySelectorAll(".option-input");
+    inputs[inputs.length - 1]?.focus();
   },
 
   collectOptions() {

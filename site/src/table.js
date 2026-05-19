@@ -63,7 +63,7 @@ const TableRenderer = {
     let html = "<tbody>";
 
     rows
-      .sort((r1, r2) => r2.id - r1.id)
+      .toSorted((r1, r2) => r2.id - r1.id)
       .forEach((row) => {
         html += `<tr class="clickable" onclick="UI.openEditModal(${Number(row.id)})" style="cursor:pointer">`;
 
