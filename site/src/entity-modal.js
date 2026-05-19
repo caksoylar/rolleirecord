@@ -2,6 +2,9 @@
 // ENTITY MODAL - Schema-driven create/edit/delete modal for any entity type
 // ============================================================================
 
+// Sentinel value for "add new" option in EntitySelector dropdowns
+const CREATE_NEW_SENTINEL = "__create_new__";
+
 // eslint-disable-next-line no-unused-vars
 class EntityFormModal {
   constructor({
@@ -20,6 +23,11 @@ class EntityFormModal {
     this.onAfterAction = onAfterAction || (() => {});
     this.mode = "create";
     this.editingId = null;
+    this._mandatory = false;
+    this._formatField =
+      this.schema.fields.find((f) => f.type === "film-format") || null;
+    this._sizeField =
+      this.schema.fields.find((f) => f.type === "film-size") || null;
 
     this.element = this._createDOM();
     document.body.appendChild(this.element);
@@ -145,17 +153,13 @@ class EntityFormModal {
   }
 
   _wireFormatSizeDependency() {
-    const formatField = this.schema.fields.find(
-      (f) => f.type === "film-format",
-    );
-    const sizeField = this.schema.fields.find((f) => f.type === "film-size");
-    if (!formatField || !sizeField) return;
+    if (!this._formatField || !this._sizeField) return;
 
     const formatSelect = this.element.querySelector(
-      `#${this.entityType}-${safeInputId(formatField.name)}`,
+      `#${this.entityType}-${safeInputId(this._formatField.name)}`,
     );
     const sizeSelect = this.element.querySelector(
-      `#${this.entityType}-${safeInputId(sizeField.name)}`,
+      `#${this.entityType}-${safeInputId(this._sizeField.name)}`,
     );
 
     formatSelect.addEventListener("change", () => {
@@ -191,11 +195,6 @@ class EntityFormModal {
 
   _populateForm(entity) {
     // Set format first so size options can be populated
-    const formatField = this.schema.fields.find(
-      (f) => f.type === "film-format",
-    );
-    const sizeField = this.schema.fields.find((f) => f.type === "film-size");
-
     this.schema.fields.forEach((field) => {
       if (field.type === "film-size") return; // handled after format
       const el = this.element.querySelector(
@@ -204,14 +203,14 @@ class EntityFormModal {
       el.value = entity[field.name] ?? "";
     });
 
-    if (formatField && sizeField) {
+    if (this._formatField && this._sizeField) {
       const sizeSelect = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(sizeField.name)}`,
+        `#${this.entityType}-${safeInputId(this._sizeField.name)}`,
       );
       this._populateSizeOptions(
-        entity[formatField.name],
+        entity[this._formatField.name],
         sizeSelect,
-        entity[sizeField.name],
+        entity[this._sizeField.name],
       );
     }
   }
@@ -229,16 +228,12 @@ class EntityFormModal {
     });
 
     // Populate size options for the default (first) format
-    const formatField = this.schema.fields.find(
-      (f) => f.type === "film-format",
-    );
-    const sizeField = this.schema.fields.find((f) => f.type === "film-size");
-    if (formatField && sizeField) {
+    if (this._formatField && this._sizeField) {
       const formatSelect = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(formatField.name)}`,
+        `#${this.entityType}-${safeInputId(this._formatField.name)}`,
       );
       const sizeSelect = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(sizeField.name)}`,
+        `#${this.entityType}-${safeInputId(this._sizeField.name)}`,
       );
       this._populateSizeOptions(formatSelect.value, sizeSelect);
     }
@@ -315,7 +310,7 @@ class EntityFormModal {
     }
 
     this.element.classList.add("active");
-    const firstInput = this.element.querySelector("input");
+    const firstInput = this.element.querySelector("input, select, textarea");
     if (firstInput) firstInput.focus();
   }
 
@@ -340,7 +335,7 @@ class EntityFormModal {
       : "none";
 
     this.element.classList.add("active");
-    const firstInput = this.element.querySelector("input");
+    const firstInput = this.element.querySelector("input, select, textarea");
     if (firstInput) firstInput.focus();
   }
 
@@ -401,7 +396,7 @@ class EntitySelector {
     this.container.addEventListener("change", (e) => {
       if (e.target !== this.selectElement) return;
       const value = e.target.value;
-      if (value === "__create_new__") {
+      if (value === CREATE_NEW_SENTINEL) {
         this.modal.openCreate();
         // Reset select to current value
         this._restoreSelection();
@@ -412,7 +407,7 @@ class EntitySelector {
 
     this.editBtn.addEventListener("click", () => {
       const selectedId = this.selectElement.value;
-      if (selectedId && selectedId !== "__create_new__") {
+      if (selectedId && selectedId !== CREATE_NEW_SENTINEL) {
         this.modal.openEdit(selectedId);
       }
     });
@@ -437,7 +432,7 @@ class EntitySelector {
         selectedItem && item.id === selectedItem.id ? "selected" : "";
       html += `<option value="${item.id}" ${selected}>${escapeHtml(this.formatLabel(item))}</option>`;
     });
-    html += `<option value="__create_new__">${escapeHtml(this.addNewLabel)}</option>`;
+    html += `<option value="${CREATE_NEW_SENTINEL}">${escapeHtml(this.addNewLabel)}</option>`;
 
     this.selectElement.innerHTML = html;
   }

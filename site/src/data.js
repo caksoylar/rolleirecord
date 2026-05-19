@@ -6,6 +6,14 @@
 // ============================================================================
 
 const SessionManager = {
+  _setRollField(fieldName, value) {
+    const currentRoll = RollManager.getCurrentRoll();
+    if (currentRoll) {
+      currentRoll[fieldName] = value;
+      RollManager.updateRoll(currentRoll.id, currentRoll);
+    }
+  },
+
   getSelectedCamera() {
     const currentRoll = RollManager.getCurrentRoll();
     return currentRoll
@@ -14,11 +22,7 @@ const SessionManager = {
   },
 
   setSelectedCamera(cameraName) {
-    const currentRoll = RollManager.getCurrentRoll();
-    if (currentRoll) {
-      currentRoll.camera = cameraName;
-      RollManager.updateRoll(currentRoll.id, currentRoll);
-    }
+    this._setRollField("camera", cameraName);
   },
 
   getAllCameras() {
@@ -31,11 +35,7 @@ const SessionManager = {
   },
 
   setSelectedFilm(filmName) {
-    const currentRoll = RollManager.getCurrentRoll();
-    if (currentRoll) {
-      currentRoll.film = filmName;
-      RollManager.updateRoll(currentRoll.id, currentRoll);
-    }
+    this._setRollField("film", filmName);
   },
 
   getAllFilms() {
@@ -51,17 +51,20 @@ const OptionsManager = {
   OPTIONS_KEY_PREFIX: "fieldOptions_",
   CAMERAS_PREFIX: "cameras",
 
+  _getField(fieldName) {
+    return FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
+  },
+
   // Build storage key for a field, incorporating camera name if camera-specific
   _getStorageKey(fieldName, camera = null) {
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
-    const cameraName =
-      camera ||
-      (field && field.entity_specific === "camera"
-        ? SessionManager.getSelectedCamera()
-        : null);
+    const field = this._getField(fieldName);
+    const isCamera = field?.entity_specific === "camera";
+    const cameraName = isCamera
+      ? camera || SessionManager.getSelectedCamera()
+      : null;
 
     let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
-    if (field && field.entity_specific === "camera" && cameraName) {
+    if (isCamera && cameraName) {
       storageKey += "_" + cameraName;
     }
     return storageKey;
@@ -74,7 +77,7 @@ const OptionsManager = {
 
   // Get options for a specific field from localStorage or defaults
   getOptions(fieldName, camera = null) {
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = this._getField(fieldName);
     if (!field || field.type !== "select") {
       return [];
     }
@@ -96,7 +99,7 @@ const OptionsManager = {
 
   // Set options for a specific field in localStorage
   setOptions(fieldName, optionsArray, camera = null) {
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = this._getField(fieldName);
     if (!field || field.type !== "select") {
       return false;
     }
@@ -115,16 +118,17 @@ const OptionsManager = {
 
   // Get default options from schema
   getDefaultOptions(fieldName) {
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
+    const field = this._getField(fieldName);
     return field && field.type === "select" ? field.options : [];
   },
 
   // Reset options to defaults
   resetOptions(fieldName, camera = null) {
-    const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
-    if (!field) return;
+    const field = this._getField(fieldName);
+    if (!field) return false;
 
     localStorage.removeItem(this._getStorageKey(fieldName, camera));
+    return true;
   },
 
   // Rename camera in all option storage keys
@@ -178,7 +182,8 @@ const LocationManager = {
   },
 
   formatCoordinatesWithAccuracy(lat, lng, accuracy) {
-    if (accuracy === undefined || accuracy === null) {
+    if (accuracy == null) {
+      // eslint-disable-line eqeqeq
       return this.formatCoordinates(lat, lng);
     }
     const accuracyMeters = Math.round(accuracy);

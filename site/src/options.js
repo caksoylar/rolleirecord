@@ -47,6 +47,21 @@ const FieldOptionsDialog = {
         this.close();
       }
     });
+
+    // Delegated handler for move/remove buttons in options list
+    this.optionsContainerElement.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const btn = e.target.closest("button[data-index]");
+      if (!btn) return;
+      const index = parseInt(btn.dataset.index, 10);
+      if (btn.classList.contains("remove-option-btn")) {
+        this.removeOption(index);
+      } else if (btn.classList.contains("move-option-btn")) {
+        if (btn.classList.contains("up")) this.moveOptionUp(index);
+        else if (btn.classList.contains("down")) this.moveOptionDown(index);
+      }
+    });
   },
 
   populateFieldSelector() {
@@ -137,42 +152,6 @@ const FieldOptionsDialog = {
     });
 
     this.optionsContainerElement.innerHTML = html;
-
-    // Attach move up button listeners
-    this.optionsContainerElement
-      .querySelectorAll(".move-option-btn.up")
-      .forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const index = parseInt(btn.dataset.index);
-          this.moveOptionUp(index);
-        });
-      });
-
-    // Attach move down button listeners
-    this.optionsContainerElement
-      .querySelectorAll(".move-option-btn.down")
-      .forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const index = parseInt(btn.dataset.index);
-          this.moveOptionDown(index);
-        });
-      });
-
-    // Attach remove button listeners
-    this.optionsContainerElement
-      .querySelectorAll(".remove-option-btn")
-      .forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const index = parseInt(btn.dataset.index);
-          this.removeOption(index);
-        });
-      });
   },
 
   removeOption(index) {

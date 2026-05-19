@@ -2,6 +2,30 @@
 // SELECTORS - Camera, Film, and Roll selectors + entity modals
 // ============================================================================
 
+// Helper: cascade a field rename to all rolls referencing the old value
+function cascadeRenameOnRolls(field, oldName, newName) {
+  const rolls = RollManager.getRolls();
+  rolls.forEach((roll) => {
+    if (roll[field] === oldName) {
+      roll[field] = newName;
+      RollManager.updateRoll(roll.id, roll);
+    }
+  });
+}
+
+// Helper: reassign rolls referencing a deleted entity to the first remaining one
+function reassignRollsOnDelete(field, manager, entity) {
+  const remaining = manager.getAll().filter((e) => e.id !== entity.id);
+  const fallback = remaining[0]?.name || "";
+  const rolls = RollManager.getRolls();
+  rolls.forEach((roll) => {
+    if (roll[field] === entity.name) {
+      roll[field] = fallback;
+      RollManager.updateRoll(roll.id, roll);
+    }
+  });
+}
+
 // ============================================================================
 // CAMERA SELECTOR - Uses EntitySelector + EntityFormModal
 // ============================================================================
@@ -18,14 +42,7 @@ const CameraSelector = {
       manager: CameraManager,
       onSave: (item, mode, oldName) => {
         if (mode === "update" && oldName && oldName !== item.name) {
-          // Cascade rename to all rolls referencing old camera name
-          const rolls = RollManager.getRolls();
-          rolls.forEach((roll) => {
-            if (roll.camera === oldName) {
-              roll.camera = item.name;
-              RollManager.updateRoll(roll.id, roll);
-            }
-          });
+          cascadeRenameOnRolls("camera", oldName, item.name);
           // Update OptionsManager storage keys
           OptionsManager.renameCameraKeys(oldName, item.name);
         }
@@ -42,18 +59,7 @@ const CameraSelector = {
         )
           return false;
 
-        // Reassign any rolls using this camera to the first remaining one
-        const remaining = CameraManager.getAll().filter(
-          (c) => c.id !== entity.id,
-        );
-        const fallback = remaining[0]?.name || "";
-        const rolls = RollManager.getRolls();
-        rolls.forEach((roll) => {
-          if (roll.camera === entity.name) {
-            roll.camera = fallback;
-            RollManager.updateRoll(roll.id, roll);
-          }
-        });
+        reassignRollsOnDelete("camera", CameraManager, entity);
         return true;
       },
       onAfterAction: () => refreshAllUI(),
@@ -99,14 +105,7 @@ const FilmSelector = {
       manager: FilmManager,
       onSave: (item, mode, oldName) => {
         if (mode === "update" && oldName && oldName !== item.name) {
-          // Cascade rename to all rolls referencing old film name
-          const rolls = RollManager.getRolls();
-          rolls.forEach((roll) => {
-            if (roll.film === oldName) {
-              roll.film = item.name;
-              RollManager.updateRoll(roll.id, roll);
-            }
-          });
+          cascadeRenameOnRolls("film", oldName, item.name);
         }
         if (mode === "create") {
           SessionManager.setSelectedFilm(item.name);
@@ -120,18 +119,7 @@ const FilmSelector = {
         )
           return false;
 
-        // Reassign any rolls using this film to the first remaining one
-        const remaining = FilmManager.getAll().filter(
-          (f) => f.id !== entity.id,
-        );
-        const fallback = remaining[0]?.name || "";
-        const rolls = RollManager.getRolls();
-        rolls.forEach((roll) => {
-          if (roll.film === entity.name) {
-            roll.film = fallback;
-            RollManager.updateRoll(roll.id, roll);
-          }
-        });
+        reassignRollsOnDelete("film", FilmManager, entity);
         return true;
       },
       onAfterAction: () => refreshAllUI(),
@@ -180,13 +168,9 @@ const RollSelector = {
         }
       },
       onDelete: (entity) => {
-        if (
-          !confirm(
-            `Are you sure you want to delete the roll "${entity.name}"? This cannot be undone.`,
-          )
-        )
-          return false;
-        return true;
+        return confirm(
+          `Are you sure you want to delete the roll "${entity.name}"? This cannot be undone.`,
+        );
       },
       onAfterAction: () => refreshAllUI(),
     });
@@ -203,13 +187,10 @@ const RollSelector = {
         RollManager.setCurrentRoll(rollId);
         refreshAllUI();
       },
-      getSelectedValue: () => {
-        const roll = RollManager.getCurrentRoll();
-        return roll ? roll.name : "";
-      },
+      getSelectedValue: () => RollManager.getCurrentRoll()?.name ?? "",
       formatLabel: (roll) => {
         const maxId = RollManager.getMaxFrameId(roll);
-        const progress = maxId != null ? `${maxId}` : "0"; // eslint-disable-line eqeqeq
+        const progress = maxId ?? 0;
         return roll.frameCount
           ? `${roll.name} (${progress}/${roll.frameCount})`
           : roll.name;

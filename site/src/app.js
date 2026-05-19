@@ -2,13 +2,15 @@
 // APP INITIALIZATION - Main entry point for application
 // ============================================================================
 
-document.addEventListener("DOMContentLoaded", function () {
-  // Initialize entity managers (seeds defaults on first load)
+function initManagers() {
   CameraManager.init();
   FilmManager.init();
-
-  // Initialize RollManager (creates default roll if needed)
   RollManager.init();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize entity managers (seeds defaults on first load)
+  initManagers();
 
   // Initialize modules
   FrameModal.init();
@@ -20,11 +22,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Render initial table
   TableRenderer.render();
-
-  // Settings gear button
-  document
-    .getElementById("settingsBtn")
-    .addEventListener("click", () => SettingsMenu.open());
 
   // FAB: add new frame
   document
@@ -46,6 +43,10 @@ const SettingsMenu = {
 
   init() {
     this.element = document.getElementById("settingsMenu");
+
+    document
+      .getElementById("settingsBtn")
+      .addEventListener("click", () => this.open());
 
     this.element
       .querySelector(".cancel-btn")
@@ -85,7 +86,6 @@ const SettingsMenu = {
         }
         const keys = await caches.keys();
         await Promise.all(keys.map((k) => caches.delete(k)));
-        this.close();
         location.reload();
       });
 
@@ -98,9 +98,7 @@ const SettingsMenu = {
           )
         ) {
           localStorage.clear();
-          CameraManager.init();
-          FilmManager.init();
-          RollManager.init();
+          initManagers();
           this.close();
           refreshAllUI();
         }

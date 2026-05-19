@@ -2,6 +2,7 @@
 // EXPORT & IMPORT - I/O for rolls
 // ============================================================================
 
+// eslint-disable-next-line no-unused-vars
 const Export = {
   // Build clean frame data for CSV export (flat rows with camera/film/iso)
   _getFrameData() {
@@ -11,10 +12,9 @@ const Export = {
     const iso = FilmManager.getByName(film)?.iso ?? "";
 
     return rows.map((row) => {
-      const clean = {};
-      for (const [key, val] of Object.entries(row)) {
-        if (val != null) clean[key] = val; // eslint-disable-line eqeqeq
-      }
+      const clean = Object.fromEntries(
+        Object.entries(row).filter(([, val]) => val != null), // eslint-disable-line eqeqeq
+      );
       clean.camera = camera;
       clean.film = film;
       clean.iso = iso;
@@ -31,13 +31,12 @@ const Export = {
 
   // Coerce raw frame objects to match FRAME_SCHEMA types, strip nulls
   _coerceFrames(rawFrames) {
-    const schemaFields = FRAME_SCHEMA.fields;
-    const schemaFieldNames = schemaFields.map((f) => f.name);
+    const fieldMap = new Map(FRAME_SCHEMA.fields.map((f) => [f.name, f]));
     return rawFrames.map((row) => {
       const frame = {};
       for (const key of Object.keys(row)) {
-        if (!schemaFieldNames.includes(key)) continue;
-        const field = schemaFields.find((f) => f.name === key);
+        const field = fieldMap.get(key);
+        if (!field) continue;
         let val = row[key];
         if (field.type === "number") {
           val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
@@ -56,10 +55,10 @@ const Export = {
 
   // Append numeric suffix if a roll with this name already exists
   _deduplicateRollName(name) {
-    const existingNames = RollManager.getRolls().map((r) => r.name);
-    if (!existingNames.includes(name)) return name;
+    const existingNames = new Set(RollManager.getRolls().map((r) => r.name));
+    if (!existingNames.has(name)) return name;
     let suffix = 2;
-    while (existingNames.includes(`${name} (${suffix})`)) {
+    while (existingNames.has(`${name} (${suffix})`)) {
       suffix++;
     }
     return `${name} (${suffix})`;
@@ -100,7 +99,7 @@ const Export = {
       notes: roll.notes || "",
       camera: this._cleanEntity(CameraManager.getByName(cameraName)),
       film: this._cleanEntity(FilmManager.getByName(filmName)),
-      frames: Export._coerceFrames(roll.frames),
+      frames: this._coerceFrames(roll.frames),
     };
 
     const jsonString = JSON.stringify(data, null, 2);
@@ -140,7 +139,7 @@ const Export = {
             camera?.name || CameraManager.getAll()[0]?.name || "";
           const filmName = film?.name || FilmManager.getAll()[0]?.name || "";
 
-          const frames = Export._coerceFrames(data.frames);
+          const frames = this._coerceFrames(data.frames);
 
           // Use roll name from data, fall back to filename
           let rollName = data.name;
@@ -151,19 +150,17 @@ const Export = {
               .replace(/_\d+$/, "")
               .replace(/_/g, " ");
           }
-          rollName = Export._deduplicateRollName(rollName || "Imported Roll");
+          rollName = this._deduplicateRollName(rollName || "Imported Roll");
 
           const newRoll = RollManagerAdapter.create({
             name: rollName,
             frameCount: data.frameCount,
             notes: data.notes || "",
-          });
-          RollManager.setCurrentRoll(newRoll.id);
-          RollManager.updateRoll(newRoll.id, {
             camera: cameraName,
             film: filmName,
             frames,
           });
+          RollManager.setCurrentRoll(newRoll.id);
 
           refreshAllUI();
         } catch (err) {

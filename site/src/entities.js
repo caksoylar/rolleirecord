@@ -56,7 +56,7 @@ class EntityManager {
 
   getNextId() {
     let counter = localStorage.getItem(this.counterKey);
-    counter = counter ? parseInt(counter) + 1 : 1;
+    counter = counter ? parseInt(counter, 10) + 1 : 1;
     localStorage.setItem(this.counterKey, String(counter));
     return `${this.storageKey}-${counter}`;
   }
@@ -71,7 +71,7 @@ class EntityManager {
 
   update(id, data) {
     const items = this.getAll();
-    const item = items.find((i) => i.id === id);
+    const item = items.find((item) => item.id === id);
     if (!item) return null;
     const oldName = item.name;
     Object.assign(item, data);
@@ -81,7 +81,7 @@ class EntityManager {
 
   delete(id) {
     const items = this.getAll();
-    const filtered = items.filter((i) => i.id !== id);
+    const filtered = items.filter((item) => item.id !== id);
     if (filtered.length === items.length) return false;
     this.saveAll(filtered);
     return true;
@@ -107,8 +107,7 @@ class EntityManager {
         JSON.stringify(existing[key]) !== JSON.stringify(importProps[key]),
     );
     if (needsUpdate) {
-      this.update(existing.id, importProps);
-      return this.getById(existing.id);
+      return this.update(existing.id, importProps).item;
     }
     return existing;
   }
@@ -133,15 +132,15 @@ CameraManager.isFieldHidden = function (fieldName, cameraName) {
 };
 
 CameraManager.toggleHiddenField = function (fieldName, cameraName) {
-  const hidden = this.getHiddenFields(cameraName);
+  const camera = this.getByName(cameraName);
+  if (!camera) return;
+  const hidden = camera["hidden-fields"] || [];
   const index = hidden.indexOf(fieldName);
   if (index === -1) {
     hidden.push(fieldName);
   } else {
     hidden.splice(index, 1);
   }
-  const camera = this.getByName(cameraName);
-  if (!camera) return;
   camera["hidden-fields"] = hidden;
   this.update(camera.id, camera);
 };
@@ -171,8 +170,7 @@ const RollManagerAdapter = {
   create(data) {
     const roll = RollManager.createRoll(data.name, data.frameCount);
     const { name: _n, frameCount: _fc, ...rest } = data;
-    RollManager.updateRoll(roll.id, rest);
-    return RollManager.getRollById(roll.id);
+    return RollManager.updateRoll(roll.id, rest);
   },
 
   update(id, data) {

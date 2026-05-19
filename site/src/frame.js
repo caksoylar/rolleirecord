@@ -49,11 +49,14 @@ const FrameModal = {
 
       if (field.type === "select") {
         // Pass current camera to OptionsManager if field is camera-specific
-        const camera =
+        const entityCamera =
           field.entity_specific === "camera"
             ? SessionManager.getSelectedCamera()
             : null;
-        const dynamicOptions = OptionsManager.getOptions(field.name, camera);
+        const dynamicOptions = OptionsManager.getOptions(
+          field.name,
+          entityCamera,
+        );
 
         // Use schema default if it's in the options list, otherwise fall back to first option
         const effectiveDefault =
@@ -153,7 +156,7 @@ const FrameModal = {
                             </div>
                         `;
         }
-      } else if (field.name === "date") {
+      } else if (field.type === "datetime") {
         // Special handling for date field
         const value = isEditMode
           ? (rowData[field.name] || "").substring(0, 16)
@@ -461,8 +464,8 @@ const ModalFlows = {
     document.getElementById("field-id").value = suggestedId;
 
     // Fetch location and date automatically
-    ModalFlows.fetchAndSetLocation();
-    ModalFlows.fetchAndSetDate();
+    this.fetchAndSetLocation();
+    this.fetchAndSetDate();
   },
 
   // Handle edit existing row
@@ -491,11 +494,9 @@ const ModalFlows = {
       const accuracyText = location.accuracy
         ? ` (Accuracy: ±${Math.round(location.accuracy)}m)`
         : "";
-      const helperEl =
-        locationField.parentElement?.querySelector(".accuracy-hint") ||
-        locationField.parentElement?.parentElement?.querySelector(
-          ".accuracy-hint",
-        );
+      const helperEl = locationField
+        .closest(".form-group")
+        ?.querySelector(".accuracy-hint");
       if (helperEl) {
         helperEl.textContent = accuracyText;
       }
@@ -558,10 +559,6 @@ const ModalFlows = {
     TableRenderer.render();
     RollSelector.render();
   },
-
-  closeModal() {
-    FrameModal.close();
-  },
 };
 
 // ============================================================================
@@ -574,6 +571,6 @@ const UI = {
   },
 
   openEditModal(rowId) {
-    ModalFlows.openEditModal(rowId);
+    FrameModal.open("edit", rowId);
   },
 };

@@ -6,17 +6,6 @@
 // UI VISIBILITY - Show/hide elements based on roll state
 // ============================================================================
 
-const UIVisibility = {
-  update() {
-    const hasRoll = RollManager.getCurrentRoll() !== null;
-    const selectorGroup = document.querySelector(".entity-selector-group");
-    const addFab = document.getElementById("addFrameFab");
-
-    if (selectorGroup) selectorGroup.style.display = hasRoll ? "" : "none";
-    if (addFab) addFab.style.display = hasRoll ? "" : "none";
-  },
-};
-
 // ============================================================================
 // TABLE RENDERING
 // ============================================================================
@@ -65,7 +54,7 @@ const TableRenderer = {
     rows
       .toSorted((r1, r2) => r2.id - r1.id)
       .forEach((row) => {
-        html += `<tr class="clickable" onclick="UI.openEditModal(${Number(row.id)})" style="cursor:pointer">`;
+        html += `<tr class="clickable" onclick="UI.openEditModal(${row.id})" style="cursor:pointer">`;
 
         visibleFields.forEach((field) => {
           const raw = row[field.name] == null ? "" : row[field.name]; // eslint-disable-line eqeqeq
@@ -85,7 +74,6 @@ const TableRenderer = {
   render() {
     const container = document.getElementById("tableContainer");
     const hasRoll = RollManager.getCurrentRoll() !== null;
-
     if (!hasRoll) {
       container.innerHTML =
         '<div class="empty-state"><p>No rolls yet</p><p>Create a new roll to get started</p></div>';
@@ -93,7 +81,10 @@ const TableRenderer = {
       container.innerHTML = `<table>${this.renderHeaders()}${this.renderTableBody()}</table>`;
     }
 
-    UIVisibility.update();
+    const selectorGroup = document.querySelector(".entity-selector-group");
+    const addFab = document.getElementById("addFrameFab");
+    if (selectorGroup) selectorGroup.style.display = hasRoll ? "" : "none";
+    if (addFab) addFab.style.display = hasRoll ? "" : "none";
   },
 };
 
@@ -120,7 +111,8 @@ function formatRelativeDate(dateStr) {
   if (diffMins < 1) return "just now";
   if (diffMins < 60) return `${diffMins}m ago`;
   if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays === 1) return "yesterday";
+  const yesterday = new Date(Date.now() - 86400000);
+  if (date.toDateString() === yesterday.toDateString()) return "yesterday";
   if (diffDays < 7) return `${diffDays}d ago`;
   return date.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }

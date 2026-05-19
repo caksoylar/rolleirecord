@@ -46,7 +46,7 @@ const RollManager = {
   // Get next roll ID
   getNextRollId() {
     let counter = localStorage.getItem(this.ROLL_ID_COUNTER_KEY);
-    counter = counter ? parseInt(counter) + 1 : 1;
+    counter = counter ? parseInt(counter, 10) + 1 : 1;
     localStorage.setItem(this.ROLL_ID_COUNTER_KEY, counter.toString());
     return `roll-${counter}`;
   },
@@ -72,6 +72,8 @@ const RollManager = {
     // Generate unique roll ID
     const rollId = this.getNextRollId();
 
+    const now = new Date().toISOString();
+
     // Create roll with defaults
     const newRoll = {
       id: rollId,
@@ -80,8 +82,8 @@ const RollManager = {
       camera: CameraManager.getAll()[0]?.name || "",
       film: FilmManager.getAll()[0]?.name || "",
       frames: [],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      createdAt: now,
+      updatedAt: now,
     };
 
     rolls.push(newRoll);
@@ -117,16 +119,7 @@ const RollManager = {
 
   // Rename roll
   renameRoll(rollId, newName) {
-    const rolls = this.getRolls();
-    const roll = rolls.find((r) => r.id === rollId);
-
-    if (roll) {
-      roll.name = newName;
-      roll.updatedAt = new Date().toISOString();
-      this.saveRolls(rolls);
-    }
-
-    return roll || null;
+    return this.updateRoll(rollId, { name: newName });
   },
 
   // Update entire roll
@@ -170,7 +163,6 @@ const RollManager = {
     if (!currentRoll) return null;
 
     currentRoll.frames.push(frameData);
-    currentRoll.updatedAt = new Date().toISOString();
     this.updateRoll(currentRoll.id, currentRoll);
 
     return frameData;
@@ -184,7 +176,6 @@ const RollManager = {
     const frameIndex = currentRoll.frames.findIndex((f) => f.id === frameId);
     if (frameIndex !== -1) {
       currentRoll.frames[frameIndex] = frameData;
-      currentRoll.updatedAt = new Date().toISOString();
       this.updateRoll(currentRoll.id, currentRoll);
       return frameData;
     }
@@ -201,7 +192,6 @@ const RollManager = {
     currentRoll.frames = currentRoll.frames.filter((f) => f.id !== frameId);
 
     if (currentRoll.frames.length < initialLength) {
-      currentRoll.updatedAt = new Date().toISOString();
       this.updateRoll(currentRoll.id, currentRoll);
       return true;
     }
@@ -231,9 +221,7 @@ const RollManager = {
 
   // Get next suggested frame ID
   getNextSuggestedFrameId() {
-    const frames = this.getFrames();
-    if (frames.length === 0) return 1;
-    const ids = frames.map((f) => f.id).filter((id) => typeof id === "number");
-    return ids.length === 0 ? 1 : Math.max(...ids) + 1;
+    const max = this.getLastFrameId();
+    return max == null ? 1 : max + 1; // eslint-disable-line eqeqeq
   },
 };
