@@ -23,9 +23,9 @@
     <link rel="manifest" href="assets/site.webmanifest" />
   </head>
   <body>
-    <div id="updateBanner" style="display: none" onclick="location.reload()">
+    <button id="updateBanner" style="display: none">
       Update available — tap to reload
-    </div>
+    </button>
     <header>
       <h1>
         <svg
@@ -33,6 +33,8 @@
           width="0.833em"
           xmlns="http://www.w3.org/2000/svg"
           style="vertical-align: -0.125em"
+          aria-hidden="true"
+          focusable="false"
         >
           <circle r="50%" cx="50%" cy="50%" fill="var(--color-danger)" />
         </svg>
@@ -65,7 +67,6 @@
     <!-- FAB: Add new frame -->
     <button
       id="addFrameFab"
-      onclick="UI.openAddModal()"
       title="Add new frame"
       style="display: none"
     >
@@ -73,10 +74,10 @@
     </button>
 
     <!-- Settings Menu -->
-    <div class="modal" id="settingsMenu">
+    <div class="modal" id="settingsMenu" role="dialog" aria-modal="true" aria-labelledby="settingsMenuTitle">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Settings</h2>
+          <h2 id="settingsMenuTitle">Settings</h2>
         </div>
         <div class="settings-section">
           <h3>Backup &amp; Restore</h3>
@@ -120,7 +121,7 @@
     </div>
 
     <!-- Frame Modal -->
-    <div class="modal" id="frameModal">
+    <div class="modal" id="frameModal" role="dialog" aria-modal="true" aria-labelledby="frameModalTitle">
       <div class="modal-content">
         <div class="modal-header">
           <h2 id="frameModalTitle">Add Row</h2>
@@ -139,10 +140,10 @@
     </div>
 
     <!-- Field Options Dialog -->
-    <div class="modal" id="optionsDialog">
+    <div class="modal" id="optionsDialog" role="dialog" aria-modal="true" aria-labelledby="optionsDialogTitle">
       <div class="modal-content">
         <div class="modal-header">
-          <h2>Edit Field Options</h2>
+          <h2 id="optionsDialogTitle">Edit Field Options</h2>
         </div>
         <form autocomplete="off">
           <div class="field-selector">
@@ -155,7 +156,7 @@
             <!-- Inline visibility toggle rendered here when applicable -->
           </div>
           <div class="options-list">
-            <label>Options</label>
+            <p class="options-list-heading">Options</p>
             <div id="optionsContainer">
               <!-- Option inputs will be rendered here -->
             </div>
@@ -178,10 +179,10 @@
 
     <script>
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js").then(function (reg) {
-          reg.addEventListener("updatefound", function () {
-            var newWorker = reg.installing;
-            newWorker.addEventListener("statechange", function () {
+        navigator.serviceWorker.register("./sw.js").then((reg) => {
+          reg.addEventListener("updatefound", () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener("statechange", () => {
               if (
                 newWorker.state === "installed" &&
                 navigator.serviceWorker.controller

@@ -25,6 +25,16 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("settingsBtn")
     .addEventListener("click", () => SettingsMenu.open());
+
+  // FAB: add new frame
+  document
+    .getElementById("addFrameFab")
+    .addEventListener("click", () => UI.openAddModal());
+
+  // Update banner: reload page to activate new service worker
+  document
+    .getElementById("updateBanner")
+    .addEventListener("click", () => location.reload());
 });
 
 // ============================================================================

@@ -81,7 +81,7 @@ html {
 
 body {
   font-family: var(--font-family);
-  font-size: 16px;
+  font-size: var(--font-size-base);
   color: var(--color-text);
   background-color: var(--color-bg);
   padding: 0.8rem;
@@ -117,7 +117,6 @@ header {
 
 header button {
   padding: 0.5rem;
-  min-height: auto;
   background: none;
   border: none;
   color: var(--color-text);
@@ -181,6 +180,12 @@ button:active {
   opacity: 0.7;
 }
 
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--color-accent-ring);
+}
+
 button.danger {
   background-color: var(--color-danger);
 }
@@ -235,7 +240,7 @@ tr:last-child td {
   aspect-ratio: 1;
 }
 
-tbody tr[onclick]:hover {
+tbody tr.clickable:hover {
   background-color: var(--color-surface-alt);
 }
 
@@ -434,7 +439,8 @@ textarea {
   margin-bottom: 1rem;
 }
 
-.options-list label {
+.options-list label,
+.options-list .options-list-heading {
   margin-bottom: 1rem;
 }
 

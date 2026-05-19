@@ -65,7 +65,7 @@ const TableRenderer = {
     rows
       .sort((r1, r2) => r2.id - r1.id)
       .forEach((row) => {
-        html += `<tr onclick="UI.openEditModal(${Number(row.id)})" style="cursor:pointer">`;
+        html += `<tr class="clickable" onclick="UI.openEditModal(${Number(row.id)})" style="cursor:pointer">`;
 
         visibleFields.forEach((field) => {
           const raw = row[field.name] == null ? "" : row[field.name]; // eslint-disable-line eqeqeq
