@@ -67,6 +67,19 @@ const SettingsMenu = {
       });
 
     document
+      .getElementById("settingsRefreshCacheBtn")
+      .addEventListener("click", async () => {
+        if (!("caches" in window)) {
+          alert("Cache API not available.");
+          return;
+        }
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+        this.close();
+        location.reload();
+      });
+
+    document
       .getElementById("settingsClearAllBtn")
       .addEventListener("click", () => {
         if (
