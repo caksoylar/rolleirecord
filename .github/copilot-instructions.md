@@ -12,6 +12,18 @@ Rolleirecord is a vanilla JS single-page PWA for logging analog film photography
 - No test suite exists. No build step on main branch.
 - **Always run `npm run lint` and `npm run format` before committing.**
 
+## Git Commits
+
+Use **Conventional Commits** for commit titles:
+- `fix: <description>` — bug fixes
+- `feat: <description>` — new features
+- `refactor: <description>` — code restructuring without behaviour change
+- `style: <description>` — formatting, whitespace, CSS-only changes
+- `chore: <description>` — build, config, dependency changes
+- `docs: <description>` — documentation only
+
+The body can be free-form. Keep the title under 72 characters.
+
 ## Architecture
 
 ### Script loading & globals
