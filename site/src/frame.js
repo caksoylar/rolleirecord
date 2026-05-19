@@ -35,207 +35,202 @@ const FrameModal = {
 
   // Render form fields based on schema
   renderFormFields(rowData = null, isEditMode = false) {
-    let html = "";
     const camera = SessionManager.getSelectedCamera();
+    let html = "";
 
     FRAME_SCHEMA.fields.forEach((field) => {
-      // Skip hideable fields that are hidden for this camera
-      if (field.hideable && CameraManager.isFieldHidden(field.name, camera)) {
+      if (field.hideable && CameraManager.isFieldHidden(field.name, camera))
         return;
-      }
 
       const inputId = `field-${safeInputId(field.name)}`;
       const required = field.required ? "required" : "";
 
       if (field.type === "select") {
-        // Pass current camera to OptionsManager if field is camera-specific
-        const entityCamera =
-          field.entity_specific === "camera"
-            ? SessionManager.getSelectedCamera()
-            : null;
-        const dynamicOptions = OptionsManager.getOptions(
-          field.name,
-          entityCamera,
-        );
-
-        // Use schema default if it's in the options list, otherwise fall back to first option
-        const effectiveDefault =
-          dynamicOptions.length > 0 &&
-          !dynamicOptions.includes(field.defaultValue)
-            ? dynamicOptions[0]
-            : field.defaultValue;
-        const currentValue = rowData
-          ? rowData[field.name] || effectiveDefault
-          : effectiveDefault;
-        const isCustom =
-          field.custom_value &&
-          currentValue &&
-          !dynamicOptions.includes(currentValue);
-
-        html += `
-          <div class="form-group">
-            <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-            <div class="custom-select-wrap">
-              <select
-                id="${inputId}"
-                name="${safeInputId(field.name)}"
-                ${required}
-                ${isCustom ? 'style="display:none"' : ""}
-              >
-        `;
-
-        dynamicOptions.forEach((option) => {
-          const selected =
-            !isCustom && option === currentValue ? "selected" : "";
-          html += `<option value="${escapeHtml(option)}" ${selected}>${escapeHtml(option)}</option>`;
-        });
-
-        if (field.custom_value) {
-          html += `<option value="__custom__" ${isCustom ? "selected" : ""}>Custom\u2026</option>`;
-        }
-
-        html += `</select>`;
-
-        if (field.custom_value) {
-          html += `
-              <div class="custom-input-wrap" ${isCustom ? "" : 'style="display:none"'}>
-                <input type="text"
-                  class="custom-value-input"
-                  value="${isCustom ? escapeHtml(currentValue) : ""}"
-                  placeholder="Enter value"
-                />
-                <button type="button" class="secondary custom-cancel-btn" title="Back to list"><svg class="icon"><use href="icons.svg#icon-close"></use></svg></button>
-              </div>
-          `;
-        }
-
-        html += `</div></div>`;
+        html += this._renderSelectField(field, inputId, required, rowData);
       } else if (field.name === "location") {
-        // Special handling for location field
-        const value = isEditMode ? rowData[field.name] || "" : "";
-        const mapsUrl = value ? LocationManager.getMapsUrl(value) : null;
-
-        if (isEditMode) {
-          // In edit mode: show field with refresh button and optional maps link
-          html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input 
-                                        type="text"
-                                        id="${inputId}"
-                                        name="${safeInputId(field.name)}"
-                                        value="${escapeHtml(String(value))}"
-                                        ${required}
-                                        ${field.readonly ? "readonly" : ""}
-                                        style="flex: 1;"
-                                    />
-                                    <button type="button" id="refresh-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
-                                        <svg class="icon"><use href="icons.svg#icon-pin"></use></svg>
-                                    </button>
-                                    ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
-                                </div>
-                                <div class="accuracy-hint"></div>
-                            </div>
-                        `;
-        } else {
-          // In add mode: just show field (location will be fetched by openAddModal)
-          html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <input 
-                                    type="text"
-                                    id="${inputId}"
-                                    name="${safeInputId(field.name)}"
-                                    value="${escapeHtml(String(value))}"
-                                    ${required}
-                                    ${field.readonly ? "readonly" : ""}
-                                    placeholder="Auto-capturing via GPS..."
-                                />
-                                <div/><div class="accuracy-hint"></div>
-                            </div>
-                        `;
-        }
+        html += this._renderLocationField(
+          field,
+          inputId,
+          required,
+          rowData,
+          isEditMode,
+        );
       } else if (field.type === "datetime") {
-        // Special handling for date field
-        const value = isEditMode
-          ? (rowData[field.name] || "").substring(0, 16)
-          : "";
-
-        html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input 
-                                        type="datetime-local"
-                                        id="${inputId}"
-                                        name="${safeInputId(field.name)}"
-                                        value="${escapeHtml(String(value))}"
-                                        ${required}
-                                        ${field.readonly ? "readonly" : ""}
-                                        style="flex: 1;"
-                                    />
-                                    <button type="button" id="refresh-date-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
-                                        <svg class="icon"><use href="icons.svg#icon-refresh"></use></svg>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
+        html += this._renderDateField(
+          field,
+          inputId,
+          required,
+          rowData,
+          isEditMode,
+        );
       } else if (field.type === "checkbox") {
-        const checked = rowData
-          ? rowData[field.name] === true
-          : !!field.defaultValue;
-        html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}</label>
-                                <input 
-                                    type="checkbox"
-                                    id="${inputId}"
-                                    name="${safeInputId(field.name)}"
-                                    ${checked ? "checked" : ""}
-                                />
-                            </div>
-                        `;
+        html += this._renderCheckboxField(field, inputId, rowData);
       } else if (field.name === "notes") {
-        const value = rowData ? rowData[field.name] || "" : "";
-        html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <div class="notes-field-wrap">
-                                    <input
-                                        type="text"
-                                        id="${inputId}"
-                                        name="${safeInputId(field.name)}"
-                                        value="${escapeHtml(String(value))}"
-                                        ${required}
-                                        ${field.readonly ? "readonly" : ""}
-                                    />
-                                    <button type="button" class="secondary notes-clear-btn" title="Clear"><svg class="icon"><use href="icons.svg#icon-close"></use></svg></button>
-                                </div>
-                            </div>
-                        `;
+        html += this._renderNotesField(field, inputId, required, rowData);
       } else {
-        // Render text or number input
-        const value = rowData ? rowData[field.name] || "" : "";
-        html += `
-                            <div class="form-group">
-                                <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-                                <input 
-                                    type="${field.type === "number" ? "number" : "text"}"
-                                    id="${inputId}"
-                                    name="${safeInputId(field.name)}"
-                                    value="${escapeHtml(String(value))}"
-                                    ${required}
-                                    ${field.readonly ? "readonly" : ""}
-                                />
-                            </div>
-                        `;
+        html += this._renderTextField(field, inputId, required, rowData);
       }
     });
 
     this.bodyElement.innerHTML = html;
+    this._wireFormEvents(isEditMode, rowData);
+  },
 
-    // Wire up notes clear button
+  _renderSelectField(field, inputId, required, rowData) {
+    const entityCamera =
+      field.entity_specific === "camera"
+        ? SessionManager.getSelectedCamera()
+        : null;
+    const dynamicOptions = OptionsManager.getOptions(field.name, entityCamera);
+
+    const effectiveDefault =
+      dynamicOptions.length > 0 && !dynamicOptions.includes(field.defaultValue)
+        ? dynamicOptions[0]
+        : field.defaultValue;
+    const currentValue = rowData
+      ? rowData[field.name] || effectiveDefault
+      : effectiveDefault;
+    const isCustom =
+      field.custom_value &&
+      currentValue &&
+      !dynamicOptions.includes(currentValue);
+
+    let html = `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+        <div class="custom-select-wrap">
+          <select id="${inputId}" name="${safeInputId(field.name)}" ${required} ${isCustom ? 'style="display:none"' : ""}>
+    `;
+
+    dynamicOptions.forEach((option) => {
+      const selected = !isCustom && option === currentValue ? "selected" : "";
+      html += `<option value="${escapeHtml(option)}" ${selected}>${escapeHtml(option)}</option>`;
+    });
+
+    if (field.custom_value) {
+      html += `<option value="__custom__" ${isCustom ? "selected" : ""}>Custom\u2026</option>`;
+    }
+
+    html += `</select>`;
+
+    if (field.custom_value) {
+      html += `
+        <div class="custom-input-wrap" ${isCustom ? "" : 'style="display:none"'}>
+          <input type="text" class="custom-value-input"
+            value="${isCustom ? escapeHtml(currentValue) : ""}"
+            placeholder="Enter value" />
+          <button type="button" class="secondary custom-cancel-btn" title="Back to list">
+            <svg class="icon"><use href="icons.svg#icon-close"></use></svg>
+          </button>
+        </div>
+      `;
+    }
+
+    html += `</div></div>`;
+    return html;
+  },
+
+  _renderLocationField(field, inputId, required, rowData, isEditMode) {
+    const value = isEditMode ? rowData[field.name] || "" : "";
+    const mapsUrl = value ? LocationManager.getMapsUrl(value) : null;
+
+    if (isEditMode) {
+      return `
+        <div class="form-group">
+          <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="${inputId}" name="${safeInputId(field.name)}"
+              value="${escapeHtml(String(value))}" ${required}
+              ${field.readonly ? "readonly" : ""} style="flex: 1;" />
+            <button type="button" id="refresh-location-btn" class="secondary"
+              style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
+              <svg class="icon"><use href="icons.svg#icon-pin"></use></svg>
+            </button>
+            ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
+          </div>
+          <div class="accuracy-hint"></div>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+        <input type="text" id="${inputId}" name="${safeInputId(field.name)}"
+          value="${escapeHtml(String(value))}" ${required}
+          ${field.readonly ? "readonly" : ""}
+          placeholder="Auto-capturing via GPS..." />
+        <div/><div class="accuracy-hint"></div>
+      </div>
+    `;
+  },
+
+  _renderDateField(field, inputId, required, rowData, isEditMode) {
+    const value = isEditMode
+      ? (rowData[field.name] || "").substring(0, 16)
+      : "";
+
+    return `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="datetime-local" id="${inputId}" name="${safeInputId(field.name)}"
+            value="${escapeHtml(String(value))}" ${required}
+            ${field.readonly ? "readonly" : ""} style="flex: 1;" />
+          <button type="button" id="refresh-date-btn" class="secondary"
+            style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
+            <svg class="icon"><use href="icons.svg#icon-refresh"></use></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  _renderCheckboxField(field, inputId, rowData) {
+    const checked = rowData
+      ? rowData[field.name] === true
+      : !!field.defaultValue;
+    return `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}</label>
+        <input type="checkbox" id="${inputId}" name="${safeInputId(field.name)}"
+          ${checked ? "checked" : ""} />
+      </div>
+    `;
+  },
+
+  _renderNotesField(field, inputId, required, rowData) {
+    const value = rowData ? rowData[field.name] || "" : "";
+    return `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+        <div class="notes-field-wrap">
+          <input type="text" id="${inputId}" name="${safeInputId(field.name)}"
+            value="${escapeHtml(String(value))}" ${required}
+            ${field.readonly ? "readonly" : ""} />
+          <button type="button" class="secondary notes-clear-btn" title="Clear">
+            <svg class="icon"><use href="icons.svg#icon-close"></use></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  },
+
+  _renderTextField(field, inputId, required, rowData) {
+    const value = rowData ? rowData[field.name] || "" : "";
+    return `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+        <input type="${field.type === "number" ? "number" : "text"}"
+          id="${inputId}" name="${safeInputId(field.name)}"
+          value="${escapeHtml(String(value))}" ${required}
+          ${field.readonly ? "readonly" : ""} />
+      </div>
+    `;
+  },
+
+  _wireFormEvents(isEditMode, rowData) {
+    // Notes clear button
     const notesClearBtn = this.bodyElement.querySelector(".notes-clear-btn");
     if (notesClearBtn) {
       notesClearBtn.addEventListener("click", (e) => {
@@ -245,7 +240,7 @@ const FrameModal = {
       });
     }
 
-    // Wire up custom value select/input toggles
+    // Custom value select/input toggles
     this.bodyElement.querySelectorAll(".custom-select-wrap").forEach((wrap) => {
       const select = wrap.querySelector("select");
       const customWrap = wrap.querySelector(".custom-input-wrap");
@@ -269,6 +264,7 @@ const FrameModal = {
       });
     });
 
+    // Date refresh button
     const refreshDateBtn = document.getElementById("refresh-date-btn");
     if (refreshDateBtn) {
       refreshDateBtn.addEventListener("click", async (e) => {
@@ -278,16 +274,15 @@ const FrameModal = {
       });
     }
 
-    // Attach refresh button listener in edit mode
+    // Location buttons (edit mode only)
     if (isEditMode) {
       const refreshBtn = document.getElementById("refresh-location-btn");
       if (refreshBtn) {
-        refreshBtn.addEventListener("click", () => {
-          ModalFlows.fetchAndSetLocation();
-        });
+        refreshBtn.addEventListener("click", () =>
+          ModalFlows.fetchAndSetLocation(),
+        );
       }
 
-      // Attach maps button listener if location is valid
       const mapsBtn = document.getElementById("maps-location-btn");
       if (mapsBtn) {
         mapsBtn.addEventListener("click", (e) => {
@@ -296,9 +291,7 @@ const FrameModal = {
           const locationInput = document.getElementById("field-location");
           if (locationInput && locationInput.value) {
             const url = LocationManager.getMapsUrl(locationInput.value);
-            if (url) {
-              window.open(url, "_blank");
-            }
+            if (url) window.open(url, "_blank");
           }
         });
       }
@@ -319,7 +312,7 @@ const FrameModal = {
       deleteBtn.style.display = "none";
     }
 
-    // Auto-focus first input (text/number/select)
+    // Auto-focus first input
     const firstInput = this.bodyElement.querySelector("input, select");
     if (firstInput) {
       setTimeout(() => firstInput.focus(), 100);
