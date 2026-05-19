@@ -30,13 +30,13 @@ function reassignRollsOnDelete(field, manager, entity) {
 // CAMERA SELECTOR - Uses EntitySelector + EntityFormModal
 // ============================================================================
 
-let cameraModal = null;
-let cameraSelector = null;
-
 // eslint-disable-next-line no-unused-vars
 const CameraSelector = {
+  _modal: null,
+  _selector: null,
+
   init() {
-    cameraModal = new EntityFormModal({
+    this._modal = new EntityFormModal({
       entityType: "Camera",
       schema: CAMERA_SCHEMA,
       manager: CameraManager,
@@ -65,11 +65,11 @@ const CameraSelector = {
       onAfterAction: () => refreshAllUI(),
     });
 
-    cameraSelector = new EntitySelector({
+    this._selector = new EntitySelector({
       containerSelector: "#cameraContainer",
       selectId: "cameraSelect",
       manager: CameraManager,
-      modal: cameraModal,
+      modal: this._modal,
       iconHref: "#icon-camera",
       label: "Select camera",
       addNewLabel: "+ Add new camera",
@@ -85,7 +85,7 @@ const CameraSelector = {
   },
 
   render() {
-    if (cameraSelector) cameraSelector.render();
+    if (this._selector) this._selector.render();
   },
 };
 
@@ -93,13 +93,13 @@ const CameraSelector = {
 // FILM SELECTOR - Uses EntitySelector + EntityFormModal
 // ============================================================================
 
-let filmModal = null;
-let filmSelector = null;
-
 // eslint-disable-next-line no-unused-vars
 const FilmSelector = {
+  _modal: null,
+  _selector: null,
+
   init() {
-    filmModal = new EntityFormModal({
+    this._modal = new EntityFormModal({
       entityType: "Film",
       schema: FILM_SCHEMA,
       manager: FilmManager,
@@ -125,11 +125,11 @@ const FilmSelector = {
       onAfterAction: () => refreshAllUI(),
     });
 
-    filmSelector = new EntitySelector({
+    this._selector = new EntitySelector({
       containerSelector: "#filmContainer",
       selectId: "filmSelect",
       manager: FilmManager,
-      modal: filmModal,
+      modal: this._modal,
       iconHref: "#icon-film",
       label: "Select film",
       addNewLabel: "+ Add new film",
@@ -144,7 +144,7 @@ const FilmSelector = {
   },
 
   render() {
-    if (filmSelector) filmSelector.render();
+    if (this._selector) this._selector.render();
   },
 };
 
@@ -152,13 +152,13 @@ const FilmSelector = {
 // ROLL SELECTOR - Uses EntitySelector + EntityFormModal
 // ============================================================================
 
-let rollModal = null;
-let rollSelector = null;
-
 // eslint-disable-next-line no-unused-vars
 const RollSelector = {
+  _modal: null,
+  _selector: null,
+
   init() {
-    rollModal = new EntityFormModal({
+    this._modal = new EntityFormModal({
       entityType: "Roll",
       schema: ROLL_SCHEMA,
       manager: RollManagerAdapter,
@@ -175,11 +175,11 @@ const RollSelector = {
       onAfterAction: () => refreshAllUI(),
     });
 
-    rollSelector = new EntitySelector({
+    this._selector = new EntitySelector({
       containerSelector: "#rollContainer",
       selectId: "rollSelect",
       manager: RollManagerAdapter,
-      modal: rollModal,
+      modal: this._modal,
       iconHref: "#icon-roll",
       label: "Select roll",
       addNewLabel: "+ Create new roll",
@@ -199,17 +199,15 @@ const RollSelector = {
 
     // Auto-open create modal when no rolls exist
     if (!RollManager.getCurrentRoll()) {
-      rollModal.openCreate({ mandatory: true });
+      this._modal.openCreate({ mandatory: true });
     }
   },
 
   render() {
-    if (rollSelector) {
-      rollSelector.render();
-    }
+    if (this._selector) this._selector.render();
     // Auto-open create modal when no rolls exist
-    if (!RollManager.getCurrentRoll() && rollModal) {
-      rollModal.openCreate({ mandatory: true });
+    if (!RollManager.getCurrentRoll() && this._modal) {
+      this._modal.openCreate({ mandatory: true });
     }
   },
 };
