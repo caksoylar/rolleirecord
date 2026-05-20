@@ -46,6 +46,17 @@ class EntityFormModal {
         const id = `${this.entityType}-${safeInputId(field.name)}`;
         const required = field.required ? "required" : "";
 
+        if (field.type === "select") {
+          const options = field.options
+            .map((o) => `<option value="${o}">${o}</option>`)
+            .join("");
+          return `
+          <div class="form-group">
+            <label for="${id}">${field.label}</label>
+            <select id="${id}" name="${safeInputId(field.name)}" ${required}>${options}</select>
+          </div>`;
+        }
+
         if (field.type === "film-format") {
           const options = Object.keys(FORMATS)
             .map((f) => `<option value="${f}">${f}</option>`)

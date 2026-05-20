@@ -204,9 +204,12 @@ const RollSelector = {
       formatLabel: (roll) => {
         const maxId = RollManager.getMaxFrameId(roll);
         const progress = maxId ?? 0;
-        return roll.frameCount
-          ? `${roll.name} (${progress}/${roll.frameCount})`
-          : roll.name;
+        const progressStr = roll.frameCount
+          ? `(${progress}/${roll.frameCount})`
+          : "";
+        const statusStr =
+          roll.status && roll.status !== "Loaded" ? ` (${roll.status})` : "";
+        return `${roll.name}${progressStr ? ` ${progressStr}` : ""}${statusStr}`;
       },
     });
 

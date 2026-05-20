@@ -162,6 +162,8 @@ const DEFAULT_FILMS = [
 ];
 
 // Entity schemas
+const ROLL_STATUSES = ["Loaded", "Finished", "Developed", "Scanned"];
+
 // eslint-disable-next-line no-unused-vars
 const ROLL_SCHEMA = {
   fields: [
@@ -171,6 +173,13 @@ const ROLL_SCHEMA = {
       type: "number",
       label: "Frame Count",
       defaultValue: DEFAULT_FRAME_COUNT,
+    },
+    {
+      name: "status",
+      type: "select",
+      label: "Status",
+      options: ROLL_STATUSES,
+      defaultValue: ROLL_STATUSES[0],
     },
     {
       name: "notes",
