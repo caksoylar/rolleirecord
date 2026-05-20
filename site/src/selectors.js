@@ -162,6 +162,19 @@ const RollSelector = {
       entityType: "Roll",
       schema: ROLL_SCHEMA,
       manager: RollManagerAdapter,
+      onBeforeSave: (data, existing, mode) => {
+        if (
+          mode === "update" &&
+          existing &&
+          existing.camera !== data.camera &&
+          existing.frames?.length > 0
+        ) {
+          return confirm(
+            `This roll already has ${existing.frames.length} frame(s) logged with "${existing.camera}". ` +
+              `Changing the camera may affect hidden fields and per-camera options. Continue?`,
+          );
+        }
+      },
       onSave: (item, mode) => {
         if (mode === "create") {
           RollManager.setCurrentRoll(item.id);

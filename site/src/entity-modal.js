@@ -12,6 +12,7 @@ class EntityFormModal {
     schema,
     manager,
     onSave,
+    onBeforeSave,
     onDelete,
     onAfterAction,
   }) {
@@ -19,6 +20,7 @@ class EntityFormModal {
     this.schema = schema;
     this.manager = manager;
     this.onSave = onSave || (() => {});
+    this.onBeforeSave = onBeforeSave || null;
     this.onDelete = onDelete || null;
     this.onAfterAction = onAfterAction || (() => {});
     this.mode = "create";
@@ -248,6 +250,13 @@ class EntityFormModal {
         alert(`${field.label} is required`);
         return;
       }
+    }
+
+    if (this.onBeforeSave) {
+      const existing = this.editingId
+        ? this.manager.getById(this.editingId)
+        : null;
+      if (this.onBeforeSave(data, existing, this.mode) === false) return;
     }
 
     if (this.mode === "create") {
