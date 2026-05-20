@@ -64,29 +64,91 @@ const Export = {
     return `${name} (${suffix})`;
   },
 
-  _downloadFile(content, mimeType, extension) {
+  _rollFilename(extension) {
     const currentRoll = RollManager.getCurrentRoll();
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
     const timestamp = new Date()
       .toISOString()
       .replace(/[:.]/g, "-")
       .slice(0, -5);
-
     const rollName = currentRoll
       ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
       : "export";
     const frameCount = currentRoll ? (currentRoll.frames?.length ?? 0) : 0;
+    return `${rollName}_${frameCount}-${timestamp}.${extension}`;
+  },
+
+  _downloadFile(content, mimeType, filename) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
     link.href = url;
-    link.download = `${rollName}_${frameCount}-${timestamp}.${extension}`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   },
 
-  exportBackup() {
+  exportStorage() {
+    const backup = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      backup[key] = localStorage.getItem(key);
+    }
+    const timestamp = new Date()
+      .toISOString()
+      .replace(/[:.]/g, "-")
+      .slice(0, -5);
+    this._downloadFile(
+      JSON.stringify(backup, null, 2),
+      "application/json",
+      `rolleirecord-backup-${timestamp}.json`,
+    );
+  },
+
+  _importFile(handler) {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".json,application/json";
+
+    input.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          handler(event.target.result, file);
+        } catch (err) {
+          alert("Failed to import: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    input.click();
+  },
+
+  importStorage() {
+    this._importFile((text) => {
+      const backup = JSON.parse(text);
+      if (!backup || typeof backup !== "object" || Array.isArray(backup)) {
+        alert("Invalid file: expected a JSON object.");
+        return;
+      }
+      if (
+        !confirm(
+          "This will replace all current data with the backup. Continue?",
+        )
+      )
+        return;
+      localStorage.clear();
+      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
+      location.reload();
+    });
+  },
+
+  exportRoll() {
     const roll = RollManager.getCurrentRoll();
     if (!roll) return;
 
@@ -103,75 +165,56 @@ const Export = {
     };
 
     const jsonString = JSON.stringify(data, null, 2);
-    this._downloadFile(jsonString, "application/json", "json");
+    this._downloadFile(
+      jsonString,
+      "application/json",
+      this._rollFilename("json"),
+    );
   },
 
-  importBackup() {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json,application/json";
+  importRoll() {
+    this._importFile((text, file) => {
+      const data = JSON.parse(text);
 
-    input.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+      if (!data || typeof data !== "object" || !Array.isArray(data.frames)) {
+        alert("Invalid file: expected a JSON object with a frames array.");
+        return;
+      }
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          const data = JSON.parse(event.target.result);
+      // Reconcile camera and film entities
+      const camera = data.camera
+        ? CameraManager.upsertByName(data.camera)
+        : null;
+      const film = data.film ? FilmManager.upsertByName(data.film) : null;
 
-          if (
-            !data ||
-            typeof data !== "object" ||
-            !Array.isArray(data.frames)
-          ) {
-            alert("Invalid file: expected a JSON object with a frames array.");
-            return;
-          }
+      const cameraName = camera?.name || CameraManager.getAll()[0]?.name || "";
+      const filmName = film?.name || FilmManager.getAll()[0]?.name || "";
 
-          // Reconcile camera and film entities
-          const camera = data.camera
-            ? CameraManager.upsertByName(data.camera)
-            : null;
-          const film = data.film ? FilmManager.upsertByName(data.film) : null;
+      const frames = this._coerceFrames(data.frames);
 
-          const cameraName =
-            camera?.name || CameraManager.getAll()[0]?.name || "";
-          const filmName = film?.name || FilmManager.getAll()[0]?.name || "";
+      // Use roll name from data, fall back to filename
+      let rollName = data.name;
+      if (!rollName) {
+        const baseName = file.name.replace(/\.json$/i, "");
+        rollName = baseName
+          .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
+          .replace(/_\d+$/, "")
+          .replace(/_/g, " ");
+      }
+      rollName = this._deduplicateRollName(rollName || "Imported Roll");
 
-          const frames = this._coerceFrames(data.frames);
+      const newRoll = RollManagerAdapter.create({
+        name: rollName,
+        frameCount: data.frameCount,
+        notes: data.notes || "",
+        camera: cameraName,
+        film: filmName,
+        frames,
+      });
+      RollManager.setCurrentRoll(newRoll.id);
 
-          // Use roll name from data, fall back to filename
-          let rollName = data.name;
-          if (!rollName) {
-            const baseName = file.name.replace(/\.json$/i, "");
-            rollName = baseName
-              .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
-              .replace(/_\d+$/, "")
-              .replace(/_/g, " ");
-          }
-          rollName = this._deduplicateRollName(rollName || "Imported Roll");
-
-          const newRoll = RollManagerAdapter.create({
-            name: rollName,
-            frameCount: data.frameCount,
-            notes: data.notes || "",
-            camera: cameraName,
-            film: filmName,
-            frames,
-          });
-          RollManager.setCurrentRoll(newRoll.id);
-
-          refreshAllUI();
-        } catch (err) {
-          alert("Failed to import: " + err.message);
-        }
-      };
-
-      reader.readAsText(file);
+      refreshAllUI();
     });
-
-    input.click();
   },
 
   exportToExiftoolCSV() {
@@ -193,6 +236,6 @@ const Export = {
 
     const csvString = [keys.join(","), ...exif.map(toCsvLine)].join("\n");
 
-    this._downloadFile(csvString, "text/csv", "csv");
+    this._downloadFile(csvString, "text/csv", this._rollFilename("csv"));
   },
 };

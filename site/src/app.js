@@ -57,17 +57,17 @@ const SettingsMenu = {
     });
 
     document
-      .getElementById("settingsExportBtn")
+      .getElementById("settingsExportRollBtn")
       .addEventListener("click", () => {
         this.close();
-        Export.exportBackup();
+        Export.exportRoll();
       });
 
     document
-      .getElementById("settingsImportBtn")
+      .getElementById("settingsImportRollBtn")
       .addEventListener("click", () => {
         this.close();
-        Export.importBackup();
+        Export.importRoll();
       });
 
     document
@@ -75,6 +75,20 @@ const SettingsMenu = {
       .addEventListener("click", () => {
         this.close();
         Export.exportToExiftoolCSV();
+      });
+
+    document
+      .getElementById("settingsFullExportBtn")
+      .addEventListener("click", () => {
+        this.close();
+        Export.exportStorage();
+      });
+
+    document
+      .getElementById("settingsFullImportBtn")
+      .addEventListener("click", () => {
+        this.close();
+        Export.importStorage();
       });
 
     document
