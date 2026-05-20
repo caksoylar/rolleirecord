@@ -418,10 +418,15 @@ textarea {
 
 .modal-footer {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
-.modal-footer button,
+.modal-footer button {
+  flex: 1;
+  min-width: 6rem;
+}
+
 .settings-actions button {
   flex: 1;
   min-width: 8rem;
