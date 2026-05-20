@@ -73,7 +73,7 @@ const Export = {
     const rollName = currentRoll
       ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
       : "export";
-    const frameCount = currentRoll ? (currentRoll.frames?.length ?? 0) : 0;
+    const frameCount = RollManager.getMaxFrameId(currentRoll) ?? 0;
     return `${rollName}_${frameCount}-${timestamp}.${extension}`;
   },
 
@@ -198,7 +198,7 @@ const Export = {
         const baseName = file.name.replace(/\.json$/i, "");
         rollName = baseName
           .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
-          .replace(/_\d+$/, "")
+          .replace(/_-?\d+$/, "")
           .replace(/_/g, " ");
       }
       rollName = this._deduplicateRollName(rollName || "Imported Roll");
