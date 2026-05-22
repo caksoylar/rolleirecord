@@ -11,6 +11,7 @@ function safeInputId(fieldName) {
 }
 
 // Default seed data (used to populate localStorage on first load)
+// eslint-disable-next-line no-unused-vars
 const DEFAULT_FRAME_COUNT = 36;
 
 // Shared hidden-fields for fully manual cameras (no auto mode or exposure comp)
@@ -161,71 +162,9 @@ const DEFAULT_FILMS = [
   { name: "Fujifilm Neopan Acros 100 II", iso: 100 },
 ];
 
-// Entity schemas
-const ROLL_STATUSES = ["Loaded", "Finished", "Developed", "Scanned"];
-
+// Roll status options
 // eslint-disable-next-line no-unused-vars
-const ROLL_SCHEMA = {
-  fields: [
-    { name: "name", type: "text", label: "Roll Name", required: true },
-    {
-      name: "camera",
-      type: "entity-select",
-      label: "Camera",
-      required: true,
-      getOptions: () => CameraManager.getAll().map((c) => c.name),
-      addNewLabel: "+ Add new camera",
-      defaultValue: () => SessionManager.getSelectedCamera(),
-      openAddNew: (onComplete) => {
-        CameraSelector._modal._onNextAfterAction = onComplete;
-        CameraSelector._modal.openCreate();
-      },
-      openEdit: (name, onComplete) => {
-        const camera = CameraManager.getByName(name);
-        if (!camera) return;
-        CameraSelector._modal._onNextAfterAction = onComplete;
-        CameraSelector._modal.openEdit(camera.id);
-      },
-    },
-    {
-      name: "film",
-      type: "entity-select",
-      label: "Film",
-      required: true,
-      getOptions: () => FilmManager.getAll().map((f) => f.name),
-      addNewLabel: "+ Add new film",
-      defaultValue: () => SessionManager.getSelectedFilm(),
-      openAddNew: (onComplete) => {
-        FilmSelector._modal._onNextAfterAction = onComplete;
-        FilmSelector._modal.openCreate();
-      },
-      openEdit: (name, onComplete) => {
-        const film = FilmManager.getByName(name);
-        if (!film) return;
-        FilmSelector._modal._onNextAfterAction = onComplete;
-        FilmSelector._modal.openEdit(film.id);
-      },
-    },
-    {
-      name: "frameCount",
-      type: "number",
-      label: "Frame Count",
-      defaultValue: DEFAULT_FRAME_COUNT,
-    },
-    {
-      name: "status",
-      type: "select",
-      label: "Status",
-      options: ROLL_STATUSES,
-      defaultValue: ROLL_STATUSES[0],
-    },
-    {
-      name: "notes",
-      type: "textarea",
-      label: "Notes",
-    },
-  ],
-};
+const ROLL_STATUSES = ["Loaded", "Finished", "Developed", "Scanned"];
 
 // eslint-disable-next-line no-unused-vars
 const FORMATS = {

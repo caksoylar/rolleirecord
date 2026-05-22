@@ -154,37 +154,3 @@ const FilmManager = new EntityManager({
   counterKey: "film-counter",
   defaults: DEFAULT_FILMS,
 });
-
-// Adapter to make RollManager compatible with EntityFormModal/EntitySelector
-// eslint-disable-next-line no-unused-vars
-const RollManagerAdapter = {
-  getAll() {
-    return RollManager.getRolls();
-  },
-
-  getById(id) {
-    return RollManager.getRollById(id);
-  },
-
-  getByName(name) {
-    return RollManager.getRolls().find((r) => r.name === name) || null;
-  },
-
-  create(data) {
-    const roll = RollManager.createRoll(data.name, data.frameCount);
-    const { name: _n, frameCount: _fc, ...rest } = data;
-    return RollManager.updateRoll(roll.id, rest);
-  },
-
-  update(id, data) {
-    const roll = RollManager.getRollById(id);
-    if (!roll) return null;
-    const oldName = roll.name;
-    RollManager.updateRoll(id, data);
-    return { item: RollManager.getRollById(id), oldName };
-  },
-
-  delete(id) {
-    return RollManager.deleteRoll(id);
-  },
-};

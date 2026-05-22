@@ -203,7 +203,7 @@ const Export = {
       }
       rollName = this._deduplicateRollName(rollName || "Imported Roll");
 
-      const newRoll = RollManagerAdapter.create({
+      const newRoll = RollManager.createRoll({
         name: rollName,
         frameCount: data.frameCount,
         notes: data.notes || "",

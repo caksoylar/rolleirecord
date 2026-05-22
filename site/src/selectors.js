@@ -27,13 +27,11 @@ function reassignRollsOnDelete(field, manager, entity) {
 }
 
 // ============================================================================
-// CAMERA SELECTOR - Uses EntitySelector + EntityFormModal
+// CAMERA SELECTOR - Modal for creating/editing cameras
 // ============================================================================
 
-// eslint-disable-next-line no-unused-vars
 const CameraSelector = {
   _modal: null,
-  _selector: null,
 
   init() {
     this._modal = new EntityFormModal({
@@ -64,39 +62,15 @@ const CameraSelector = {
       },
       onAfterAction: () => refreshAllUI(),
     });
-
-    this._selector = new EntitySelector({
-      containerSelector: "#cameraContainer",
-      selectId: "cameraSelect",
-      manager: CameraManager,
-      modal: this._modal,
-      iconHref: "#icon-camera",
-      label: "Select camera",
-      addNewLabel: "+ Add new camera",
-      onSelect: (cameraId) => {
-        const camera = CameraManager.getById(cameraId);
-        if (camera) {
-          SessionManager.setSelectedCamera(camera.name);
-          TableRenderer.render();
-        }
-      },
-      getSelectedValue: () => SessionManager.getSelectedCamera(),
-    });
-  },
-
-  render() {
-    if (this._selector) this._selector.render();
   },
 };
 
 // ============================================================================
-// FILM SELECTOR - Uses EntitySelector + EntityFormModal
+// FILM SELECTOR - Modal for creating/editing films
 // ============================================================================
 
-// eslint-disable-next-line no-unused-vars
 const FilmSelector = {
   _modal: null,
-  _selector: null,
 
   init() {
     this._modal = new EntityFormModal({
@@ -124,32 +98,337 @@ const FilmSelector = {
       },
       onAfterAction: () => refreshAllUI(),
     });
-
-    this._selector = new EntitySelector({
-      containerSelector: "#filmContainer",
-      selectId: "filmSelect",
-      manager: FilmManager,
-      modal: this._modal,
-      iconHref: "#icon-film",
-      label: "Select film",
-      addNewLabel: "+ Add new film",
-      onSelect: (filmId) => {
-        const film = FilmManager.getById(filmId);
-        if (film) {
-          SessionManager.setSelectedFilm(film.name);
-        }
-      },
-      getSelectedValue: () => SessionManager.getSelectedFilm(),
-    });
-  },
-
-  render() {
-    if (this._selector) this._selector.render();
   },
 };
 
 // ============================================================================
-// ROLL SELECTOR - Uses EntitySelector + EntityFormModal
+// ROLL FORM MODAL - Dedicated create/edit dialog for rolls
+// ============================================================================
+
+class RollFormModal {
+  constructor({ onAfterAction } = {}) {
+    this.onAfterAction = onAfterAction || (() => {});
+    this._mandatory = false;
+    this._editingId = null;
+    this._mode = null;
+    this.element = this._createDOM();
+    document.body.appendChild(this.element);
+    this._attachEvents();
+  }
+
+  _createDOM() {
+    const statusOptions = ROLL_STATUSES.map(
+      (s) => `<option value="${escapeHtml(s)}">${escapeHtml(s)}</option>`,
+    ).join("");
+    const modal = document.createElement("div");
+    modal.className = "modal";
+    modal.id = "RollModal";
+    modal.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title"></h2>
+        </div>
+        <form class="entity-form" autocomplete="off">
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="Roll-label">Roll Name</label>
+              <input type="text" id="Roll-label" name="label" required />
+            </div>
+            <div class="form-group">
+              <label for="Roll-camera">Camera</label>
+              <div class="entity-select-wrap">
+                <select id="Roll-camera" name="camera" required></select>
+                <button type="button" class="secondary" id="roll-camera-edit-btn" title="Edit camera">
+                  <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="Roll-film">Film</label>
+              <div class="entity-select-wrap">
+                <select id="Roll-film" name="film" required></select>
+                <button type="button" class="secondary" id="roll-film-edit-btn" title="Edit film">
+                  <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="Roll-frameCount">Frame Count</label>
+              <input type="number" id="Roll-frameCount" name="frameCount" />
+            </div>
+            <div class="form-group">
+              <label for="Roll-status">Status</label>
+              <select id="Roll-status" name="status">${statusOptions}</select>
+            </div>
+            <div class="form-group">
+              <label for="Roll-notes">Notes</label>
+              <textarea id="Roll-notes" name="notes" rows="3"></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn"></button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
+            <button type="button" class="secondary import-btn" style="display:none">Import</button>
+            <button type="button" class="danger delete-btn" style="display:none">Delete</button>
+          </div>
+        </form>
+      </div>`;
+    return modal;
+  }
+
+  _attachEvents() {
+    this.element
+      .querySelector(".entity-form")
+      .addEventListener("submit", (e) => {
+        e.preventDefault();
+        this._handleSubmit();
+      });
+
+    this.element
+      .querySelector(".cancel-btn")
+      .addEventListener("click", () => this.close());
+
+    this.element.addEventListener("click", (e) => {
+      if (e.target === this.element && !this._mandatory) this.close();
+    });
+
+    this.element
+      .querySelector(".delete-btn")
+      .addEventListener("click", () => this._handleDelete());
+
+    this.element.querySelector(".import-btn").addEventListener("click", () => {
+      this._mandatory = false;
+      this.close();
+      Export.importRoll();
+    });
+
+    const cameraSelect = this.element.querySelector("#Roll-camera");
+    cameraSelect.addEventListener("change", () => {
+      if (cameraSelect.value === CREATE_NEW_SENTINEL) {
+        cameraSelect.value = cameraSelect.options[0]?.value ?? "";
+        this._openSubModal(CameraSelector._modal, "create", {
+          afterSave: () => this._populateCameraSelect(),
+        });
+      }
+    });
+
+    const filmSelect = this.element.querySelector("#Roll-film");
+    filmSelect.addEventListener("change", () => {
+      if (filmSelect.value === CREATE_NEW_SENTINEL) {
+        filmSelect.value = filmSelect.options[0]?.value ?? "";
+        this._openSubModal(FilmSelector._modal, "create", {
+          afterSave: () => this._populateFilmSelect(),
+        });
+      }
+    });
+
+    this.element
+      .querySelector("#roll-camera-edit-btn")
+      .addEventListener("click", () => {
+        const camera = CameraManager.getByName(cameraSelect.value);
+        if (camera) {
+          this._openSubModal(CameraSelector._modal, "edit", {
+            id: camera.id,
+            afterSave: () => this._populateCameraSelect(),
+          });
+        }
+      });
+
+    this.element
+      .querySelector("#roll-film-edit-btn")
+      .addEventListener("click", () => {
+        const film = FilmManager.getByName(filmSelect.value);
+        if (film) {
+          this._openSubModal(FilmSelector._modal, "edit", {
+            id: film.id,
+            afterSave: () => this._populateFilmSelect(),
+          });
+        }
+      });
+  }
+
+  _openSubModal(modal, mode, { id, afterSave } = {}) {
+    this.element.classList.remove("active");
+    const onClose = () => this.element.classList.add("active");
+    if (mode === "create") {
+      modal.openCreate({ afterSave, onClose });
+    } else {
+      modal.openEdit(id, { afterSave, onClose });
+    }
+  }
+
+  _populateCameraSelect(currentValue) {
+    const select = this.element.querySelector("#Roll-camera");
+    const current = currentValue ?? select.value;
+    const cameras = CameraManager.getAll();
+    let html = cameras
+      .map(
+        (c) =>
+          `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`,
+      )
+      .join("");
+    html += `<option value="${CREATE_NEW_SENTINEL}">+ Add new camera</option>`;
+    select.innerHTML = html;
+    if (current && cameras.some((c) => c.name === current))
+      select.value = current;
+  }
+
+  _populateFilmSelect(currentValue) {
+    const select = this.element.querySelector("#Roll-film");
+    const current = currentValue ?? select.value;
+    const films = FilmManager.getAll();
+    let html = films
+      .map(
+        (f) =>
+          `<option value="${escapeHtml(f.name)}">${escapeHtml(f.name)}</option>`,
+      )
+      .join("");
+    html += `<option value="${CREATE_NEW_SENTINEL}">+ Add new film</option>`;
+    select.innerHTML = html;
+    if (current && films.some((f) => f.name === current))
+      select.value = current;
+  }
+
+  _collectFormData() {
+    const q = (id) => this.element.querySelector(`#${id}`);
+    const frameCountVal = q("Roll-frameCount").value;
+    return {
+      name: q("Roll-label").value.trim(),
+      camera: q("Roll-camera").value,
+      film: q("Roll-film").value,
+      frameCount: frameCountVal === "" ? null : Number(frameCountVal),
+      status: q("Roll-status").value,
+      notes: q("Roll-notes").value.trim(),
+    };
+  }
+
+  _populateForm(roll) {
+    this._populateCameraSelect(roll.camera ?? "");
+    this._populateFilmSelect(roll.film ?? "");
+    this.element.querySelector("#Roll-label").value = roll.name ?? "";
+    this.element.querySelector("#Roll-frameCount").value =
+      roll.frameCount ?? "";
+    this.element.querySelector("#Roll-status").value =
+      roll.status ?? ROLL_STATUSES[0];
+    this.element.querySelector("#Roll-notes").value = roll.notes ?? "";
+  }
+
+  _clearForm() {
+    const defaultCamera =
+      SessionManager.getSelectedCamera() ||
+      CameraManager.getAll()[0]?.name ||
+      "";
+    const defaultFilm =
+      SessionManager.getSelectedFilm() || FilmManager.getAll()[0]?.name || "";
+    this._populateCameraSelect(defaultCamera);
+    this._populateFilmSelect(defaultFilm);
+    this.element.querySelector("#Roll-label").value = "";
+    this.element.querySelector("#Roll-frameCount").value = DEFAULT_FRAME_COUNT;
+    this.element.querySelector("#Roll-status").value = ROLL_STATUSES[0];
+    this.element.querySelector("#Roll-notes").value = "";
+  }
+
+  _handleSubmit() {
+    const data = this._collectFormData();
+    if (!data.name) {
+      alert("Roll Name is required");
+      return;
+    }
+    if (!data.camera) {
+      alert("Camera is required");
+      return;
+    }
+    if (!data.film) {
+      alert("Film is required");
+      return;
+    }
+
+    if (this._mode === "create") {
+      const created = RollManager.createRoll(data);
+      RollManager.setCurrentRoll(created.id);
+    } else {
+      const existing = RollManager.getRollById(this._editingId);
+      if (
+        existing &&
+        existing.camera !== data.camera &&
+        existing.frames?.length > 0
+      ) {
+        if (
+          !confirm(
+            `This roll already has ${existing.frames.length} frame(s) logged with "${existing.camera}". ` +
+              `Changing the camera may affect hidden fields and per-camera options. Continue?`,
+          )
+        )
+          return;
+      }
+      RollManager.updateRoll(this._editingId, data);
+    }
+
+    this.close();
+    this.onAfterAction();
+  }
+
+  _handleDelete() {
+    if (!this._editingId) return;
+    const roll = RollManager.getRollById(this._editingId);
+    if (!roll) return;
+    if (
+      !confirm(
+        `Are you sure you want to delete the roll "${roll.name}"? This cannot be undone.`,
+      )
+    )
+      return;
+    RollManager.deleteRoll(this._editingId);
+    this.close();
+    this.onAfterAction();
+  }
+
+  openCreate({ mandatory } = {}) {
+    this._mode = "create";
+    this._editingId = null;
+    this._mandatory = mandatory || false;
+    this._clearForm();
+
+    this.element.querySelector(".modal-title").textContent = "New Roll";
+    this.element.querySelector(".save-btn").textContent = "Create";
+    this.element.querySelector(".delete-btn").style.display = "none";
+    this.element.querySelector(".cancel-btn").style.display = this._mandatory
+      ? "none"
+      : "";
+    this.element.querySelector(".import-btn").style.display = this._mandatory
+      ? ""
+      : "none";
+
+    this.element.classList.add("active");
+    this.element.querySelector("#Roll-label").focus();
+  }
+
+  openEdit(rollId) {
+    const roll = RollManager.getRollById(rollId);
+    if (!roll) return;
+
+    this._mode = "edit";
+    this._editingId = rollId;
+    this._mandatory = false;
+    this._populateForm(roll);
+
+    this.element.querySelector(".modal-title").textContent = "Edit Roll";
+    this.element.querySelector(".save-btn").textContent = "Save";
+    this.element.querySelector(".delete-btn").style.display = "";
+    this.element.querySelector(".cancel-btn").style.display = "";
+    this.element.querySelector(".import-btn").style.display = "none";
+
+    this.element.classList.add("active");
+    this.element.querySelector("#Roll-label").focus();
+  }
+
+  close() {
+    this.element.classList.remove("active");
+  }
+}
+
+// ============================================================================
+// ROLL SELECTOR - Uses EntitySelector + RollFormModal
 // ============================================================================
 
 // eslint-disable-next-line no-unused-vars
@@ -159,40 +438,21 @@ const RollSelector = {
   _caption: null,
 
   init() {
-    this._modal = new EntityFormModal({
-      entityType: "Roll",
-      schema: ROLL_SCHEMA,
-      manager: RollManagerAdapter,
-      onBeforeSave: (data, existing, mode) => {
-        if (
-          mode === "update" &&
-          existing &&
-          existing.camera !== data.camera &&
-          existing.frames?.length > 0
-        ) {
-          return confirm(
-            `This roll already has ${existing.frames.length} frame(s) logged with "${existing.camera}". ` +
-              `Changing the camera may affect hidden fields and per-camera options. Continue?`,
-          );
-        }
-      },
-      onSave: (item, mode) => {
-        if (mode === "create") {
-          RollManager.setCurrentRoll(item.id);
-        }
-      },
-      onDelete: (entity) => {
-        return confirm(
-          `Are you sure you want to delete the roll "${entity.name}"? This cannot be undone.`,
-        );
-      },
+    this._modal = new RollFormModal({
       onAfterAction: () => refreshAllUI(),
     });
+
+    const rollAdapter = {
+      getAll: () => RollManager.getRolls(),
+      getById: (id) => RollManager.getRollById(id),
+      getByName: (name) =>
+        RollManager.getRolls().find((r) => r.name === name) || null,
+    };
 
     this._selector = new EntitySelector({
       containerSelector: "#rollContainer",
       selectId: "rollSelect",
-      manager: RollManagerAdapter,
+      manager: rollAdapter,
       modal: this._modal,
       iconHref: "#icon-roll",
       label: "Select roll",

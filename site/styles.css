@@ -325,6 +325,14 @@ tbody tr.clickable:hover {
   justify-content: center;
 }
 
+/* Camera/film modals open on top of the roll modal: raise z-index and
+   suppress the backdrop so it doesn't stack with the roll modal's */
+#CameraModal,
+#FilmModal {
+  background: transparent;
+  z-index: 1010;
+}
+
 .modal.active {
   display: flex;
 }

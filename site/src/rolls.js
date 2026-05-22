@@ -64,24 +64,21 @@ const RollManager = {
     return this.getRollById(currentId);
   },
 
-  // Create new roll
-  createRoll(name, frameCount) {
-    frameCount = frameCount ?? this.DEFAULT_FRAME_COUNT;
+  // Create new roll from a data object
+  createRoll(data) {
     const rolls = this.getRolls();
-
-    // Generate unique roll ID
     const rollId = this.getNextRollId();
-
     const now = new Date().toISOString();
 
-    // Create roll with defaults
     const newRoll = {
       id: rollId,
-      name: name,
-      frameCount: frameCount,
-      camera: CameraManager.getAll()[0]?.name || "",
-      film: FilmManager.getAll()[0]?.name || "",
-      frames: [],
+      name: data.name,
+      frameCount: data.frameCount ?? this.DEFAULT_FRAME_COUNT,
+      camera: data.camera || CameraManager.getAll()[0]?.name || "",
+      film: data.film || FilmManager.getAll()[0]?.name || "",
+      status: data.status || "Loaded",
+      notes: data.notes || "",
+      frames: data.frames || [],
       createdAt: now,
       updatedAt: now,
     };
