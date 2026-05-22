@@ -46,6 +46,22 @@ class EntityFormModal {
         const id = `${this.entityType}-${safeInputId(field.name)}`;
         const required = field.required ? "required" : "";
 
+        if (field.type === "entity-select") {
+          const editBtn = field.openEdit
+            ? `<button type="button" class="secondary entity-select-edit-btn" data-field="${field.name}" title="Edit">
+                <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
+               </button>`
+            : "";
+          return `
+          <div class="form-group">
+            <label for="${id}">${field.label}</label>
+            <div class="entity-select-wrap">
+              <select id="${id}" name="${safeInputId(field.name)}" ${required}></select>
+              ${editBtn}
+            </div>
+          </div>`;
+        }
+
         if (field.type === "select") {
           const options = field.options
             .map((o) => `<option value="${o}">${o}</option>`)
@@ -152,6 +168,33 @@ class EntityFormModal {
 
     // Wire film-format → film-size dependency
     this._wireFormatSizeDependency();
+
+    // Entity-select: handle "+ Add new" sentinel and edit buttons
+    this.element.querySelectorAll("[data-field]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const fieldName = btn.dataset.field;
+        const field = this.schema.fields.find((f) => f.name === fieldName);
+        const select = this.element.querySelector(
+          `#${this.entityType}-${safeInputId(fieldName)}`,
+        );
+        const value = select?.value;
+        if (value && value !== CREATE_NEW_SENTINEL && field?.openEdit) {
+          field.openEdit(value, () => this._populateEntitySelects());
+        }
+      });
+    });
+
+    this.element.addEventListener("change", (e) => {
+      const select = e.target.closest(`select[name]`);
+      if (!select || select.value !== CREATE_NEW_SENTINEL) return;
+      const field = this.schema.fields.find(
+        (f) => safeInputId(f.name) === select.name,
+      );
+      if (field?.type === "entity-select" && field.openAddNew) {
+        select.value = select.options[0]?.value ?? "";
+        field.openAddNew(() => this._populateEntitySelects());
+      }
+    });
   }
 
   _openFieldOptions() {
@@ -163,6 +206,31 @@ class EntityFormModal {
       entityType: this.entityType.toLowerCase(),
       entityName: entity.name,
     });
+  }
+
+  _populateEntitySelects() {
+    this.schema.fields
+      .filter((f) => f.type === "entity-select")
+      .forEach((field) => {
+        const id = `${this.entityType}-${safeInputId(field.name)}`;
+        const select = this.element.querySelector(`#${id}`);
+        if (!select) return;
+        const currentValue = select.value;
+        const options = field.getOptions();
+        let html = options
+          .map(
+            (name) =>
+              `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`,
+          )
+          .join("");
+        if (field.addNewLabel) {
+          html += `<option value="${CREATE_NEW_SENTINEL}">${escapeHtml(field.addNewLabel)}</option>`;
+        }
+        select.innerHTML = html;
+        if (currentValue && options.includes(currentValue)) {
+          select.value = currentValue;
+        }
+      });
   }
 
   _wireFormatSizeDependency() {
@@ -229,12 +297,19 @@ class EntityFormModal {
   }
 
   _clearForm() {
+    this._populateEntitySelects();
     this.schema.fields.forEach((field) => {
       const el = this.element.querySelector(
         `#${this.entityType}-${safeInputId(field.name)}`,
       );
       if (field.type === "film-format") {
         el.selectedIndex = 0;
+      } else if (field.type === "entity-select") {
+        const defaultVal =
+          typeof field.defaultValue === "function"
+            ? field.defaultValue()
+            : (field.defaultValue ?? "");
+        if (defaultVal) el.value = defaultVal;
       } else if (field.type !== "film-size") {
         el.value = field.defaultValue ?? "";
       }
@@ -282,6 +357,11 @@ class EntityFormModal {
 
     this.close();
     this.onAfterAction();
+    if (this._onNextAfterAction) {
+      const cb = this._onNextAfterAction;
+      this._onNextAfterAction = null;
+      cb();
+    }
   }
 
   _handleDelete() {
@@ -310,8 +390,8 @@ class EntityFormModal {
   openCreate(options = {}) {
     this.mode = "create";
     this.editingId = null;
-    this._clearForm();
     this._mandatory = options.mandatory || false;
+    this._clearForm();
 
     this.element.querySelector(".modal-title").textContent =
       `New ${this.entityType}`;
@@ -341,6 +421,7 @@ class EntityFormModal {
     this.mode = "edit";
     this.editingId = entityId;
     this._mandatory = false;
+    this._populateEntitySelects();
     this._populateForm(entity);
 
     this.element.querySelector(".modal-title").textContent =
@@ -399,6 +480,7 @@ class EntitySelector {
   }
 
   _buildDOM() {
+    if (!this.container) return;
     this.container.innerHTML = `
       <label title="${this.label}">
         <svg class="icon"><use href="icons.svg${this.iconHref}"></use></svg>
@@ -413,6 +495,7 @@ class EntitySelector {
   }
 
   _attachEvents() {
+    if (!this.container) return;
     this.container.addEventListener("change", (e) => {
       if (e.target !== this.selectElement) return;
       const value = e.target.value;
@@ -442,6 +525,7 @@ class EntitySelector {
   }
 
   render() {
+    if (!this.container) return;
     const items = this.manager.getAll();
     const selectedName = this.getSelectedValue();
     const selectedItem = this.manager.getByName(selectedName);

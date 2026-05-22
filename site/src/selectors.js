@@ -156,6 +156,7 @@ const FilmSelector = {
 const RollSelector = {
   _modal: null,
   _selector: null,
+  _caption: null,
 
   init() {
     this._modal = new EntityFormModal({
@@ -213,6 +214,12 @@ const RollSelector = {
       },
     });
 
+    // Append caption element to roll card (after EntitySelector built the DOM)
+    this._caption = document.createElement("div");
+    this._caption.className = "roll-caption";
+    this._selector.container.appendChild(this._caption);
+    this._renderCaption();
+
     // Auto-open create modal when no rolls exist
     if (!RollManager.getCurrentRoll()) {
       this._modal.openCreate({ mandatory: true });
@@ -221,9 +228,30 @@ const RollSelector = {
 
   render() {
     if (this._selector) this._selector.render();
+    this._renderCaption();
     // Auto-open create modal when no rolls exist
     if (!RollManager.getCurrentRoll() && this._modal) {
       this._modal.openCreate({ mandatory: true });
     }
+  },
+
+  _renderCaption() {
+    if (!this._caption) return;
+    const roll = RollManager.getCurrentRoll();
+    if (!roll) {
+      this._caption.innerHTML = "";
+      return;
+    }
+    const camera = roll.camera || "—";
+    const film = roll.film || "—";
+    this._caption.innerHTML = `
+      <span class="chip">
+        <svg class="icon"><use href="icons.svg#icon-camera"></use></svg>
+        ${escapeHtml(camera)}
+      </span>
+      <span class="chip">
+        <svg class="icon"><use href="icons.svg#icon-film"></use></svg>
+        ${escapeHtml(film)}
+      </span>`;
   },
 };

@@ -81,9 +81,7 @@ const TableRenderer = {
       container.innerHTML = `<table>${this.renderHeaders()}${this.renderTableBody()}</table>`;
     }
 
-    const selectorGroup = document.querySelector(".entity-selector-group");
     const addFab = document.getElementById("addFrameFab");
-    if (selectorGroup) selectorGroup.style.display = hasRoll ? "" : "none";
     if (addFab) addFab.style.display = hasRoll ? "" : "none";
   },
 };
@@ -121,6 +119,4 @@ function formatRelativeDate(dateStr) {
 function refreshAllUI() {
   RollSelector.render();
   TableRenderer.render();
-  CameraSelector.render();
-  FilmSelector.render();
 }
