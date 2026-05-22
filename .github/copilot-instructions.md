@@ -38,7 +38,7 @@ Each file can reference globals defined by earlier scripts. `app.js` is the entr
 
 - **Entities** (cameras, films): Managed by `EntityManager` class in `entities.js`, stored in localStorage. Schemas defined in `config.js` (`CAMERA_SCHEMA`, `FILM_SCHEMA`).
 - **Rolls**: Managed by `RollManager` in `rolls.js` with a separate storage model (each roll contains `name`, `camera`, `film`, `frames[]`, `frameCount`, `notes`). `RollManagerAdapter` in `entities.js` wraps it for compatibility with `EntityFormModal`/`EntitySelector`.
-- **Frames**: Stored as arrays inside each roll. Schema is `FRAME_SCHEMA` in `config.js` with field types: `select`, `number`, `text`, `checkbox`, `datetime`, `location`.
+- **Frames**: Stored as arrays inside each roll. Schema is `FRAME_SCHEMA` in `config.js` with field types: `select`, `number`, `text`, `checkbox`, `datetime`, `location`. The `date` field is always auto-populated with the current datetime when a new frame is created — it is not optional/manual input.
 
 ### Key patterns
 
@@ -52,9 +52,22 @@ Each file can reference globals defined by earlier scripts. `app.js` is the entr
 
 `site/sw.js` caches all assets for offline use. The `ASSETS` list and `CACHE_NAME` version must be updated when adding/renaming files.
 
+### Modal systems
+
+There are two separate modal systems — do not conflate them:
+
+- **`frame.js`** — handles add/edit of individual frames. Invoked via `openAddModal()` / `openEditModal()`.
+- **`entity-modal.js`** (`EntityFormModal`) — handles create/edit of cameras, films, and rolls. Reused via the `EntityManager` abstraction.
+
+CSS is shared, but JS is entirely separate. Changes to frame add/edit behavior never require touching `entity-modal.js`, and vice versa.
+
+**Copy-from-previous-frame** is already implemented: `openAddModal()` passes the last frame's id as `refData` to `FrameModal.open()`, which pre-fills form fields from that frame without entering edit mode. This is intentional — do not flag it as a missing feature during code review.
+
 ### CSS
 
 `site/styles.css` uses CSS custom properties on `:root` for theming (light/dark via `prefers-color-scheme`). Form modals use a 2-column grid with `.form-group { display: contents }` — label and input become direct grid children.
+
+**Height units**: Use `dvh` (dynamic viewport height), not `vh`. iOS Safari calculates `vh` based on the maximum viewport height (browser chrome hidden), causing overflow when the address bar is visible. `dvh` updates dynamically and is used throughout the app intentionally.
 
 ### Export/Import format
 
@@ -78,3 +91,4 @@ Import reconciles camera/film entities via `EntityManager.upsertByName()` — cr
 - **Use `!=` / `== null` for null-or-undefined checks** with an `// eslint-disable-line eqeqeq` comment. The `eqeqeq` rule is set to warn.
 - **Icons**: SVG sprites from Phosphor Icons in `site/icons.svg`, referenced as `<svg class="icon"><use href="icons.svg#icon-name"></use></svg>`.
 - **Favor code reuse.** Extract shared logic into helper functions rather than duplicating patterns across files. When adding new functionality, look for existing utilities or patterns that can be extended. Refactor proactively when you see an opportunity to reduce duplication.
+- **Ask before making major decisions.** If you are making any architectural overhauls, you ran into a roadblock and want to work around it with a hack, or if the code changes to satisfy a request seem too major, always check with the user first. Describe the problem, ask for clarification or confirm your decisions.
