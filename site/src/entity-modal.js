@@ -26,10 +26,7 @@ class EntityFormModal {
     this.mode = "create";
     this.editingId = null;
     this._mandatory = false;
-    this._formatField =
-      this.schema.fields.find((f) => f.type === "film-format") || null;
-    this._sizeField =
-      this.schema.fields.find((f) => f.type === "film-size") || null;
+    this._dependentFields = this.schema.fields.filter((f) => f.dependent_on);
 
     this.element = this._createDOM();
     document.body.appendChild(this.element);
@@ -47,32 +44,17 @@ class EntityFormModal {
         const required = field.required ? "required" : "";
 
         if (field.type === "select") {
-          const options = field.options
-            .map((o) => `<option value="${o}">${o}</option>`)
-            .join("");
+          // Dependent fields start empty; options are populated based on the
+          // value of the field named in `dependent_on`.
+          const options = field.dependent_on
+            ? ""
+            : field.options
+                .map((o) => `<option value="${o}">${o}</option>`)
+                .join("");
           return `
           <div class="form-group">
             <label for="${id}">${field.label}</label>
             <select id="${id}" name="${safeInputId(field.name)}" ${required}>${options}</select>
-          </div>`;
-        }
-
-        if (field.type === "film-format") {
-          const options = Object.keys(FORMATS)
-            .map((f) => `<option value="${f}">${f}</option>`)
-            .join("");
-          return `
-          <div class="form-group">
-            <label for="${id}">${field.label}</label>
-            <select id="${id}" name="${safeInputId(field.name)}" ${required}>${options}</select>
-          </div>`;
-        }
-
-        if (field.type === "film-size") {
-          return `
-          <div class="form-group">
-            <label for="${id}">${field.label}</label>
-            <select id="${id}" name="${safeInputId(field.name)}" ${required}></select>
           </div>`;
         }
 
@@ -142,8 +124,7 @@ class EntityFormModal {
       fieldOptionsBtn.addEventListener("click", () => this._openFieldOptions());
     }
 
-    // Wire film-format → film-size dependency
-    this._wireFormatSizeDependency();
+    this._wireDependentFields();
   }
 
   _openFieldOptions() {
@@ -157,28 +138,33 @@ class EntityFormModal {
     });
   }
 
-  _wireFormatSizeDependency() {
-    if (!this._formatField || !this._sizeField) return;
-
-    const formatSelect = this.element.querySelector(
-      `#${this.entityType}-${safeInputId(this._formatField.name)}`,
+  _fieldEl(fieldName) {
+    return this.element.querySelector(
+      `#${this.entityType}-${safeInputId(fieldName)}`,
     );
-    const sizeSelect = this.element.querySelector(
-      `#${this.entityType}-${safeInputId(this._sizeField.name)}`,
-    );
+  }
 
-    formatSelect.addEventListener("change", () => {
-      this._populateSizeOptions(formatSelect.value, sizeSelect);
+  _wireDependentFields() {
+    this._dependentFields.forEach((field) => {
+      const parentEl = this._fieldEl(field.dependent_on);
+      const childEl = this._fieldEl(field.name);
+      if (!parentEl || !childEl) return;
+      parentEl.addEventListener("change", () => {
+        this._populateDependentOptions(field, parentEl.value, childEl);
+      });
     });
   }
 
-  _populateSizeOptions(format, sizeSelect, currentValue = null) {
-    const sizes = FORMATS[format] || [];
-    sizeSelect.innerHTML = sizes
-      .map((s) => `<option value="${s}">${s}</option>`)
+  _populateDependentOptions(field, parentValue, childEl, currentValue = null) {
+    const options =
+      (field.dependent_options && field.dependent_options[parentValue]) || [];
+    childEl.innerHTML = options
+      .map((o) => `<option value="${o}">${o}</option>`)
       .join("");
-    if (currentValue && sizes.includes(currentValue)) {
-      sizeSelect.value = currentValue;
+    if (currentValue && options.includes(currentValue)) {
+      childEl.value = currentValue;
+    } else if (field.defaultValue && options.includes(field.defaultValue)) {
+      childEl.value = field.defaultValue;
     }
   }
 
@@ -199,49 +185,46 @@ class EntityFormModal {
   }
 
   _populateForm(entity) {
-    // Set format first so size options can be populated
+    // Set parent (non-dependent) fields first so dependent option lists can be
+    // computed from their values.
     this.schema.fields.forEach((field) => {
-      if (field.type === "film-size") return; // handled after format
-      const el = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(field.name)}`,
-      );
+      if (field.dependent_on) return;
+      const el = this._fieldEl(field.name);
       el.value = entity[field.name] ?? "";
     });
 
-    if (this._formatField && this._sizeField) {
-      const sizeSelect = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(this._sizeField.name)}`,
+    this._dependentFields.forEach((field) => {
+      const childEl = this._fieldEl(field.name);
+      this._populateDependentOptions(
+        field,
+        entity[field.dependent_on],
+        childEl,
+        entity[field.name],
       );
-      this._populateSizeOptions(
-        entity[this._formatField.name],
-        sizeSelect,
-        entity[this._sizeField.name],
-      );
-    }
+    });
   }
 
   _clearForm() {
     this.schema.fields.forEach((field) => {
-      const el = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(field.name)}`,
-      );
-      if (field.type === "film-format") {
-        el.selectedIndex = 0;
-      } else if (field.type !== "film-size") {
+      if (field.dependent_on) return;
+      const el = this._fieldEl(field.name);
+      if (field.type === "select") {
+        // eslint-disable-next-line eqeqeq
+        if (field.defaultValue != null) {
+          el.value = field.defaultValue;
+        } else {
+          el.selectedIndex = 0;
+        }
+      } else {
         el.value = field.defaultValue ?? "";
       }
     });
 
-    // Populate size options for the default (first) format
-    if (this._formatField && this._sizeField) {
-      const formatSelect = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(this._formatField.name)}`,
-      );
-      const sizeSelect = this.element.querySelector(
-        `#${this.entityType}-${safeInputId(this._sizeField.name)}`,
-      );
-      this._populateSizeOptions(formatSelect.value, sizeSelect);
-    }
+    this._dependentFields.forEach((field) => {
+      const parentEl = this._fieldEl(field.dependent_on);
+      const childEl = this._fieldEl(field.name);
+      this._populateDependentOptions(field, parentEl.value, childEl);
+    });
   }
 
   _handleSubmit() {

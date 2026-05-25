@@ -166,7 +166,6 @@ const DEFAULT_FILMS = [
 // eslint-disable-next-line no-unused-vars
 const ROLL_STATUSES = ["Loaded", "Finished", "Developed", "Scanned"];
 
-// eslint-disable-next-line no-unused-vars
 const FORMATS = {
   "35mm": ["24×36mm", "24×18mm (half)"],
   "120 (Medium)": ["6×4.5", "6×6", "6×7", "6×9", "6×12", "6×17"],
@@ -180,8 +179,21 @@ const FORMATS = {
 const CAMERA_SCHEMA = {
   fields: [
     { name: "name", type: "text", label: "Camera Name", required: true },
-    { name: "format", type: "film-format", label: "Format", required: true },
-    { name: "size", type: "film-size", label: "Size", required: true },
+    {
+      name: "format",
+      type: "select",
+      label: "Format",
+      required: true,
+      options: Object.keys(FORMATS),
+    },
+    {
+      name: "size",
+      type: "select",
+      label: "Size",
+      required: true,
+      dependent_on: "format",
+      dependent_options: FORMATS,
+    },
   ],
 };
 
