@@ -46,7 +46,7 @@
     </header>
     <main>
       <div id="rollContainer" class="roll-selector-bar">
-        <!-- Populated dynamically by EntitySelector -->
+        <!-- Populated dynamically by RollSelector -->
       </div>
 
       <div id="tableContainer">
@@ -154,50 +154,6 @@
       </div>
     </div>
 
-    <!-- Field Options Dialog -->
-    <div
-      class="modal"
-      id="optionsDialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="optionsDialogTitle"
-    >
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="optionsDialogTitle">Edit Field Options</h2>
-        </div>
-        <form autocomplete="off">
-          <div class="field-selector">
-            <label for="fieldSelect">Select Field</label>
-            <select id="fieldSelect">
-              <!-- Options will be populated dynamically -->
-            </select>
-          </div>
-          <div id="visibilityToggle" style="display: none">
-            <!-- Inline visibility toggle rendered here when applicable -->
-          </div>
-          <div class="options-list">
-            <p class="options-list-heading">Options</p>
-            <div id="optionsContainer">
-              <!-- Option inputs will be rendered here -->
-            </div>
-            <button
-              type="button"
-              id="addOptionBtn"
-              class="secondary"
-              style="width: 100%; margin-top: 0.75rem"
-            >
-              + Add Option
-            </button>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="save-btn">Save</button>
-            <button type="button" class="secondary cancel-btn">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("./sw.js").then((reg) => {
@@ -217,7 +173,6 @@
     </script>
     <script src="src/config.js"></script>
     <script src="src/entities.js"></script>
-    <script src="src/entity-modal.js"></script>
     <script src="src/rolls.js"></script>
     <script src="src/data.js"></script>
     <script src="src/table.js"></script>
@@ -225,7 +180,6 @@
     <script src="src/exif.js"></script>
     <script src="src/export.js"></script>
     <script src="src/frame.js"></script>
-    <script src="src/options.js"></script>
     <script src="src/app.js"></script>
   </body>
 </html>

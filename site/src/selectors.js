@@ -1,105 +1,9 @@
 // ============================================================================
-// SELECTORS - Camera, Film, and Roll selectors + entity modals
+// SELECTORS - Roll selector + roll create/edit modal
 // ============================================================================
 
-// Helper: cascade a field rename to all rolls referencing the old value
-function cascadeRenameOnRolls(field, oldName, newName) {
-  const rolls = RollManager.getRolls();
-  rolls.forEach((roll) => {
-    if (roll[field] === oldName) {
-      roll[field] = newName;
-      RollManager.updateRoll(roll.id, roll);
-    }
-  });
-}
-
-// Helper: reassign rolls referencing a deleted entity to the first remaining one
-function reassignRollsOnDelete(field, manager, entity) {
-  const remaining = manager.getAll().filter((e) => e.id !== entity.id);
-  const fallback = remaining[0]?.name || "";
-  const rolls = RollManager.getRolls();
-  rolls.forEach((roll) => {
-    if (roll[field] === entity.name) {
-      roll[field] = fallback;
-      RollManager.updateRoll(roll.id, roll);
-    }
-  });
-}
-
-// ============================================================================
-// CAMERA SELECTOR - Modal for creating/editing cameras
-// ============================================================================
-
-const CameraSelector = {
-  _modal: null,
-
-  init() {
-    this._modal = new EntityFormModal({
-      entityType: "Camera",
-      schema: CAMERA_SCHEMA,
-      manager: CameraManager,
-      onSave: (item, mode, oldName) => {
-        if (mode === "update" && oldName && oldName !== item.name) {
-          cascadeRenameOnRolls("camera", oldName, item.name);
-          // Update OptionsManager storage keys
-          OptionsManager.renameEntityKeys("camera", oldName, item.name);
-        }
-        if (mode === "create") {
-          // Set new camera as selected for current roll
-          SessionManager.setSelectedCamera(item.name);
-        }
-      },
-      onDelete: (entity) => {
-        if (
-          !confirm(
-            `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
-          )
-        )
-          return false;
-
-        reassignRollsOnDelete("camera", CameraManager, entity);
-        return true;
-      },
-      onAfterAction: () => refreshAllUI(),
-    });
-  },
-};
-
-// ============================================================================
-// FILM SELECTOR - Modal for creating/editing films
-// ============================================================================
-
-const FilmSelector = {
-  _modal: null,
-
-  init() {
-    this._modal = new EntityFormModal({
-      entityType: "Film",
-      schema: FILM_SCHEMA,
-      manager: FilmManager,
-      onSave: (item, mode, oldName) => {
-        if (mode === "update" && oldName && oldName !== item.name) {
-          cascadeRenameOnRolls("film", oldName, item.name);
-        }
-        if (mode === "create") {
-          SessionManager.setSelectedFilm(item.name);
-        }
-      },
-      onDelete: (entity) => {
-        if (
-          !confirm(
-            `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
-          )
-        )
-          return false;
-
-        reassignRollsOnDelete("film", FilmManager, entity);
-        return true;
-      },
-      onAfterAction: () => refreshAllUI(),
-    });
-  },
-};
+// Sentinel value used by the roll dropdown's "+ Create new roll" entry
+const CREATE_NEW_ROLL = "__create_new_roll__";
 
 // ============================================================================
 // ROLL FORM MODAL - Dedicated create/edit dialog for rolls
@@ -136,21 +40,11 @@ class RollFormModal {
             </div>
             <div class="form-group">
               <label for="Roll-camera">Camera</label>
-              <div class="entity-select-wrap">
-                <select id="Roll-camera" name="camera" required></select>
-                <button type="button" class="secondary" id="roll-camera-edit-btn" title="Edit camera">
-                  <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
-                </button>
-              </div>
+              <select id="Roll-camera" name="camera" required></select>
             </div>
             <div class="form-group">
               <label for="Roll-film">Film</label>
-              <div class="entity-select-wrap">
-                <select id="Roll-film" name="film" required></select>
-                <button type="button" class="secondary" id="roll-film-edit-btn" title="Edit film">
-                  <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
-                </button>
-              </div>
+              <select id="Roll-film" name="film" required></select>
             </div>
             <div class="form-group">
               <label for="Roll-frameCount">Frame Count</label>
@@ -201,74 +95,18 @@ class RollFormModal {
       this.close();
       Export.importRoll();
     });
-
-    const cameraSelect = this.element.querySelector("#Roll-camera");
-    cameraSelect.addEventListener("change", () => {
-      if (cameraSelect.value === CREATE_NEW_SENTINEL) {
-        cameraSelect.value = cameraSelect.options[0]?.value ?? "";
-        this._openSubModal(CameraSelector._modal, "create", {
-          afterSave: () => this._populateCameraSelect(),
-        });
-      }
-    });
-
-    const filmSelect = this.element.querySelector("#Roll-film");
-    filmSelect.addEventListener("change", () => {
-      if (filmSelect.value === CREATE_NEW_SENTINEL) {
-        filmSelect.value = filmSelect.options[0]?.value ?? "";
-        this._openSubModal(FilmSelector._modal, "create", {
-          afterSave: () => this._populateFilmSelect(),
-        });
-      }
-    });
-
-    this.element
-      .querySelector("#roll-camera-edit-btn")
-      .addEventListener("click", () => {
-        const camera = CameraManager.getByName(cameraSelect.value);
-        if (camera) {
-          this._openSubModal(CameraSelector._modal, "edit", {
-            id: camera.id,
-            afterSave: () => this._populateCameraSelect(),
-          });
-        }
-      });
-
-    this.element
-      .querySelector("#roll-film-edit-btn")
-      .addEventListener("click", () => {
-        const film = FilmManager.getByName(filmSelect.value);
-        if (film) {
-          this._openSubModal(FilmSelector._modal, "edit", {
-            id: film.id,
-            afterSave: () => this._populateFilmSelect(),
-          });
-        }
-      });
-  }
-
-  _openSubModal(modal, mode, { id, afterSave } = {}) {
-    this.element.classList.remove("active");
-    const onClose = () => this.element.classList.add("active");
-    if (mode === "create") {
-      modal.openCreate({ afterSave, onClose });
-    } else {
-      modal.openEdit(id, { afterSave, onClose });
-    }
   }
 
   _populateCameraSelect(currentValue) {
     const select = this.element.querySelector("#Roll-camera");
     const current = currentValue ?? select.value;
     const cameras = CameraManager.getAll();
-    let html = cameras
+    select.innerHTML = cameras
       .map(
         (c) =>
           `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`,
       )
       .join("");
-    html += `<option value="${CREATE_NEW_SENTINEL}">+ Add new camera</option>`;
-    select.innerHTML = html;
     if (current && cameras.some((c) => c.name === current))
       select.value = current;
   }
@@ -277,14 +115,12 @@ class RollFormModal {
     const select = this.element.querySelector("#Roll-film");
     const current = currentValue ?? select.value;
     const films = FilmManager.getAll();
-    let html = films
+    select.innerHTML = films
       .map(
         (f) =>
           `<option value="${escapeHtml(f.name)}">${escapeHtml(f.name)}</option>`,
       )
       .join("");
-    html += `<option value="${CREATE_NEW_SENTINEL}">+ Add new film</option>`;
-    select.innerHTML = html;
     if (current && films.some((f) => f.name === current))
       select.value = current;
   }
@@ -428,13 +264,15 @@ class RollFormModal {
 }
 
 // ============================================================================
-// ROLL SELECTOR - Uses EntitySelector + RollFormModal
+// ROLL SELECTOR - Header dropdown + caption for the active roll
 // ============================================================================
 
 // eslint-disable-next-line no-unused-vars
 const RollSelector = {
   _modal: null,
-  _selector: null,
+  _container: null,
+  _select: null,
+  _editBtn: null,
   _caption: null,
 
   init() {
@@ -442,57 +280,84 @@ const RollSelector = {
       onAfterAction: () => refreshAllUI(),
     });
 
-    const rollAdapter = {
-      getAll: () => RollManager.getRolls(),
-      getById: (id) => RollManager.getRollById(id),
-      getByName: (name) =>
-        RollManager.getRolls().find((r) => r.name === name) || null,
-    };
+    this._container = document.querySelector("#rollContainer");
+    this._container.innerHTML = `
+      <label title="Select roll">
+        <svg class="icon"><use href="icons.svg#icon-roll"></use></svg>
+      </label>
+      <select id="rollSelect"></select>
+      <button type="button" class="secondary entity-edit-btn" title="Edit">
+        <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
+      </button>`;
 
-    this._selector = new EntitySelector({
-      containerSelector: "#rollContainer",
-      selectId: "rollSelect",
-      manager: rollAdapter,
-      modal: this._modal,
-      iconHref: "#icon-roll",
-      label: "Select roll",
-      addNewLabel: "+ Create new roll",
-      onSelect: (rollId) => {
-        RollManager.setCurrentRoll(rollId);
+    this._select = this._container.querySelector("#rollSelect");
+    this._editBtn = this._container.querySelector(".entity-edit-btn");
+
+    this._select.addEventListener("change", (e) => {
+      const value = e.target.value;
+      if (value === CREATE_NEW_ROLL) {
+        this._restoreSelection();
+        this._modal.openCreate();
+      } else {
+        RollManager.setCurrentRoll(value);
         refreshAllUI();
-      },
-      getSelectedValue: () => RollManager.getCurrentRoll()?.name ?? "",
-      formatLabel: (roll) => {
-        const maxId = RollManager.getMaxFrameId(roll);
-        const progress = maxId ?? 0;
-        const progressStr = roll.frameCount
-          ? `(${progress}/${roll.frameCount})`
-          : "";
-        const statusStr =
-          roll.status && roll.status !== "Loaded" ? ` (${roll.status})` : "";
-        return `${roll.name}${progressStr ? ` ${progressStr}` : ""}${statusStr}`;
-      },
+      }
     });
 
-    // Append caption element to roll card (after EntitySelector built the DOM)
+    this._editBtn.addEventListener("click", () => {
+      const selectedId = this._select.value;
+      if (selectedId && selectedId !== CREATE_NEW_ROLL) {
+        this._modal.openEdit(selectedId);
+      }
+    });
+
     this._caption = document.createElement("div");
     this._caption.className = "roll-caption";
-    this._selector.container.appendChild(this._caption);
-    this._renderCaption();
+    this._container.appendChild(this._caption);
 
-    // Auto-open create modal when no rolls exist
+    this.render();
+
     if (!RollManager.getCurrentRoll()) {
       this._modal.openCreate({ mandatory: true });
     }
   },
 
   render() {
-    if (this._selector) this._selector.render();
+    if (!this._select) return;
+    const rolls = RollManager.getRolls();
+    const currentRoll = RollManager.getCurrentRoll();
+
+    let html = rolls
+      .map((roll) => {
+        const selected =
+          currentRoll && roll.id === currentRoll.id ? "selected" : "";
+        return `<option value="${roll.id}" ${selected}>${escapeHtml(this._formatRollLabel(roll))}</option>`;
+      })
+      .join("");
+    html += `<option value="${CREATE_NEW_ROLL}">+ Create new roll</option>`;
+    this._select.innerHTML = html;
+
     this._renderCaption();
-    // Auto-open create modal when no rolls exist
+
     if (!RollManager.getCurrentRoll() && this._modal) {
       this._modal.openCreate({ mandatory: true });
     }
+  },
+
+  _formatRollLabel(roll) {
+    const maxId = RollManager.getMaxFrameId(roll);
+    const progress = maxId ?? 0;
+    const progressStr = roll.frameCount
+      ? `(${progress}/${roll.frameCount})`
+      : "";
+    const statusStr =
+      roll.status && roll.status !== "Loaded" ? ` (${roll.status})` : "";
+    return `${roll.name}${progressStr ? ` ${progressStr}` : ""}${statusStr}`;
+  },
+
+  _restoreSelection() {
+    const currentRoll = RollManager.getCurrentRoll();
+    if (currentRoll) this._select.value = currentRoll.id;
   },
 
   _renderCaption() {

@@ -14,9 +14,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize modules
   FrameModal.init();
-  FieldOptionsDialog.init();
-  CameraSelector.init();
-  FilmSelector.init();
   RollSelector.init();
   SettingsMenu.init();
 

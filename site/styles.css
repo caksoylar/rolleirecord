@@ -188,16 +188,7 @@ header button {
   opacity: 0.7;
 }
 
-/* Entity-select wrapper in form modals (select + edit button side by side) */
-.entity-select-wrap {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.entity-select-wrap select {
-  flex: 1;
-}
-
+/* Anchor wrappers used to wrap buttons inside settings menus */
 a {
   display: contents;
 }
@@ -482,16 +473,6 @@ textarea {
 .settings-actions button {
   flex: 1;
   min-width: 8rem;
-}
-
-.field-options-btn {
-  width: 100%;
-  margin-bottom: 1rem;
-}
-
-/* Field Options Dialog */
-.field-selector {
-  margin-bottom: 1.5rem;
 }
 
 .options-list {
