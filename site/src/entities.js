@@ -3,11 +3,19 @@
 // ============================================================================
 
 class EntityManager {
-  constructor({ storageKey, counterKey, schema, defaults }) {
+  constructor({ entityType, storageKey, counterKey, schema, defaults }) {
+    this.entityType = entityType;
     this.storageKey = storageKey;
     this.counterKey = counterKey;
     this.schema = schema;
     this.defaults = defaults;
+  }
+
+  // Frame fields whose option lists are scoped per-entity of this type.
+  getEntitySpecificFrameFields() {
+    return FRAME_SCHEMA.fields.filter(
+      (f) => f.type === "select" && f.entity_specific === this.entityType,
+    );
   }
 
   init() {
@@ -141,6 +149,7 @@ class EntityManager {
 // Singleton instances
 
 const CameraManager = new EntityManager({
+  entityType: "camera",
   storageKey: "cameras",
   counterKey: "camera-counter",
   schema: CAMERA_SCHEMA,
@@ -148,6 +157,7 @@ const CameraManager = new EntityManager({
 });
 
 const FilmManager = new EntityManager({
+  entityType: "film",
   storageKey: "films",
   counterKey: "film-counter",
   schema: FILM_SCHEMA,

@@ -116,9 +116,9 @@ class EntityFormModal {
     deleteBtn.addEventListener("click", () => this._handleDelete());
 
     // Field Options button — visible only if FRAME_SCHEMA has matching entity_specific fields
-    this.hasFieldOptions = FRAME_SCHEMA.fields.some(
-      (f) => f.entity_specific === this.entityType.toLowerCase(),
-    );
+    this.hasFieldOptions =
+      this.manager.getEntitySpecificFrameFields &&
+      this.manager.getEntitySpecificFrameFields().length > 0;
     const fieldOptionsBtn = this.element.querySelector(".field-options-btn");
     if (this.hasFieldOptions) {
       fieldOptionsBtn.addEventListener("click", () => this._openFieldOptions());

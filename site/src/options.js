@@ -65,9 +65,8 @@ const FieldOptionsDialog = {
   },
 
   populateFieldSelector() {
-    const selectFields = FRAME_SCHEMA.fields.filter(
-      (f) => f.type === "select" && f.entity_specific === this.entityType,
-    );
+    const manager = EntityManagers[this.entityType];
+    const selectFields = manager ? manager.getEntitySpecificFrameFields() : [];
     this.fieldSelectElement.innerHTML = "";
 
     selectFields.forEach((field) => {
