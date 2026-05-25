@@ -72,7 +72,7 @@ const DEFAULT_CAMERAS = [
     name: "Pentax 17",
     format: "35mm",
     size: "24×18mm (half)",
-    "hidden-fields": ["lens"],
+    "hidden-fields": ["shutter", "aperture", "lens"],
   },
   // Medium format
   {
