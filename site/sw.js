@@ -1,7 +1,8 @@
-const CACHE_NAME = 'rolleirecord-v14';
+const CACHE_NAME = 'rolleirecord-v15';
 const ASSETS = [
   './',
   './index.html',
+  './entity-editor.html',
   './icons.svg',
   './styles.css',
   './assets/site.webmanifest',
@@ -15,6 +16,7 @@ const ASSETS = [
   './src/config.js',
   './src/data.js',
   './src/entities.js',
+  './src/entity-editor.js',
   './src/entity-modal.js',
   './src/exif.js',
   './src/export.js',

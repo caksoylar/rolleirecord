@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Edit Entities — Rolleirecord</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="shortcut icon" href="assets/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="Rolleirecord" />
+    <link rel="manifest" href="assets/site.webmanifest" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="index.html" id="backLink" title="Back" aria-label="Back"
+          >←</a
+        >
+        <span id="pageTitle">Edit</span>
+      </h1>
+    </header>
+    <main>
+      <div id="entitySelectorContainer" class="entity-selector-bar">
+        <!-- Populated dynamically -->
+      </div>
+
+      <section class="entity-editor-section">
+        <h2 class="section-heading">Properties</h2>
+        <div id="propertiesList" class="entity-prop-list">
+          <!-- Property rows rendered here -->
+        </div>
+      </section>
+
+      <section
+        class="entity-editor-section"
+        id="frameFieldsSection"
+        style="display: none"
+      >
+        <h2 class="section-heading">Frame field options</h2>
+        <p class="section-caption">
+          Customize the per-entity list of values for each frame field.
+        </p>
+        <div id="frameFieldsList" class="entity-prop-list">
+          <!-- Frame field rows rendered here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Property Edit Modal: single-field input -->
+    <div
+      class="modal"
+      id="propertyEditModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="propertyEditTitle"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="propertyEditTitle" class="modal-title"></h2>
+        </div>
+        <form id="propertyEditForm" autocomplete="off">
+          <div class="modal-body" id="propertyEditBody">
+            <!-- Single form-group rendered here -->
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Save</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Frame-field Options Edit Modal -->
+    <div
+      class="modal"
+      id="optionsEditModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="optionsEditTitle"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="optionsEditTitle" class="modal-title"></h2>
+        </div>
+        <form id="optionsEditForm" autocomplete="off">
+          <div class="options-list">
+            <p class="options-list-heading">Options</p>
+            <div id="optionsEditContainer">
+              <!-- Option inputs rendered here -->
+            </div>
+            <button
+              type="button"
+              id="addOptionBtn"
+              class="secondary"
+              style="width: 100%; margin-top: 0.75rem"
+            >
+              + Add Option
+            </button>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Save</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
+            <button type="button" class="secondary reset-btn">
+              Reset to defaults
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="src/config.js"></script>
+    <script src="src/entities.js"></script>
+    <script src="src/entity-editor.js"></script>
+  </body>
+</html>

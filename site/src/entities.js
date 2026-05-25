@@ -142,7 +142,7 @@ class EntityManager {
       hidden.splice(index, 1);
     }
     entity["hidden-fields"] = hidden;
-    this.update(entity.id, camera);
+    this.update(entity.id, entity);
   }
 }
 
