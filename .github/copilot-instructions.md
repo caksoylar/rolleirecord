@@ -86,9 +86,9 @@ Import reconciles camera/film entities via `EntityManager.upsertByName()` — cr
 
 ## Conventions
 
-- **No ES modules on main branch.** All `site/src/*.js` are plain scripts sharing globals. Use `// eslint-disable-next-line no-unused-vars` on global declarations that are consumed by other files.
+- **No ES modules on main branch.** All `site/src/*.js` are plain scripts sharing globals. Use `// eslint-disable-next-line no-unused-vars` on global declarations that are consumed by other files. Always prefer `// eslint-disable-next-line` over `// eslint-disable-line` — Prettier may reflow trailing comments onto a new line, breaking the line-targeted directive.
 - **Prefix unused variables with `_`** (e.g., `const { id: _id, ...rest } = obj`). Configured in eslint: `varsIgnorePattern: "^_"`.
-- **Use `!=` / `== null` for null-or-undefined checks** with an `// eslint-disable-line eqeqeq` comment. The `eqeqeq` rule is set to warn.
+- **Use `!=` / `== null` for null-or-undefined checks** with an `// eslint-disable-next-line eqeqeq` comment on the line above. The `eqeqeq` rule is set to warn.
 - **Icons**: SVG sprites from Phosphor Icons in `site/icons.svg`, referenced as `<svg class="icon"><use href="icons.svg#icon-name"></use></svg>`.
 - **Favor code reuse.** Extract shared logic into helper functions rather than duplicating patterns across files. When adding new functionality, look for existing utilities or patterns that can be extended. Refactor proactively when you see an opportunity to reduce duplication.
 - **Ask before making major decisions.** If you are making any architectural overhauls, you ran into a roadblock and want to work around it with a hack, or if the code changes to satisfy a request seem too major, always check with the user first. Describe the problem, ask for clarification or confirm your decisions.

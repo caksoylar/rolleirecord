@@ -77,11 +77,14 @@ const FrameModal = {
   },
 
   _renderSelectField(field, inputId, required, rowData) {
-    const entityCamera =
-      field.entity_specific === "camera"
-        ? SessionManager.getSelectedCamera()
-        : null;
-    const dynamicOptions = OptionsManager.getOptions(field.name, entityCamera);
+    const entityType = field.entity_specific || "";
+    const entityName =
+      entityType === "camera" ? SessionManager.getSelectedCamera() : "";
+    const dynamicOptions = OptionsManager.getOptions(
+      field.name,
+      entityType,
+      entityName,
+    );
 
     const effectiveDefault =
       dynamicOptions.length > 0 && !dynamicOptions.includes(field.defaultValue)

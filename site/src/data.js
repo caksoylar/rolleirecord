@@ -5,6 +5,7 @@
 // SESSION MANAGER - manage camera and film selection (now delegates to current roll)
 // ============================================================================
 
+// eslint-disable-next-line no-unused-vars
 const SessionManager = {
   _setRollField(fieldName, value) {
     const currentRoll = RollManager.getCurrentRoll();
@@ -48,43 +49,44 @@ const SessionManager = {
 // ============================================================================
 // eslint-disable-next-line no-unused-vars
 const OptionsManager = {
-  OPTIONS_KEY_PREFIX: "fieldOptions_",
+  OPTIONS_KEY: "fieldOptions",
 
   _getField(fieldName) {
     return FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
   },
 
-  // Build storage key for a field, incorporating camera name if camera-specific
-  _getStorageKey(fieldName, camera = null) {
-    const field = this._getField(fieldName);
-    const isCamera = field?.entity_specific === "camera";
-    const cameraName = isCamera
-      ? camera || SessionManager.getSelectedCamera()
-      : null;
-
-    let storageKey = this.OPTIONS_KEY_PREFIX + fieldName;
-    if (isCamera && cameraName) {
-      storageKey += "_" + cameraName;
+  _readAll() {
+    const raw = localStorage.getItem(this.OPTIONS_KEY);
+    if (!raw) return {};
+    try {
+      const parsed = JSON.parse(raw);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch (e) {
+      console.error("Failed to parse field options store", e);
+      return {};
     }
-    return storageKey;
+  },
+
+  _writeAll(obj) {
+    try {
+      localStorage.setItem(this.OPTIONS_KEY, JSON.stringify(obj));
+      return true;
+    } catch (e) {
+      console.error("Failed to save field options store", e);
+      return false;
+    }
   },
 
   // Get options for a specific field from localStorage or defaults
-  getOptions(fieldName, camera = null) {
+  getOptions(fieldName, entityType = "", entityName = "") {
     const field = this._getField(fieldName);
     if (!field || field.type !== "select") {
       return [];
     }
 
-    const stored = localStorage.getItem(this._getStorageKey(fieldName, camera));
-
-    if (stored) {
-      try {
-        return JSON.parse(stored);
-      } catch (e) {
-        console.error("Failed to parse options for", fieldName, e);
-        return field.options || [];
-      }
+    const stored = this._readAll()?.[entityType]?.[entityName]?.[fieldName];
+    if (Array.isArray(stored)) {
+      return stored;
     }
 
     // Return default options from schema
@@ -92,22 +94,17 @@ const OptionsManager = {
   },
 
   // Set options for a specific field in localStorage
-  setOptions(fieldName, optionsArray, camera = null) {
+  setOptions(fieldName, optionsArray, entityType = "", entityName = "") {
     const field = this._getField(fieldName);
     if (!field || field.type !== "select") {
       return false;
     }
 
-    try {
-      localStorage.setItem(
-        this._getStorageKey(fieldName, camera),
-        JSON.stringify(optionsArray),
-      );
-      return true;
-    } catch (e) {
-      console.error("Failed to save options for", fieldName, e);
-      return false;
-    }
+    const all = this._readAll();
+    if (!all[entityType]) all[entityType] = {};
+    if (!all[entityType][entityName]) all[entityType][entityName] = {};
+    all[entityType][entityName][fieldName] = optionsArray;
+    return this._writeAll(all);
   },
 
   // Get default options from schema
@@ -117,28 +114,31 @@ const OptionsManager = {
   },
 
   // Reset options to defaults
-  resetOptions(fieldName, camera = null) {
+  resetOptions(fieldName, entityType = "", entityName = "") {
     const field = this._getField(fieldName);
     if (!field) return false;
 
-    localStorage.removeItem(this._getStorageKey(fieldName, camera));
-    return true;
+    const all = this._readAll();
+    const fields = all?.[entityType]?.[entityName];
+    if (!fields || !(fieldName in fields)) return true;
+    delete fields[fieldName];
+    if (Object.keys(fields).length === 0) {
+      delete all[entityType][entityName];
+      if (Object.keys(all[entityType]).length === 0) {
+        delete all[entityType];
+      }
+    }
+    return this._writeAll(all);
   },
 
-  // Rename camera in all option storage keys
-  renameCameraKeys(oldName, newName) {
-    const cameraFields = FRAME_SCHEMA.fields.filter(
-      (f) => f.entity_specific === "camera",
-    );
-    cameraFields.forEach((field) => {
-      const oldKey = this.OPTIONS_KEY_PREFIX + field.name + "_" + oldName;
-      const stored = localStorage.getItem(oldKey);
-      if (stored !== null) {
-        const newKey = this.OPTIONS_KEY_PREFIX + field.name + "_" + newName;
-        localStorage.setItem(newKey, stored);
-        localStorage.removeItem(oldKey);
-      }
-    });
+  // Rename an entity in the options store (e.g., camera renamed from oldName to newName)
+  renameEntityKeys(entityType, oldName, newName) {
+    const all = this._readAll();
+    const bucket = all[entityType];
+    if (!bucket || !(oldName in bucket)) return;
+    bucket[newName] = bucket[oldName];
+    delete bucket[oldName];
+    this._writeAll(all);
   },
 };
 

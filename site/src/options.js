@@ -86,7 +86,11 @@ const FieldOptionsDialog = {
 
   onFieldSelected(fieldName) {
     this.currentField = fieldName;
-    const options = OptionsManager.getOptions(fieldName, this.entityName);
+    const options = OptionsManager.getOptions(
+      fieldName,
+      this.entityType,
+      this.entityName,
+    );
     this.renderOptionsInputs(options);
     this.renderVisibilityToggle(fieldName);
   },
@@ -226,10 +230,11 @@ const FieldOptionsDialog = {
       return false;
     }
 
-    // Pass entity name for entity-specific fields
+    // Pass entity type and name for entity-specific fields
     const success = OptionsManager.setOptions(
       this.currentField,
       options,
+      this.entityType,
       this.entityName,
     );
     if (success) {

@@ -42,7 +42,7 @@ const CameraSelector = {
         if (mode === "update" && oldName && oldName !== item.name) {
           cascadeRenameOnRolls("camera", oldName, item.name);
           // Update OptionsManager storage keys
-          OptionsManager.renameCameraKeys(oldName, item.name);
+          OptionsManager.renameEntityKeys("camera", oldName, item.name);
         }
         if (mode === "create") {
           // Set new camera as selected for current roll
