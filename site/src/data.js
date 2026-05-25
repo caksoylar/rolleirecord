@@ -49,7 +49,6 @@ const SessionManager = {
 // eslint-disable-next-line no-unused-vars
 const OptionsManager = {
   OPTIONS_KEY_PREFIX: "fieldOptions_",
-  CAMERAS_PREFIX: "cameras",
 
   _getField(fieldName) {
     return FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
@@ -68,11 +67,6 @@ const OptionsManager = {
       storageKey += "_" + cameraName;
     }
     return storageKey;
-  },
-
-  // Get all select fields from schema
-  getSelectFields() {
-    return FRAME_SCHEMA.fields.filter((f) => f.type === "select");
   },
 
   // Get options for a specific field from localStorage or defaults

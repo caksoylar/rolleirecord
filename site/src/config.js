@@ -183,18 +183,14 @@ const CAMERA_SCHEMA = {
       name: "format",
       type: "select",
       label: "Format",
-      required: true,
       options: Object.keys(FORMATS),
-      readonly: true,
     },
     {
       name: "size",
       type: "select",
       label: "Size",
-      required: true,
       dependent_on: "format",
       dependent_options: FORMATS,
-      readonly: true,
     },
   ],
 };
