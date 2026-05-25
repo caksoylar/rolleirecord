@@ -198,9 +198,13 @@ header button {
   flex: 1;
 }
 
+a {
+  display: contents;
+}
+
 button {
   padding: 0.75rem;
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-sm);
   border: none;
   border-radius: var(--radius);
   background-color: var(--color-accent);
