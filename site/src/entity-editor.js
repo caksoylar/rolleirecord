@@ -90,20 +90,13 @@ const EntityEditorSelector = {
   _addNew() {
     const manager = getManager();
     const type = getEntityType();
-    const name = prompt(`New ${type} name:`);
-    // eslint-disable-next-line eqeqeq
-    if (name == null) return;
-    const trimmed = name.trim();
-    if (!trimmed) {
-      alert("Name is required");
-      return;
-    }
-    if (manager.getByName(trimmed)) {
-      alert(`A ${type} named "${trimmed}" already exists.`);
+    const name = `New ${capitalize(type)}`;
+    if (manager.getByName(name)) {
+      alert(`A ${type} named "${name}" already exists.`);
       return;
     }
     // Seed remaining fields with defaults (first option for selects, "" for text/number)
-    const data = { name: trimmed };
+    const data = { name: name };
     manager.schema.fields.forEach((field) => {
       if (field.name === "name") return;
       if (field.dependent_on) {
@@ -169,12 +162,9 @@ const PropertiesSection = {
         const value = entity[field.name];
         // eslint-disable-next-line eqeqeq
         const display = value === "" || value == null ? "—" : String(value);
-        const canEdit = !field.dependent_on;
-        const editBtn = canEdit
-          ? `<button type="button" class="secondary entity-prop-edit" data-field="${field.name}" title="Edit ${escapeHtml(field.label)}">
+        const editBtn = `<button type="button" class="secondary entity-prop-edit" data-field="${field.name}" title="Edit ${escapeHtml(field.label)}">
               <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
-            </button>`
-          : "";
+            </button>`;
         return `
           <div class="entity-prop-row">
             <span class="entity-prop-label">${escapeHtml(field.label)}</span>
@@ -220,23 +210,27 @@ const PropertyEditModal = {
     const entity = manager.getById(currentEntityId);
     if (!entity) return;
     const field = manager.schema.fields.find((f) => f.name === fieldName);
-    if (!field || field.dependent_on) return;
+    if (!field) return;
 
     this.currentField = field;
     this.titleEl.textContent = `Edit ${field.label}`;
-    this.bodyEl.innerHTML = this._renderInput(field, entity[field.name]);
+    this.bodyEl.innerHTML = this._renderInput(field, entity);
     this.modalEl.classList.add("active");
     const input = this.bodyEl.querySelector("input, select, textarea");
     if (input) input.focus();
   },
 
-  _renderInput(field, currentValue) {
+  _renderInput(field, entity) {
     const id = `property-edit-input`;
     // eslint-disable-next-line eqeqeq
-    const val = currentValue == null ? "" : currentValue;
+    const val = entity[field.name] == null ? "" : entity[field.name];
     const required = field.required ? "required" : "";
     if (field.type === "select") {
-      const options = (field.options || [])
+      const options = (
+        field.dependent_on
+          ? field.dependent_options[entity[field.dependent_on]]
+          : field.options || []
+      )
         .map(
           (o) =>
             `<option value="${escapeHtml(o)}" ${o === val ? "selected" : ""}>${escapeHtml(o)}</option>`,
