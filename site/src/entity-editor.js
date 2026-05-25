@@ -34,6 +34,25 @@ function capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+// Rolls reference cameras/films by name string. The entity type identifier
+// ("camera" / "film") matches the roll field name, so we can look up
+// referencing rolls directly.
+function rollsReferencing(entityName) {
+  return RollManager.getRolls().filter(
+    (roll) => roll[getEntityType()] === entityName,
+  );
+}
+
+// Cascade a name change to every roll that references the entity by its old name.
+function cascadeRenameOnRolls(oldName, newName) {
+  const field = getEntityType();
+  RollManager.getRolls().forEach((roll) => {
+    if (roll[field] === oldName) {
+      RollManager.updateRoll(roll.id, { [field]: newName });
+    }
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Entity selector bar
 // ---------------------------------------------------------------------------
@@ -120,8 +139,27 @@ const EntityEditorSelector = {
 
   _deleteCurrent() {
     const manager = getManager();
+    const type = getEntityType();
     const entity = manager.getById(currentEntityId);
     if (!entity) return;
+
+    if (manager.getAll().length <= 1) {
+      alert(
+        `Cannot delete the last ${type}. At least one ${type} is required to create rolls.`,
+      );
+      return;
+    }
+
+    const referencing = rollsReferencing(entity.name);
+    if (referencing.length > 0) {
+      const names = referencing.map((r) => `"${r.name}"`).join(", ");
+      alert(
+        `Cannot delete "${entity.name}" — it is used by ${referencing.length} roll(s): ${names}.\n\n` +
+          `Reassign or delete those rolls first.`,
+      );
+      return;
+    }
+
     if (
       !confirm(
         `Are you sure you want to delete "${entity.name}"? This cannot be undone.`,
@@ -129,6 +167,7 @@ const EntityEditorSelector = {
     )
       return;
     manager.delete(entity.id);
+    OptionsManager.deleteEntity(type, entity.name);
     currentEntityId = null;
     renderEntityEditor();
   },
@@ -294,6 +333,7 @@ const PropertyEditModal = {
 
     if (field.name === "name" && oldName !== value) {
       OptionsManager.renameEntityKeys(getEntityType(), oldName, value);
+      cascadeRenameOnRolls(oldName, value);
     }
 
     this.close();

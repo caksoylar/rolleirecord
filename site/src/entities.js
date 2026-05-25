@@ -266,4 +266,16 @@ const OptionsManager = {
     delete bucket[oldName];
     this._writeAll(all);
   },
+
+  // Drop all stored options for a deleted entity.
+  deleteEntity(entityType, entityName) {
+    const all = this._readAll();
+    const bucket = all[entityType];
+    if (!bucket || !(entityName in bucket)) return;
+    delete bucket[entityName];
+    if (Object.keys(bucket).length === 0) {
+      delete all[entityType];
+    }
+    this._writeAll(all);
+  },
 };
