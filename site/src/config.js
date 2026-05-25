@@ -286,7 +286,9 @@ const FRAME_SCHEMA = {
       name: "mode",
       type: "select",
       label: "Shooting Mode",
+      header: "M",
       entity_specific: "camera",
+      column_width: "10%",
       // custom_value intentionally omitted (false): mode is a fixed enum
       options: ["P", "S", "A", "M"],
       defaultValue: "P",
