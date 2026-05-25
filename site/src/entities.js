@@ -139,16 +139,20 @@ class EntityManager {
 
 // Singleton instances
 
-// eslint-disable-next-line no-unused-vars
 const CameraManager = new EntityManager({
   storageKey: "cameras",
   counterKey: "camera-counter",
   defaults: DEFAULT_CAMERAS,
 });
 
-// eslint-disable-next-line no-unused-vars
 const FilmManager = new EntityManager({
   storageKey: "films",
   counterKey: "film-counter",
   defaults: DEFAULT_FILMS,
 });
+
+// eslint-disable-next-line no-unused-vars
+const EntityManagers = {
+  camera: CameraManager,
+  film: FilmManager,
+};
