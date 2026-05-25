@@ -185,6 +185,7 @@ const CAMERA_SCHEMA = {
       label: "Format",
       required: true,
       options: Object.keys(FORMATS),
+      readonly: true,
     },
     {
       name: "size",
@@ -193,6 +194,7 @@ const CAMERA_SCHEMA = {
       required: true,
       dependent_on: "format",
       dependent_options: FORMATS,
+      readonly: true,
     },
   ],
 };

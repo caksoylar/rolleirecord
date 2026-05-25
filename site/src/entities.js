@@ -3,9 +3,10 @@
 // ============================================================================
 
 class EntityManager {
-  constructor({ storageKey, counterKey, defaults }) {
+  constructor({ storageKey, counterKey, schema, defaults }) {
     this.storageKey = storageKey;
     this.counterKey = counterKey;
+    this.schema = schema;
     this.defaults = defaults;
   }
 
@@ -142,12 +143,14 @@ class EntityManager {
 const CameraManager = new EntityManager({
   storageKey: "cameras",
   counterKey: "camera-counter",
+  schema: CAMERA_SCHEMA,
   defaults: DEFAULT_CAMERAS,
 });
 
 const FilmManager = new EntityManager({
   storageKey: "films",
   counterKey: "film-counter",
+  schema: FILM_SCHEMA,
   defaults: DEFAULT_FILMS,
 });
 
