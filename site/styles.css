@@ -199,7 +199,7 @@ header button {
 }
 
 button {
-  padding: 0.875rem 1.25rem;
+  padding: 0.75rem;
   font-size: var(--font-size-base);
   border: none;
   border-radius: var(--radius);
@@ -276,7 +276,6 @@ tr:last-child td {
 }
 
 .entity-edit-btn {
-  padding: 0;
   font-size: var(--font-size-xs);
   aspect-ratio: 1;
 }
@@ -598,12 +597,13 @@ textarea {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 0.75rem 1rem;
+  padding: 0.5rem;
 }
 
 .entity-prop-label {
   font-weight: 600;
   color: var(--color-text);
+  padding-left: 0.5rem;
 }
 
 .entity-prop-value {
@@ -611,22 +611,20 @@ textarea {
   font-size: var(--font-size-sm);
   text-align: right;
   word-break: break-word;
+  padding-left: 0.5rem;
 }
 
 .entity-prop-value--list {
   text-align: left;
-  grid-column: 1 / -1;
+  grid-column: 1 / 3;
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
-}
-
-.entity-prop-edit {
-  padding: 0.5rem 0.75rem;
 }
 
 .entity-prop-toggle {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+  grid-column: 3 / -1;
 }
 
 .entity-prop-row--muted .entity-prop-value,
