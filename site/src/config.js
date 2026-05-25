@@ -327,7 +327,7 @@ const FRAME_SCHEMA = {
       entity_specific: "camera",
       custom_value: true,
       options: [
-        "",
+        "None",
         "UV",
         "Skylight 1A",
         "Circular Polarizer",
