@@ -39,8 +39,7 @@ const FrameModal = {
     let html = "";
 
     FRAME_SCHEMA.fields.forEach((field) => {
-      if (field.hideable && CameraManager.isFieldHidden(field.name, camera))
-        return;
+      if (CameraManager.isFieldHidden(field.name, camera)) return;
 
       const inputId = `field-${safeInputId(field.name)}`;
       const required = field.required ? "required" : "";
@@ -355,7 +354,7 @@ const FormValidator = {
 
     FRAME_SCHEMA.fields.forEach((field) => {
       // Hidden fields save as null
-      if (field.hideable && CameraManager.isFieldHidden(field.name, camera)) {
+      if (CameraManager.isFieldHidden(field.name, camera)) {
         formData[field.name] = null;
         return;
       }

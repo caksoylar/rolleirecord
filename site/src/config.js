@@ -286,7 +286,6 @@ const FRAME_SCHEMA = {
       name: "mode",
       type: "select",
       label: "Shooting Mode",
-      hideable: true,
       entity_specific: "camera",
       // custom_value intentionally omitted (false): mode is a fixed enum
       options: ["P", "S", "A", "M"],
@@ -296,7 +295,6 @@ const FRAME_SCHEMA = {
       name: "exposure_comp",
       type: "select",
       label: "Exposure Comp.",
-      hideable: true,
       entity_specific: "camera",
       custom_value: true,
       options: ["-2", "-1.5", "-1", "-0.5", "0", "+0.5", "+1", "+1.5", "+2"],
@@ -306,7 +304,6 @@ const FRAME_SCHEMA = {
       name: "lens",
       type: "select",
       label: "Lens",
-      hideable: true,
       entity_specific: "camera",
       options: [
         "50mm f/1.8",
@@ -323,7 +320,6 @@ const FRAME_SCHEMA = {
       name: "filter",
       type: "select",
       label: "Filter",
-      hideable: true,
       entity_specific: "camera",
       custom_value: true,
       options: [

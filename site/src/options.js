@@ -99,7 +99,7 @@ const FieldOptionsDialog = {
     if (!container) return;
 
     const field = FRAME_SCHEMA.fields.find((f) => f.name === fieldName);
-    if (!field || !field.hideable) {
+    if (!field) {
       container.style.display = "none";
       this._setOptionsEnabled(true);
       return;

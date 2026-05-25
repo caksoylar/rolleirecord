@@ -355,12 +355,10 @@ const FrameFieldsSection = {
         );
         const isHidden = manager.isFieldHidden(field.name, entity.name);
         const muted = isHidden ? "entity-prop-row--muted" : "";
-        const toggle = field.hideable
-          ? `<label class="toggle-row entity-prop-toggle" title="Enabled for this ${getEntityType()}">
+        const toggle = `<label class="toggle-row entity-prop-toggle" title="Enabled for this ${getEntityType()}">
               <input type="checkbox" class="field-enabled-toggle" data-field="${field.name}" ${isHidden ? "" : "checked"} />
               <span>Enabled</span>
-            </label>`
-          : "";
+            </label>`;
         return `
           <div class="entity-prop-row ${muted}">
             <span class="entity-prop-label">${escapeHtml(field.label)}</span>
