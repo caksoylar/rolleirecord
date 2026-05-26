@@ -192,4 +192,19 @@
     <line x1="200" y1="56" x2="56" y2="200" />
     <line x1="200" y1="200" x2="56" y2="56" />
   </symbol>
+  <!-- Phosphor icons, hash -->
+  <symbol
+    id="icon-hash"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <line x1="48" y1="96" x2="224" y2="96" />
+    <line x1="176" y1="40" x2="144" y2="216" />
+    <line x1="112" y1="40" x2="80" y2="216" />
+    <line x1="32" y1="160" x2="208" y2="160" />
+  </symbol>
 </svg>

@@ -341,14 +341,9 @@ const RollSelector = {
   },
 
   _formatRollLabel(roll) {
-    const maxId = RollManager.getMaxFrameId(roll);
-    const progress = maxId ?? 0;
-    const progressStr = roll.frameCount
-      ? `(${progress}/${roll.frameCount})`
-      : "";
     const statusStr =
       roll.status && roll.status !== "Loaded" ? ` (${roll.status})` : "";
-    return `${roll.name}${progressStr ? ` ${progressStr}` : ""}${statusStr}`;
+    return `${roll.name}${statusStr}`;
   },
 
   _restoreSelection() {
@@ -363,9 +358,18 @@ const RollSelector = {
       this._caption.innerHTML = "";
       return;
     }
+    const maxId = RollManager.getMaxFrameId(roll);
+    const progressStr = `${maxId ?? 0} / ${roll.frameCount}`;
+    if (roll.frameCount) {
+      this._caption.innerHTML = `
+      <span class="chip">
+        <svg class="icon"><use href="icons.svg#icon-hash"></use></svg>
+        ${escapeHtml(progressStr)}
+      </span>`;
+    }
     const camera = roll.camera || "—";
     const film = roll.film || "—";
-    this._caption.innerHTML = `
+    this._caption.innerHTML += `
       <span class="chip">
         <svg class="icon"><use href="icons.svg#icon-camera"></use></svg>
         ${escapeHtml(camera)}
