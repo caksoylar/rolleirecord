@@ -13,7 +13,7 @@
 const TableRenderer = {
   // Get column fields (those with column_width), excluding per-camera hidden fields
   getVisibleFields() {
-    const camera = SessionManager.getSelectedCamera();
+    const camera = RollManager.getCurrentCamera();
     return FRAME_SCHEMA.fields.filter(
       (f) => f.column_width && !CameraManager.isFieldHidden(f.name, camera),
     );

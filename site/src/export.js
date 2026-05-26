@@ -7,8 +7,8 @@ const Export = {
   // Build clean frame data for CSV export (flat rows with camera/film/iso)
   _getFrameData() {
     const rows = RollManager.getFrames();
-    const camera = SessionManager.getSelectedCamera();
-    const film = SessionManager.getSelectedFilm();
+    const camera = RollManager.getCurrentCamera();
+    const film = RollManager.getCurrentFilm();
     const iso = FilmManager.getByName(film)?.iso ?? "";
 
     return rows.map((row) => {
@@ -152,8 +152,8 @@ const Export = {
     const roll = RollManager.getCurrentRoll();
     if (!roll) return;
 
-    const cameraName = SessionManager.getSelectedCamera();
-    const filmName = SessionManager.getSelectedFilm();
+    const cameraName = RollManager.getCurrentCamera();
+    const filmName = RollManager.getCurrentFilm();
 
     const data = {
       name: roll.name,

@@ -33,7 +33,7 @@ Files in `site/src/` are plain scripts (`sourceType: "script"`), not ES modules.
 
 **`index.html` — main app:**
 
-`config.js` → `entities.js` → `rolls.js` → `data.js` → `table.js` → `selectors.js` → `exif.js` → `export.js` → `frame.js` → `app.js`
+`config.js` → `entities.js` → `rolls.js` → `table.js` → `selectors.js` → `exif.js` → `export.js` → `frame.js` → `app.js`
 
 **`entity-editor.html` — camera/film editor page:**
 

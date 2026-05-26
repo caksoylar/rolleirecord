@@ -150,12 +150,8 @@ class RollFormModal {
   }
 
   _clearForm() {
-    const defaultCamera =
-      SessionManager.getSelectedCamera() ||
-      CameraManager.getAll()[0]?.name ||
-      "";
-    const defaultFilm =
-      SessionManager.getSelectedFilm() || FilmManager.getAll()[0]?.name || "";
+    const defaultCamera = RollManager.getCurrentCamera();
+    const defaultFilm = RollManager.getCurrentFilm();
     this._populateCameraSelect(defaultCamera);
     this._populateFilmSelect(defaultFilm);
     this.element.querySelector("#Roll-label").value = "";

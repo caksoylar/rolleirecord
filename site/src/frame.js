@@ -2,6 +2,70 @@
 // FRAME MODAL - Add/edit frame dialog, validation, and form flows
 // ============================================================================
 
+// LOCATION MANAGER - Geolocation API wrapper
+// ============================================================================
+const LocationManager = {
+  getLocation() {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error("Geolocation not supported"));
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          });
+        },
+        (error) => reject(error),
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        },
+      );
+    });
+  },
+
+  formatCoordinates(lat, lng) {
+    return `${lat},${lng}`;
+  },
+
+  formatCoordinatesWithAccuracy(lat, lng, accuracy) {
+    // eslint-disable-next-line eqeqeq
+    if (accuracy == null) {
+      return this.formatCoordinates(lat, lng);
+    }
+    const accuracyMeters = Math.round(accuracy);
+    return `${lat},${lng} (±${accuracyMeters}m)`;
+  },
+
+  displayCoordinates(lat, lng) {
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  },
+
+  parseCoordinates(coordString) {
+    const [lat, lng] = coordString.split(",").map((s) => parseFloat(s.trim()));
+    return { lat, lng };
+  },
+
+  isValidCoordinates(coordString) {
+    const regex = /^-?\d+\.?\d*\s*,\s*-?\d+\.?\d*$/;
+    return regex.test(coordString.trim());
+  },
+
+  getMapsUrl(coordString) {
+    if (!this.isValidCoordinates(coordString)) {
+      return null;
+    }
+    const cleaned = coordString.replace(/\s+/g, "");
+    return `https://www.google.com/maps?q=${cleaned}`;
+  },
+};
+
 // APPLICATION STATE
 let appState = {
   mode: null, // 'add' or 'edit'
@@ -35,7 +99,7 @@ const FrameModal = {
 
   // Render form fields based on schema
   renderFormFields(rowData = null, isEditMode = false) {
-    const camera = SessionManager.getSelectedCamera();
+    const camera = RollManager.getCurrentCamera();
     let html = "";
 
     FRAME_SCHEMA.fields.forEach((field) => {
@@ -78,7 +142,7 @@ const FrameModal = {
   _renderSelectField(field, inputId, required, rowData) {
     const entityType = field.entity_specific || "";
     const entityName =
-      entityType === "camera" ? SessionManager.getSelectedCamera() : "";
+      entityType === "camera" ? RollManager.getCurrentCamera() : "";
     const dynamicOptions = OptionsManager.getOptions(
       field.name,
       entityType,
@@ -350,7 +414,7 @@ const FrameModal = {
 const FormValidator = {
   getFormData() {
     const formData = {};
-    const camera = SessionManager.getSelectedCamera();
+    const camera = RollManager.getCurrentCamera();
 
     FRAME_SCHEMA.fields.forEach((field) => {
       // Hidden fields save as null

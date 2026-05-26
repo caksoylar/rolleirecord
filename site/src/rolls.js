@@ -64,6 +64,20 @@ const RollManager = {
     return this.getRollById(currentId);
   },
 
+  // Get the camera name for the current roll, falling back to the first
+  // available camera if no roll is selected.
+  getCurrentCamera() {
+    return (
+      this.getCurrentRoll()?.camera ?? CameraManager.getAll()[0]?.name ?? ""
+    );
+  },
+
+  // Get the film name for the current roll, falling back to the first
+  // available film if no roll is selected.
+  getCurrentFilm() {
+    return this.getCurrentRoll()?.film ?? FilmManager.getAll()[0]?.name ?? "";
+  },
+
   // Create new roll from a data object
   createRoll(data) {
     const rolls = this.getRolls();

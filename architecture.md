@@ -11,7 +11,7 @@ Two HTML entry points share the same `src/` directory:
 **`index.html` — main app** (in dependency order):
 
 ```
-config.js → entities.js → rolls.js → data.js → table.js →
+config.js → entities.js → rolls.js → table.js →
 selectors.js → exif.js → export.js → frame.js → app.js
 ```
 
@@ -32,18 +32,16 @@ graph LR
     config["config.js\nschemas · defaults · safeInputId()"]
     entities["entities.js\nCameraManager · FilmManager · OptionsManager"]
     rolls["rolls.js\nRollManager"]
-    data["data.js\nSessionManager · LocationManager"]
     table["table.js\nTableRenderer · refreshAllUI · escapeHtml"]
     selectors["selectors.js\nRollSelector · RollFormModal"]
     exif["exif.js\nbuildExifTags()"]
     export_["export.js\nExport"]
-    frame["frame.js\nFrameModal · ModalFlows · UI"]
+    frame["frame.js\nFrameModal · LocationManager · ModalFlows · UI"]
     app["app.js\nSettingsMenu · init"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
 
     config --> entities
     config --> rolls
-    config --> data
     config --> table
     config --> frame
     config --> export_
@@ -51,22 +49,15 @@ graph LR
     config --> entity_editor
 
     entities --> rolls
-    entities --> data
     entities --> selectors
     entities --> frame
     entities --> export_
     entities --> entity_editor
 
-    rolls --> data
     rolls --> selectors
     rolls --> table
     rolls --> frame
     rolls --> export_
-
-    data --> table
-    data --> selectors
-    data --> frame
-    data --> export_
 
     table --> selectors
     table --> app
@@ -144,17 +135,17 @@ erDiagram
 
 ### `config.js`
 
-| Export | Kind | Purpose |
-|--------|------|---------|
-| `safeInputId(fieldName)` | function | Replaces `"name"` → `"label"` in HTML `id`/`name` attrs to prevent iOS Safari autofill |
-| `FRAME_SCHEMA` | const | Schema for frame fields — drives form rendering, table columns, validation, export |
-| `CAMERA_SCHEMA` | const | Schema for camera entity forms |
-| `FILM_SCHEMA` | const | Schema for film entity forms |
-| `FORMATS` | const | Map of film format → valid size strings. Used as `dependent_options` for the camera `size` field (which declares `dependent_on: "format"`) to drive a cascading select |
-| `ROLL_STATUSES` | const | Ordered list of roll lifecycle statuses |
-| `DEFAULT_CAMERAS` | const | Seed data for first load |
-| `DEFAULT_FILMS` | const | Seed data for first load |
-| `DEFAULT_FRAME_COUNT` | const | Default frame count for new rolls (36) |
+| Export                   | Kind     | Purpose                                                                                                                                                                |
+| ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `safeInputId(fieldName)` | function | Replaces `"name"` → `"label"` in HTML `id`/`name` attrs to prevent iOS Safari autofill                                                                                 |
+| `FRAME_SCHEMA`           | const    | Schema for frame fields — drives form rendering, table columns, validation, export                                                                                     |
+| `CAMERA_SCHEMA`          | const    | Schema for camera entity forms                                                                                                                                         |
+| `FILM_SCHEMA`            | const    | Schema for film entity forms                                                                                                                                           |
+| `FORMATS`                | const    | Map of film format → valid size strings. Used as `dependent_options` for the camera `size` field (which declares `dependent_on: "format"`) to drive a cascading select |
+| `ROLL_STATUSES`          | const    | Ordered list of roll lifecycle statuses                                                                                                                                |
+| `DEFAULT_CAMERAS`        | const    | Seed data for first load                                                                                                                                               |
+| `DEFAULT_FILMS`          | const    | Seed data for first load                                                                                                                                               |
+| `DEFAULT_FRAME_COUNT`    | const    | Default frame count for new rolls (36)                                                                                                                                 |
 
 ---
 
@@ -225,29 +216,22 @@ when an entity is renamed.
 
 ### `rolls.js`
 
-| Export | Kind | Purpose |
-|--------|------|---------|
+| Export        | Kind             | Purpose                                                                                                                                                           |
+| ------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `RollManager` | object singleton | Manages the list of rolls in localStorage (`"rolls"` key). Tracks the active roll via `"current-roll-id"`. Provides roll CRUD and frame CRUD on the current roll. |
 
-Key methods: `createRoll`, `updateRoll`, `deleteRoll`, `setCurrentRoll`, `getFrames`, `addFrame`, `updateFrame`, `deleteFrame`, `getNextSuggestedFrameId`.
+Key methods: `createRoll`, `updateRoll`, `deleteRoll`, `setCurrentRoll`, `getFrames`, `addFrame`, `updateFrame`, `deleteFrame`, `getNextSuggestedFrameId`, `getCurrentCamera`, `getCurrentFilm`.
 
----
-
-### `data.js`
-
-| Export | Kind | Purpose |
-|--------|------|---------|
-| `SessionManager` | object singleton | Thin facade over `RollManager`. "Selected camera/film" is just the current roll's `camera`/`film` fields. Provides `getSelectedCamera()`, `setSelectedCamera()`, `getSelectedFilm()`, `setSelectedFilm()`. |
-| `LocationManager` | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings. Generates Google Maps URLs. |
+The `getCurrentCamera()` / `getCurrentFilm()` helpers return the current roll's `camera` / `film` field, falling back to the first available camera/film when no roll is selected. These are the canonical "what camera/film is currently active" accessors used throughout the UI.
 
 ---
 
 ### `table.js`
 
-| Export | Kind | Purpose |
-|--------|------|---------|
-| `TableRenderer` | object singleton | Renders the frame table from `FRAME_SCHEMA`. `getVisibleFields()` filters to columns with `column_width`, excluding per-camera hidden fields. Normalises column widths to always fill 100%. |
-| `refreshAllUI()` | function | Re-renders the table, selector dropdowns, and UI visibility states. Called after any data mutation. |
+| Export           | Kind             | Purpose                                                                                                                                                                                     |
+| ---------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TableRenderer`  | object singleton | Renders the frame table from `FRAME_SCHEMA`. `getVisibleFields()` filters to columns with `column_width`, excluding per-camera hidden fields. Normalises column widths to always fill 100%. |
+| `refreshAllUI()` | function         | Re-renders the table, selector dropdowns, and UI visibility states. Called after any data mutation.                                                                                         |
 
 ---
 
@@ -283,11 +267,12 @@ separate `entity-editor.html` page).
 
 ### `frame.js`
 
-| Export | Kind | Purpose |
-|--------|------|---------|
-| `FrameModal` | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. |
-| `ModalFlows` | object | Handles form submit logic: reads inputs, type-coerces values, calls `RollManager.addFrame` / `updateFrame`, then calls `refreshAllUI()`. |
-| `UI` | object | `openAddModal(refData?)` / `openEditModal(frameId)` — public entry points called by the FAB and table row actions. |
+| Export            | Kind             | Purpose                                                                                                                                                                   |
+| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FrameModal`      | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data.   |
+| `LocationManager` | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings. Generates Google Maps URLs. Used only by the location field flows in this file. |
+| `ModalFlows`      | object           | Handles form submit logic: reads inputs, type-coerces values, calls `RollManager.addFrame` / `updateFrame`, then calls `refreshAllUI()`.                                  |
+| `UI`              | object           | `openAddModal(refData?)` / `openEditModal(frameId)` — public entry points called by the FAB and table row actions.                                                        |
 
 `FrameModal` (used inside `index.html`) and `entity-editor.js`'s
 `PropertyEditModal` / `FrameFieldOptionsModal` (used inside
@@ -301,13 +286,13 @@ but no JS.
 Standalone page script loaded by `entity-editor.html`. The URL parameter
 `?type=camera|film` selects the entity type via `EntityManagers[type]`.
 
-| Export | Kind | Purpose |
-|--------|------|---------|
-| `EntityEditorSelector` | object singleton | Header dropdown for picking the active entity; adds/deletes entities of the current type. |
-| `PropertiesSection` | object singleton | Renders schema-field rows. Edit button opens `PropertyEditModal`. |
-| `FrameFieldsSection` | object singleton | Renders one row per entity-specific frame field with the current option list, an Enabled toggle (wired to `EntityManager.toggleHiddenField`), and an edit button. |
-| `PropertyEditModal` | object singleton | Single-field input modal. On name change, calls `OptionsManager.renameEntityKeys`. Resets dependent fields when a parent field changes. |
-| `FrameFieldOptionsModal` | object singleton | Multi-value list editor for an entity-specific frame field — add, reorder, remove, reset to schema defaults. |
+| Export                   | Kind             | Purpose                                                                                                                                                           |
+| ------------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `EntityEditorSelector`   | object singleton | Header dropdown for picking the active entity; adds/deletes entities of the current type.                                                                         |
+| `PropertiesSection`      | object singleton | Renders schema-field rows. Edit button opens `PropertyEditModal`.                                                                                                 |
+| `FrameFieldsSection`     | object singleton | Renders one row per entity-specific frame field with the current option list, an Enabled toggle (wired to `EntityManager.toggleHiddenField`), and an edit button. |
+| `PropertyEditModal`      | object singleton | Single-field input modal. On name change, calls `OptionsManager.renameEntityKeys`. Resets dependent fields when a parent field changes.                           |
+| `FrameFieldOptionsModal` | object singleton | Multi-value list editor for an entity-specific frame field — add, reorder, remove, reset to schema defaults.                                                      |
 
 The settings menu in `index.html` links to `/entity-editor.html?type=camera`
 and `/entity-editor.html?type=film`.
@@ -316,16 +301,16 @@ and `/entity-editor.html?type=film`.
 
 ### `exif.js`
 
-| Export | Kind | Purpose |
-|--------|------|---------|
+| Export                | Kind     | Purpose                                                                                                                                          |
+| --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `buildExifTags(meta)` | function | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. |
 
 ---
 
 ### `export.js`
 
-| Export | Kind | Purpose |
-|--------|------|---------|
+| Export   | Kind             | Purpose                                                                                                                                                                                                                                                                |
+| -------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Export` | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
 ---
@@ -334,8 +319,8 @@ and `/entity-editor.html?type=film`.
 
 Entry point. `DOMContentLoaded` calls `.init()` on all modules in order. Also contains:
 
-| Export | Kind | Purpose |
-|--------|------|---------|
+| Export         | Kind             | Purpose                                                                                               |
+| -------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
 | `SettingsMenu` | object singleton | Gear-icon bottom sheet. Wires export, import, clear-all, and cache-refresh actions to their handlers. |
 
 ---
@@ -374,13 +359,13 @@ flowchart TD
 
 ## localStorage Key Map
 
-| Key | Owner | Contents |
-|-----|-------|----------|
-| `cameras` | `CameraManager` | JSON array of camera objects |
-| `camera-counter` | `CameraManager` | Auto-increment counter for IDs |
-| `films` | `FilmManager` | JSON array of film objects |
-| `film-counter` | `FilmManager` | Auto-increment counter for IDs |
-| `rolls` | `RollManager` | JSON array of roll objects (each contains `frames[]`) |
-| `roll-counter` | `RollManager` | Auto-increment counter for roll IDs |
-| `current-roll-id` | `RollManager` | ID of the currently active roll |
-| `fieldOptions` | `OptionsManager` | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options |
+| Key               | Owner            | Contents                                                                                                 |
+| ----------------- | ---------------- | -------------------------------------------------------------------------------------------------------- |
+| `cameras`         | `CameraManager`  | JSON array of camera objects                                                                             |
+| `camera-counter`  | `CameraManager`  | Auto-increment counter for IDs                                                                           |
+| `films`           | `FilmManager`    | JSON array of film objects                                                                               |
+| `film-counter`    | `FilmManager`    | Auto-increment counter for IDs                                                                           |
+| `rolls`           | `RollManager`    | JSON array of roll objects (each contains `frames[]`)                                                    |
+| `roll-counter`    | `RollManager`    | Auto-increment counter for roll IDs                                                                      |
+| `current-roll-id` | `RollManager`    | ID of the currently active roll                                                                          |
+| `fieldOptions`    | `OptionsManager` | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options |

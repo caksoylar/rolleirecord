@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rolleirecord-v18';
+const CACHE_NAME = 'rolleirecord-v19';
 const ASSETS = [
   './',
   './index.html',
@@ -14,7 +14,6 @@ const ASSETS = [
   './assets/web-app-manifest-512x512.png',
   './src/app.js',
   './src/config.js',
-  './src/data.js',
   './src/entities.js',
   './src/entity-editor.js',
   './src/exif.js',
