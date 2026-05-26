@@ -21,6 +21,24 @@
     />
     <meta name="apple-mobile-web-app-title" content="Rolleirecord" />
     <link rel="manifest" href="assets/site.webmanifest" />
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./sw.js").then((reg) => {
+          reg.addEventListener("updatefound", () => {
+            const newWorker = reg.installing;
+            newWorker.addEventListener("statechange", () => {
+              if (
+                newWorker.state === "installed" &&
+                navigator.serviceWorker.controller
+              ) {
+                const banner = document.getElementById("updateBanner");
+                if (banner) banner.style.display = "";
+              }
+            });
+          });
+        });
+      }
+    </script>
   </head>
   <body>
     <button id="updateBanner" style="display: none">
@@ -154,23 +172,6 @@
       </div>
     </div>
 
-    <script>
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js").then((reg) => {
-          reg.addEventListener("updatefound", () => {
-            const newWorker = reg.installing;
-            newWorker.addEventListener("statechange", () => {
-              if (
-                newWorker.state === "installed" &&
-                navigator.serviceWorker.controller
-              ) {
-                document.getElementById("updateBanner").style.display = "";
-              }
-            });
-          });
-        });
-      }
-    </script>
     <script src="src/config.js"></script>
     <script src="src/entities.js"></script>
     <script src="src/rolls.js"></script>

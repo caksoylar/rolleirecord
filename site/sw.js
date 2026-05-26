@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rolleirecord-v17';
+const CACHE_NAME = 'rolleirecord-v18';
 const ASSETS = [
   './',
   './index.html',
@@ -41,10 +41,23 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache-first, fallback to network; skip non-GET requests
+// Cache-first, fallback to network; skip non-GET requests.
+// When offline, never let a network fetch reject — that can surface iOS's
+// "Turn Off Airplane Mode" prompt on PWA launch.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
   e.respondWith(
-    caches.match(e.request).then((cached) => cached || fetch(e.request)).catch(() => caches.match('./index.html'))
+    caches.match(e.request).then((cached) => {
+      if (cached) return cached;
+      if (e.request.mode === 'navigate') {
+        return caches.match('./index.html').then(
+          (fallback) => fallback || new Response('', { status: 504 })
+        );
+      }
+      if (!self.navigator.onLine) {
+        return new Response('', { status: 504 });
+      }
+      return fetch(e.request).catch(() => new Response('', { status: 504 }));
+    })
   );
 });

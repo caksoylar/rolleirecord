@@ -1,6 +1,8 @@
 {
   "name": "Rolleirecord",
   "short_name": "Rolleirec",
+  "start_url": "../index.html",
+  "scope": "../",
   "icons": [
     {
       "src": "web-app-manifest-192x192.png",
