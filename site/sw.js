@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rolleirecord-v19';
+const CACHE_NAME = 'rolleirecord-v20';
 const ASSETS = [
   './',
   './index.html',
@@ -48,11 +48,6 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     caches.match(e.request).then((cached) => {
       if (cached) return cached;
-      if (e.request.mode === 'navigate') {
-        return caches.match('./index.html').then(
-          (fallback) => fallback || new Response('', { status: 504 })
-        );
-      }
       if (!self.navigator.onLine) {
         return new Response('', { status: 504 });
       }
