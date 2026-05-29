@@ -25,6 +25,13 @@ function getEntityType() {
   return type;
 }
 
+// Read entity name from URL, default to null
+function getEntityName() {
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get("name");
+  return name;
+}
+
 // Returns the EntityManager for the current type, or null if invalid.
 function getManager() {
   return EntityManagers[getEntityType()] || null;
@@ -587,6 +594,6 @@ document.addEventListener("DOMContentLoaded", () => {
   PropertyEditModal.init();
   FrameFieldOptionsModal.init();
 
-  currentEntityId = manager.getAll()[0]?.id || null;
+  currentEntityId = getManager().getByName(getEntityName())?.id;
   renderEntityEditor();
 });

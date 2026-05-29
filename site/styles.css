@@ -188,11 +188,6 @@ header button {
   opacity: 0.7;
 }
 
-/* Anchor wrappers used to wrap buttons inside settings menus */
-a {
-  display: contents;
-}
-
 button {
   padding: 0.75rem;
   font-size: var(--font-size-sm);

@@ -54,6 +54,26 @@ const SettingsMenu = {
     });
 
     document
+      .getElementById("settingsEditCamera")
+      .addEventListener("click", () => {
+        const cameraParams = new URLSearchParams({
+          type: "camera",
+          name: RollManager.getCurrentCamera(),
+        });
+        window.location.href = `entity-editor.html?${cameraParams}`;
+      });
+
+    document
+      .getElementById("settingsEditFilms")
+      .addEventListener("click", () => {
+        const filmParams = new URLSearchParams({
+          type: "film",
+          name: RollManager.getCurrentFilm(),
+        });
+        window.location.href = `entity-editor.html?${filmParams}`;
+      });
+
+    document
       .getElementById("settingsExportRollBtn")
       .addEventListener("click", () => {
         this.close();
