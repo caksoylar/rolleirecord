@@ -3,13 +3,6 @@
 // ============================================================================
 // Edit this file to customize default cameras, films, and table fields
 
-// Sanitize field names for HTML id/name attributes to prevent iOS Safari
-// autofill from triggering on fields containing the word "name".
-// eslint-disable-next-line no-unused-vars
-function safeInputId(fieldName) {
-  return fieldName.replace(/name/gi, "label");
-}
-
 // Default seed data (used to populate localStorage on first load)
 // eslint-disable-next-line no-unused-vars
 const DEFAULT_FRAME_COUNT = 36;

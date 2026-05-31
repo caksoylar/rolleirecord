@@ -261,7 +261,6 @@ class RollFormModal {
 // ROLL SELECTOR - Header dropdown + caption for the active roll
 // ============================================================================
 
-// eslint-disable-next-line no-unused-vars
 const RollSelector = {
   _modal: null,
   _container: null,
@@ -378,3 +377,10 @@ const RollSelector = {
       </span>`;
   },
 };
+
+// Re-render every roll-dependent UI surface (selector + table). Lives here
+// because it orchestrates RollSelector and TableRenderer, both defined by now.
+function refreshAllUI() {
+  RollSelector.render();
+  TableRenderer.render();
+}

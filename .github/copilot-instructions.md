@@ -36,7 +36,6 @@ The rest of this section is working guidance (gotchas and conventions) that comp
 ### Schema-driven UI
 
 - `FRAME_SCHEMA`, `CAMERA_SCHEMA`, `FILM_SCHEMA`, `ROLL_SCHEMA` in `config.js` drive form rendering, validation, export, and type coercion. Add a field to the schema and the UI picks it up.
-- **`safeInputId()`** (in `config.js`): replaces "name" → "label" in HTML `id`/`name` attributes to prevent iOS Safari autofill. Apply whenever generating input IDs from field names. Data-model field names are unchanged.
 - **Entity-specific fields**: `FRAME_SCHEMA` fields can have `entity_specific: "camera"` — per-camera option lists managed through `OptionsManager` (in `entities.js`).
 - **`hidden-fields`**: each camera stores a `hidden-fields` array of frame fields to hide for that camera.
 - The frame `date` field is always auto-populated with the current datetime on frame creation — it is not manual input.

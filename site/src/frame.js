@@ -105,7 +105,7 @@ const FrameModal = {
     FRAME_SCHEMA.fields.forEach((field) => {
       if (CameraManager.isFieldHidden(field.name, camera)) return;
 
-      const inputId = `field-${safeInputId(field.name)}`;
+      const inputId = `field-${field.name}`;
       const required = field.required ? "required" : "";
 
       if (field.type === "select") {
@@ -165,7 +165,7 @@ const FrameModal = {
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
         <div class="custom-select-wrap">
-          <select id="${inputId}" name="${safeInputId(field.name)}" ${required} ${isCustom ? 'style="display:none"' : ""}>
+          <select id="${inputId}" name="${field.name}" ${required} ${isCustom ? 'style="display:none"' : ""}>
     `;
 
     dynamicOptions.forEach((option) => {
@@ -205,7 +205,7 @@ const FrameModal = {
         <div class="form-group">
           <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
           <div style="display: flex; gap: 0.5rem;">
-            <input type="text" id="${inputId}" name="${safeInputId(field.name)}"
+            <input type="text" id="${inputId}" name="${field.name}"
               value="${escapeHtml(String(value))}" ${required}
               ${field.readonly ? "readonly" : ""} style="flex: 1;" />
             <button type="button" id="refresh-location-btn" class="secondary"
@@ -222,7 +222,7 @@ const FrameModal = {
     return `
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-        <input type="text" id="${inputId}" name="${safeInputId(field.name)}"
+        <input type="text" id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""}
           placeholder="Auto-capturing via GPS..." />
@@ -240,7 +240,7 @@ const FrameModal = {
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
         <div style="display: flex; gap: 0.5rem;">
-          <input type="datetime-local" id="${inputId}" name="${safeInputId(field.name)}"
+          <input type="datetime-local" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
             ${field.readonly ? "readonly" : ""} style="flex: 1;" />
           <button type="button" id="refresh-date-btn" class="secondary"
@@ -259,7 +259,7 @@ const FrameModal = {
     return `
       <div class="form-group">
         <label for="${inputId}">${field.label}</label>
-        <input type="checkbox" id="${inputId}" name="${safeInputId(field.name)}"
+        <input type="checkbox" id="${inputId}" name="${field.name}"
           ${checked ? "checked" : ""} />
       </div>
     `;
@@ -271,7 +271,7 @@ const FrameModal = {
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
         <div class="notes-field-wrap">
-          <input type="text" id="${inputId}" name="${safeInputId(field.name)}"
+          <input type="text" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
             ${field.readonly ? "readonly" : ""} />
           <button type="button" class="secondary notes-clear-btn" title="Clear">
@@ -288,7 +288,7 @@ const FrameModal = {
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
         <input type="${field.type === "number" ? "number" : "text"}"
-          id="${inputId}" name="${safeInputId(field.name)}"
+          id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""} />
       </div>
@@ -370,7 +370,7 @@ const FrameModal = {
         if (confirm("Are you sure you want to delete this frame?")) {
           RollManager.deleteFrame(rowData.id);
           this.close();
-          TableRenderer.render();
+          refreshAllUI();
         }
       };
       deleteBtn.style.display = "";
@@ -423,7 +423,7 @@ const FormValidator = {
         return;
       }
 
-      const input = document.getElementById(`field-${safeInputId(field.name)}`);
+      const input = document.getElementById(`field-${field.name}`);
       if (input) {
         let value = input.value;
 
@@ -615,8 +615,7 @@ const ModalFlows = {
     }
 
     FrameModal.close();
-    TableRenderer.render();
-    RollSelector.render();
+    refreshAllUI();
   },
 };
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rolleirecord-v22';
+const CACHE_NAME = 'rolleirecord-v23';
 const ASSETS = [
   './',
   './index.html',
@@ -24,6 +24,7 @@ const ASSETS = [
   './src/selectors.js',
   './src/settings.js',
   './src/table.js',
+  './src/util.js',
 ];
 
 // Cache all assets on install

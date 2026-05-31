@@ -9,12 +9,6 @@
 //     `entity_specific === <type>` (multi-option edit modal). Hideable fields
 //     get an inline Enabled toggle wired to toggleHiddenField.
 
-function escapeHtml(text) {
-  const div = document.createElement("div");
-  div.textContent = text;
-  return div.innerHTML;
-}
-
 // Selected entity id (per type, scoped to this page session)
 let currentEntityId = null;
 

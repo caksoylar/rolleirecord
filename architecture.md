@@ -11,22 +11,24 @@ Three HTML entry points share the same `src/` directory:
 **`index.html` — main app** (in dependency order):
 
 ```
-config.js → entities.js → rolls.js → table.js →
+util.js → config.js → entities.js → rolls.js → table.js →
 selectors.js → export.js → frame.js → app.js
 ```
 
 **`entity-editor.html` — camera/film editor page**:
 
 ```
-config.js → entities.js → rolls.js → entity-editor.js
+util.js → config.js → entities.js → rolls.js → entity-editor.js
 ```
 
 **`settings.html` — settings page**:
 
 ```
-config.js → entities.js → rolls.js → exif.js → export.js → settings.js
+util.js → config.js → entities.js → rolls.js → exif.js → export.js → settings.js
 ```
 
+`util.js` holds pure, dependency-free helpers (`escapeHtml`,
+`formatRelativeDate`) and loads first on every page.
 `exif.js` feeds only CSV export, so it loads on `settings.html` only.
 `export.js` loads on both `index.html` (for roll import) and `settings.html`
 (for roll/CSV export).
@@ -39,17 +41,23 @@ Each file may reference globals defined by any earlier script.
 
 ```mermaid
 graph LR
-    config["config.js\nschemas · defaults · safeInputId()"]
+    util["util.js\nescapeHtml · formatRelativeDate"]
+    config["config.js\nschemas · defaults"]
     entities["entities.js\nCameraManager · FilmManager · OptionsManager"]
     rolls["rolls.js\nRollManager"]
-    table["table.js\nTableRenderer · refreshAllUI · escapeHtml"]
-    selectors["selectors.js\nRollSelector · RollFormModal"]
+    table["table.js\nTableRenderer"]
+    selectors["selectors.js\nRollSelector · RollFormModal · refreshAllUI"]
     exif["exif.js\nbuildExifTags()"]
     export_["export.js\nExport"]
     frame["frame.js\nFrameModal · LocationManager · ModalFlows · UI"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
     settings["settings.js\nSettingsPage\n(loaded by settings.html)"]
+
+    util --> table
+    util --> selectors
+    util --> frame
+    util --> entity_editor
 
     config --> entities
     config --> rolls
@@ -79,11 +87,16 @@ graph LR
 
     selectors --> app
     selectors --> export_
+    selectors --> frame
     exif --> export_
     export_ --> settings
     frame --> app
 ```
 
+> `util.js` holds pure, dependency-free helpers and is consumed by any page
+> that renders HTML. `refreshAllUI()` now lives in `selectors.js` (it
+> orchestrates `RollSelector` + `TableRenderer`), so `table.js` is a pure
+> provider with no forward references.
 > `app.js` no longer owns settings logic — the header gear button simply
 > navigates to `settings.html`. `selectors.js` depends on `export.js` for the
 > roll-import flow (the create dialog's "Import from file…" button).
@@ -154,11 +167,22 @@ erDiagram
 
 ## Class & Singleton Reference
 
+### `util.js`
+
+| Export                      | Kind     | Purpose                                                                       |
+| --------------------------- | -------- | ---------------------------------------------------------------------------- |
+| `escapeHtml(text)`          | function | Escapes text for safe interpolation into HTML strings (used on every page)   |
+| `formatRelativeDate(str)`   | function | Formats an ISO date string as a short relative label (e.g. `5m ago`)         |
+
+Pure, dependency-free helpers. Loads first on every entry point so any later
+module can use them.
+
+---
+
 ### `config.js`
 
 | Export                   | Kind     | Purpose                                                                                                                                                                |
 | ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `safeInputId(fieldName)` | function | Replaces `"name"` → `"label"` in HTML `id`/`name` attrs to prevent iOS Safari autofill                                                                                 |
 | `FRAME_SCHEMA`           | const    | Schema for frame fields — drives form rendering, table columns, validation, export                                                                                     |
 | `CAMERA_SCHEMA`          | const    | Schema for camera entity forms                                                                                                                                         |
 | `FILM_SCHEMA`            | const    | Schema for film entity forms                                                                                                                                           |
@@ -249,10 +273,12 @@ The `getCurrentCamera()` / `getCurrentFilm()` helpers return the current roll's 
 
 ### `table.js`
 
-| Export           | Kind             | Purpose                                                                                                                                                                                     |
-| ---------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TableRenderer`  | object singleton | Renders the frame table from `FRAME_SCHEMA`. `getVisibleFields()` filters to columns with `column_width`, excluding per-camera hidden fields. Normalises column widths to always fill 100%. |
-| `refreshAllUI()` | function         | Re-renders the table, selector dropdowns, and UI visibility states. Called after any data mutation.                                                                                         |
+| Export          | Kind             | Purpose                                                                                                                                                                                     |
+| --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TableRenderer` | object singleton | Renders the frame table from `FRAME_SCHEMA`. `getVisibleFields()` filters to columns with `column_width`, excluding per-camera hidden fields. Normalises column widths to always fill 100%. |
+
+A pure provider — depends only on earlier modules (`util`, `config`, `rolls`,
+`entities`) and has no forward references.
 
 ---
 
@@ -274,6 +300,13 @@ classDiagram
 
     RollSelector --> RollFormModal : owns
 ```
+
+In addition to the singletons above, `selectors.js` defines `refreshAllUI()` —
+a free function that re-renders both roll-dependent surfaces
+(`RollSelector.render()` + `TableRenderer.render()`). It lives here because it
+orchestrates `RollSelector` and `TableRenderer`, and every caller
+(`selectors.js`, `export.js`, `frame.js`, `app.js`) loads at or after this
+point, so no forward references are introduced.
 
 `RollSelector` renders the header dropdown and an edit button. The dropdown
 lists rolls plus a `+ Create new roll` sentinel; selecting it opens
