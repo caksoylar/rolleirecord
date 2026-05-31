@@ -1,25 +1,35 @@
 # Rolleirecord — Code Architecture
 
-A vanilla JS single-page PWA with **zero runtime dependencies**. All scripts are plain `<script>` tags sharing globals via load order. No bundler, no ES modules on the main branch.
+A vanilla JS PWA with **zero runtime dependencies**. All scripts are plain `<script>` tags sharing globals via load order. No bundler, no ES modules on the main branch. Three HTML entry points (main app, entity editor, settings) share one `src/` directory.
 
 ---
 
 ## Script Load Order
 
-Two HTML entry points share the same `src/` directory:
+Three HTML entry points share the same `src/` directory:
 
 **`index.html` — main app** (in dependency order):
 
 ```
 config.js → entities.js → rolls.js → table.js →
-selectors.js → exif.js → export.js → frame.js → app.js
+selectors.js → export.js → frame.js → app.js
 ```
 
 **`entity-editor.html` — camera/film editor page**:
 
 ```
-config.js → entities.js → entity-editor.js
+config.js → entities.js → rolls.js → entity-editor.js
 ```
+
+**`settings.html` — settings page**:
+
+```
+config.js → entities.js → rolls.js → exif.js → export.js → settings.js
+```
+
+`exif.js` feeds only CSV export, so it loads on `settings.html` only.
+`export.js` loads on both `index.html` (for roll import) and `settings.html`
+(for roll/CSV export).
 
 Each file may reference globals defined by any earlier script.
 
@@ -37,8 +47,9 @@ graph LR
     exif["exif.js\nbuildExifTags()"]
     export_["export.js\nExport"]
     frame["frame.js\nFrameModal · LocationManager · ModalFlows · UI"]
-    app["app.js\nSettingsMenu · init"]
+    app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
+    settings["settings.js\nSettingsPage\n(loaded by settings.html)"]
 
     config --> entities
     config --> rolls
@@ -47,26 +58,36 @@ graph LR
     config --> export_
     config --> exif
     config --> entity_editor
+    config --> settings
 
     entities --> rolls
     entities --> selectors
     entities --> frame
     entities --> export_
     entities --> entity_editor
+    entities --> settings
 
     rolls --> selectors
     rolls --> table
     rolls --> frame
     rolls --> export_
+    rolls --> settings
+    rolls --> entity_editor
 
     table --> selectors
     table --> app
 
     selectors --> app
+    selectors --> export_
     exif --> export_
-    export_ --> app
+    export_ --> settings
     frame --> app
 ```
+
+> `app.js` no longer owns settings logic — the header gear button simply
+> navigates to `settings.html`. `selectors.js` depends on `export.js` for the
+> roll-import flow (the create dialog's "Import from file…" button).
+> `settings.js` depends on `exif.js` + `export.js` for roll/CSV/backup export.
 
 ---
 
@@ -263,6 +284,13 @@ not derived from a generic entity modal) — it has a fixed set of fields
 `<select>` elements for camera and film (cameras/films are managed on the
 separate `entity-editor.html` page).
 
+In create mode, `RollFormModal` also shows an **"Import from file…"** button
+that calls `Export.importRoll()` — import is offered as an alternative
+creation flow rather than a standalone control, so there are no roll-file
+buttons in the roll selector bar. (This is the only roll-file operation on the
+main page, because import mutates the live view; roll/CSV/backup _export_ lives
+on `settings.html`.)
+
 ---
 
 ### `frame.js`
@@ -294,7 +322,7 @@ Standalone page script loaded by `entity-editor.html`. The URL parameter
 | `PropertyEditModal`      | object singleton | Single-field input modal. On name change, calls `OptionsManager.renameEntityKeys`. Resets dependent fields when a parent field changes.                           |
 | `FrameFieldOptionsModal` | object singleton | Multi-value list editor for an entity-specific frame field — add, reorder, remove, reset to schema defaults.                                                      |
 
-The settings menu in `index.html` links to `/entity-editor.html?type=camera`
+The settings page (`settings.html`) links to `/entity-editor.html?type=camera`
 and `/entity-editor.html?type=film`.
 
 ---
@@ -305,6 +333,8 @@ and `/entity-editor.html?type=film`.
 | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `buildExifTags(meta)` | function | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. |
 
+Loaded on `settings.html` only (CSV export is a settings-page action).
+
 ---
 
 ### `export.js`
@@ -313,15 +343,30 @@ and `/entity-editor.html?type=film`.
 | -------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Export` | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
+Loaded on **both** `index.html` and `settings.html`. The functions are kept in
+one file despite the page split because they are small, similar, and coupled
+(e.g. `importRoll` reaches into the live UI via `refreshAllUI()`). On the main
+page only `importRoll` is reachable (the roll create dialog's "Import from
+file…" button); `exportRoll`, `exportToExiftoolCSV`, and the storage
+backup/restore functions are wired up by `settings.js`.
+
+---
+
+### `settings.js`
+
+Standalone page script loaded by `settings.html`.
+
+| Export         | Kind             | Purpose                                                                                                                                                                                                               |
+| -------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `SettingsPage` | object singleton | Seeds the entity/roll managers, then wires the settings page buttons: Edit Cameras/Films links (→ `entity-editor.html`, carrying the current camera/film name), Export Roll, Export CSV, full backup export/import, refresh assets, clear all (clears storage then returns to `index.html`). |
+
 ---
 
 ### `app.js`
 
-Entry point. `DOMContentLoaded` calls `.init()` on all modules in order. Also contains:
-
-| Export         | Kind             | Purpose                                                                                               |
-| -------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
-| `SettingsMenu` | object singleton | Gear-icon bottom sheet. Wires export, import, clear-all, and cache-refresh actions to their handlers. |
+Entry point for `index.html`. `DOMContentLoaded` calls `.init()` on all main-app
+modules in order, wires the FAB and update banner, and points the header gear
+button at `settings.html`. It no longer owns any settings/export logic.
 
 ---
 

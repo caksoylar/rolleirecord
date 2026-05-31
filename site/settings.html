@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Settings — Rolleirecord</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="shortcut icon" href="assets/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="Rolleirecord" />
+    <link rel="manifest" href="assets/site.webmanifest" />
+  </head>
+  <body>
+    <header>
+      <h1>
+        <a href="index.html" id="backLink" title="Back" aria-label="Back"
+          >←</a
+        >
+        <span id="pageTitle">Settings</span>
+      </h1>
+    </header>
+    <main>
+      <section class="entity-editor-section">
+        <h2 class="section-heading">Edit Entities</h2>
+        <div class="settings-actions">
+          <button id="settingsEditCamera" class="secondary">
+            Edit Cameras
+          </button>
+          <button id="settingsEditFilms" class="secondary">Edit Films</button>
+        </div>
+      </section>
+
+      <section class="entity-editor-section">
+        <h2 class="section-heading">Back Up Roll</h2>
+        <p class="section-caption">
+          Save the current roll to a JSON file you can re-import later. Import a
+          roll from the
+          <strong>+ Create new roll → Import from file…</strong> flow on the
+          main page.
+        </p>
+        <div class="settings-actions">
+          <button id="settingsExportRollBtn" class="secondary">
+            Export Roll
+          </button>
+        </div>
+      </section>
+
+      <section class="entity-editor-section">
+        <h2 class="section-heading">Export Roll Metadata</h2>
+        <p class="section-caption">
+          For use with exiftool to embed metadata in scanned photos. Edit the
+          SourceFile column to match your filenames, then call
+          <code>exiftool -csv=&lt;exported&gt;.csv &lt;files&gt;</code>.
+        </p>
+        <div class="settings-actions">
+          <button id="settingsExportCSVBtn" class="secondary">
+            Export CSV
+          </button>
+        </div>
+      </section>
+
+      <section class="entity-editor-section">
+        <h2 class="section-heading">Developer</h2>
+        <p class="section-caption">
+          Full backup covers every roll, camera, and film stored on this
+          device.
+        </p>
+        <div class="settings-actions">
+          <button id="settingsFullExportBtn" class="secondary">
+            Export Full Backup
+          </button>
+          <button id="settingsFullImportBtn" class="secondary">
+            Import Full Backup
+          </button>
+          <button id="settingsRefreshCacheBtn" class="secondary">
+            Refresh Assets
+          </button>
+          <button id="settingsClearAllBtn" class="danger">
+            Clear All Data
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <script src="src/config.js"></script>
+    <script src="src/entities.js"></script>
+    <script src="src/rolls.js"></script>
+    <script src="src/exif.js"></script>
+    <script src="src/export.js"></script>
+    <script src="src/settings.js"></script>
+  </body>
+</html>

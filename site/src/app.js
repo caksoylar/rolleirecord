@@ -15,10 +15,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize modules
   FrameModal.init();
   RollSelector.init();
-  SettingsMenu.init();
 
   // Render initial table
   TableRenderer.render();
+
+  // Settings: navigate to the settings page
+  document.getElementById("settingsBtn").addEventListener("click", () => {
+    window.location.href = "settings.html";
+  });
 
   // FAB: add new frame
   document
@@ -30,117 +34,3 @@ document.addEventListener("DOMContentLoaded", function () {
     .getElementById("updateBanner")
     .addEventListener("click", () => location.reload());
 });
-
-// ============================================================================
-// SETTINGS MENU - App-level actions (Export, Import, Clear All)
-// ============================================================================
-
-const SettingsMenu = {
-  element: null,
-
-  init() {
-    this.element = document.getElementById("settingsMenu");
-
-    document
-      .getElementById("settingsBtn")
-      .addEventListener("click", () => this.open());
-
-    this.element
-      .querySelector(".cancel-btn")
-      .addEventListener("click", () => this.close());
-
-    this.element.addEventListener("click", (e) => {
-      if (e.target === this.element) this.close();
-    });
-
-    document
-      .getElementById("settingsEditCamera")
-      .addEventListener("click", () => {
-        const cameraParams = new URLSearchParams({
-          type: "camera",
-          name: RollManager.getCurrentCamera(),
-        });
-        window.location.href = `entity-editor.html?${cameraParams}`;
-      });
-
-    document
-      .getElementById("settingsEditFilms")
-      .addEventListener("click", () => {
-        const filmParams = new URLSearchParams({
-          type: "film",
-          name: RollManager.getCurrentFilm(),
-        });
-        window.location.href = `entity-editor.html?${filmParams}`;
-      });
-
-    document
-      .getElementById("settingsExportRollBtn")
-      .addEventListener("click", () => {
-        this.close();
-        Export.exportRoll();
-      });
-
-    document
-      .getElementById("settingsImportRollBtn")
-      .addEventListener("click", () => {
-        this.close();
-        Export.importRoll();
-      });
-
-    document
-      .getElementById("settingsExportCSVBtn")
-      .addEventListener("click", () => {
-        this.close();
-        Export.exportToExiftoolCSV();
-      });
-
-    document
-      .getElementById("settingsFullExportBtn")
-      .addEventListener("click", () => {
-        this.close();
-        Export.exportStorage();
-      });
-
-    document
-      .getElementById("settingsFullImportBtn")
-      .addEventListener("click", () => {
-        this.close();
-        Export.importStorage();
-      });
-
-    document
-      .getElementById("settingsRefreshCacheBtn")
-      .addEventListener("click", async () => {
-        if (!("caches" in window)) {
-          alert("Cache API not available.");
-          return;
-        }
-        const keys = await caches.keys();
-        await Promise.all(keys.map((k) => caches.delete(k)));
-        location.reload();
-      });
-
-    document
-      .getElementById("settingsClearAllBtn")
-      .addEventListener("click", () => {
-        if (
-          confirm(
-            "Are you sure you want to clear all storage? This cannot be undone.",
-          )
-        ) {
-          localStorage.clear();
-          initManagers();
-          this.close();
-          refreshAllUI();
-        }
-      });
-  },
-
-  open() {
-    this.element.classList.add("active");
-  },
-
-  close() {
-    this.element.classList.remove("active");
-  },
-};

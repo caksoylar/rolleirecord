@@ -77,74 +77,6 @@
       <svg class="icon"><use href="icons.svg#icon-add"></use></svg>
     </button>
 
-    <!-- Settings Menu -->
-    <div
-      class="modal"
-      id="settingsMenu"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="settingsMenuTitle"
-    >
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="settingsMenuTitle">Settings</h2>
-        </div>
-        <div class="settings-section">
-          <h3>Edit Entities</h3>
-          <div class="settings-actions">
-            <button id="settingsEditCamera" class="secondary">
-              Edit Cameras
-            </button>
-            <button id="settingsEditFilms" class="secondary">Edit Films</button>
-          </div>
-        </div>
-        <div class="settings-section">
-          <h3>Backup &amp; Restore Roll</h3>
-          <div class="settings-actions">
-            <button id="settingsExportRollBtn" class="secondary">
-              Export Roll
-            </button>
-            <button id="settingsImportRollBtn" class="secondary">
-              Import Roll
-            </button>
-          </div>
-        </div>
-        <div class="settings-section">
-          <h3>Export Roll Metadata</h3>
-          <p class="settings-caption">
-            For use with exiftool to embed metadata in scanned photos. Edit the
-            SourceFile column to match your filenames, then call
-            <code>exiftool -csv=&lt;exported&gt;.csv &lt;files&gt;</code>.
-          </p>
-          <div class="settings-actions">
-            <button id="settingsExportCSVBtn" class="secondary">
-              Export CSV
-            </button>
-          </div>
-        </div>
-        <div class="settings-section">
-          <h3>Developer</h3>
-          <div class="settings-actions">
-            <button id="settingsFullExportBtn" class="secondary">
-              Export Full Backup
-            </button>
-            <button id="settingsFullImportBtn" class="secondary">
-              Import Full Backup
-            </button>
-            <button id="settingsRefreshCacheBtn" class="secondary">
-              Refresh Assets
-            </button>
-            <button id="settingsClearAllBtn" class="danger">
-              Clear All Data
-            </button>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="secondary cancel-btn">Close</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Frame Modal -->
     <div
       class="modal"
@@ -175,7 +107,6 @@
     <script src="src/rolls.js"></script>
     <script src="src/table.js"></script>
     <script src="src/selectors.js"></script>
-    <script src="src/exif.js"></script>
     <script src="src/export.js"></script>
     <script src="src/frame.js"></script>
     <script src="src/app.js"></script>

@@ -62,7 +62,7 @@ class RollFormModal {
           <div class="modal-footer">
             <button type="submit" class="save-btn"></button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
-            <button type="button" class="secondary import-btn" style="display:none">Import</button>
+            <button type="button" class="secondary import-btn" style="display:none">Import from file…</button>
             <button type="button" class="danger delete-btn" style="display:none">Delete</button>
           </div>
         </form>
@@ -227,9 +227,7 @@ class RollFormModal {
     this.element.querySelector(".cancel-btn").style.display = this._mandatory
       ? "none"
       : "";
-    this.element.querySelector(".import-btn").style.display = this._mandatory
-      ? ""
-      : "none";
+    this.element.querySelector(".import-btn").style.display = "";
 
     this.element.classList.add("active");
     this.element.querySelector("#Roll-label").focus();

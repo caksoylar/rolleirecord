@@ -2,7 +2,7 @@
 
 ## Overview
 
-Rolleirecord is a vanilla JS single-page PWA for logging analog film photography metadata. It has **zero runtime dependencies** — no frameworks, no bundlers, no vendored libraries. All JS files are plain `<script>` tags loaded in order.
+Rolleirecord is a vanilla JS PWA for logging analog film photography metadata. It has **zero runtime dependencies** — no frameworks, no bundlers, no vendored libraries. All JS files are plain `<script>` tags loaded in order. It has three HTML entry points (main app, entity editor, settings) sharing one `site/src/` directory.
 
 ## Commands
 
@@ -33,11 +33,17 @@ Files in `site/src/` are plain scripts (`sourceType: "script"`), not ES modules.
 
 **`index.html` — main app:**
 
-`config.js` → `entities.js` → `rolls.js` → `table.js` → `selectors.js` → `exif.js` → `export.js` → `frame.js` → `app.js`
+`config.js` → `entities.js` → `rolls.js` → `table.js` → `selectors.js` → `export.js` → `frame.js` → `app.js`
 
 **`entity-editor.html` — camera/film editor page:**
 
 `config.js` → `entities.js` → `rolls.js` → `entity-editor.js`
+
+**`settings.html` — settings page:**
+
+`config.js` → `entities.js` → `rolls.js` → `exif.js` → `export.js` → `settings.js`
+
+`exif.js` is only needed for CSV export, so it loads on `settings.html` only, not on `index.html`.
 
 Each file can reference globals defined by any earlier script. `app.js` is the main-app entry point that calls `.init()` on modules during `DOMContentLoaded`. See `dev/architecture.md` for the full dependency graph.
 
@@ -56,19 +62,26 @@ Each file can reference globals defined by any earlier script. `app.js` is the m
 
 ### Service worker
 
-`site/sw.js` caches all assets for offline use. The `ASSETS` list and `CACHE_NAME` version must be bumped when adding/renaming files (including both HTML entry points and any new `src/*.js` file).
+`site/sw.js` caches all assets for offline use. The `ASSETS` list and `CACHE_NAME` version must be bumped when adding/renaming files (including any of the three HTML entry points — `index.html`, `entity-editor.html`, `settings.html` — and any new `src/*.js` file).
 
 ### Modal & editor surfaces
 
 There are two distinct add/edit surfaces — do not conflate them:
 
 - **`frame.js`** (`FrameModal`) — modal for add/edit of individual frames in the main app. Invoked via `openAddModal()` / `openEditModal()`.
-- **`entity-editor.html` + `src/entity-editor.js`** — a dedicated full-page editor for cameras and films (not a modal). Navigated to from the main app; uses `EntityManagers[type]` to dispatch on the selected entity type and edits properties / per-entity option lists via `OptionsManager`.
+- **`entity-editor.html` + `src/entity-editor.js`** — a dedicated full-page editor for cameras and films (not a modal). Navigated to from the settings page; uses `EntityManagers[type]` to dispatch on the selected entity type and edits properties / per-entity option lists via `OptionsManager`.
 - **`selectors.js`** (`RollFormModal`) — modal for create/edit of rolls, used alongside `RollSelector`.
 
 CSS is shared across these surfaces, but their JS is entirely separate. Changes to frame add/edit behavior never require touching the entity editor or roll modal, and vice versa.
 
 **Copy-from-previous-frame** is already implemented: `openAddModal()` passes the last frame's id as `refData` to `FrameModal.open()`, which pre-fills form fields from that frame without entering edit mode. This is intentional — do not flag it as a missing feature during code review.
+
+### Pages & where data operations live
+
+`index.html` is the interactive working surface. The header gear button navigates to `settings.html` (it does not open a modal). The split is deliberate: the main page carries only roll operations that change what you are currently viewing; everything terminal/read-only or global lives on the settings page.
+
+- **Roll import** — an _alternative creation flow_, not a standalone control. The `RollFormModal` create dialog (`selectors.js`) always shows an **"Import from file…"** button that calls `Export.importRoll()`. There are no roll-file buttons in the roll selector bar. Import is the only roll-file op on the main page because it mutates the live view (creates a roll, then `refreshAllUI()`).
+- **`settings.html` + `src/settings.js`** (`SettingsPage`) — a navigable page (mirrors the entity-editor page chrome) hosting: Edit Cameras/Films links (→ `entity-editor.html`), **Export Roll** (JSON), **Export CSV** (exiftool), and developer/global ops (full backup export/import, refresh assets, clear all). These are read-only/terminal or global, so they navigate away from the working view.
 
 ### CSS
 
