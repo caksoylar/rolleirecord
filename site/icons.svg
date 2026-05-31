@@ -54,6 +54,19 @@
     <line x1="128" y1="40" x2="128" y2="216" />
     <polyline points="56 144 128 216 200 144" />
   </symbol>
+  <!-- Phosphor icons, arrow-left -->
+  <symbol
+    id="icon-left"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <line x1="216" y1="128" x2="40" y2="128" />
+    <polyline points="112 56 40 128 112 200" />
+  </symbol>
   <!-- Phosphor icons, arrow-up -->
   <symbol
     id="icon-up"

@@ -3,8 +3,8 @@
   "scripts": {
     "lint": "eslint site/src/",
     "lint:fix": "eslint site/src/ --fix",
-    "format": "prettier --write site/src/ site/styles.css site/index.html",
-    "format:check": "prettier --check site/src/ site/styles.css site/index.html"
+    "format": "prettier --write site/src/ site/styles.css site/index.html site/settings.html site/entity-editor.html",
+    "format:check": "prettier --check site/src/ site/styles.css site/index.html site/settings.html site/entity-editor.html"
   },
   "devDependencies": {
     "eslint": "^10.1.0",
