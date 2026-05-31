@@ -2,15 +2,11 @@
 // APP INITIALIZATION - Main entry point for application
 // ============================================================================
 
-function initManagers() {
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize entity managers (seeds defaults on first load)
   CameraManager.init();
   FilmManager.init();
   RollManager.init();
-}
-
-document.addEventListener("DOMContentLoaded", function () {
-  // Initialize entity managers (seeds defaults on first load)
-  initManagers();
 
   // Initialize modules
   FrameModal.init();
