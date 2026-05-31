@@ -155,7 +155,7 @@ const EntityEditorSelector = {
     if (referencing.length > 0) {
       const names = referencing.map((r) => `"${r.name}"`).join(", ");
       alert(
-        `Cannot delete "${entity.name}" — it is used by ${referencing.length} roll(s): ${names}.\n\n` +
+        `Cannot delete "${entity.name}":  it is used by ${referencing.length} roll(s): ${names}.\n\n` +
           `Reassign or delete those rolls first.`,
       );
       return;
@@ -217,7 +217,7 @@ const PropertiesSection = {
 };
 
 // ---------------------------------------------------------------------------
-// Property Edit Modal — single-field input (text, number, select)
+// Property Edit Modal - single-field input (text, number, select)
 // ---------------------------------------------------------------------------
 
 const PropertyEditModal = {
@@ -348,7 +348,7 @@ const PropertyEditModal = {
 };
 
 // ---------------------------------------------------------------------------
-// Frame fields section — per-entity option lists for entity_specific frame fields
+// Frame fields section - per-entity option lists for entity_specific frame fields
 // ---------------------------------------------------------------------------
 
 const FrameFieldsSection = {
@@ -579,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize all managers so defaults are seeded if needed
   Object.values(EntityManagers).forEach((m) => m.init());
 
-  document.title = `Edit ${capitalize(type)}s — Rolleirecord`;
+  document.title = `Edit ${capitalize(type)}s`;
   document.getElementById("pageTitle").textContent = `${capitalize(type)}s`;
 
   EntityEditorSelector.init();

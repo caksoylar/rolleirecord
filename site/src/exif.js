@@ -52,7 +52,7 @@ function buildExifTags(meta) {
     tags["ExposureCompensation"] = String(meta.exposure_comp);
   }
 
-  // Flash: EXIF Flash tag — 0 = No Flash, 1 = Fired
+  // Flash: EXIF Flash tag:  0 = No Flash, 1 = Fired
   // eslint-disable-next-line eqeqeq
   if (meta.flash != null) {
     tags["Flash"] = meta.flash ? "1" : "0";
@@ -69,14 +69,14 @@ function buildExifTags(meta) {
       tags["LensMake"] = parts[0];
       tags["LensModel"] = parts.slice(1).join(" ");
     } else {
-      // No brand prefix — use full string as model
+      // No brand prefix:  use full string as model
       tags["LensModel"] = meta.lens;
     }
   }
 
   // Focal length (e.g. "85mm" or "85")
   // Note: we write FocalLength (actual physical focal length) only.
-  // FocalLengthIn35mmFormat is intentionally omitted — computing it requires
+  // FocalLengthIn35mmFormat is intentionally omitted - computing it requires
   // a per-format crop factor that we don't have reliably for user-added cameras
   // and medium format bodies where the relationship to 35mm varies widely.
   if (meta.focal_length) {

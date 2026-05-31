@@ -44,7 +44,7 @@ self.addEventListener('activate', (e) => {
 });
 
 // Cache-first, fallback to network; skip non-GET requests.
-// When offline, never let a network fetch reject — that can surface iOS's
+// When offline, never let a network fetch reject - that can surface iOS's
 // "Turn Off Airplane Mode" prompt on PWA launch.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;

@@ -62,7 +62,7 @@ class RollFormModal {
           <div class="modal-footer">
             <button type="submit" class="save-btn"></button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
-            <button type="button" class="secondary import-btn" style="display:none">Import from file…</button>
+            <button type="button" class="secondary import-btn" style="display:none">Import</button>
             <button type="button" class="danger delete-btn" style="display:none">Delete</button>
           </div>
         </form>

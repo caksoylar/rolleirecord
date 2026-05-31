@@ -34,15 +34,6 @@ const LocationManager = {
     return `${lat},${lng}`;
   },
 
-  formatCoordinatesWithAccuracy(lat, lng, accuracy) {
-    // eslint-disable-next-line eqeqeq
-    if (accuracy == null) {
-      return this.formatCoordinates(lat, lng);
-    }
-    const accuracyMeters = Math.round(accuracy);
-    return `${lat},${lng} (±${accuracyMeters}m)`;
-  },
-
   displayCoordinates(lat, lng) {
     return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
   },
