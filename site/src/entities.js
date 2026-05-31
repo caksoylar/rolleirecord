@@ -7,8 +7,20 @@ class EntityManager {
     this.entityType = entityType;
     this.storageKey = storageKey;
     this.counterKey = counterKey;
+    this.seededKey = `${storageKey}-seeded`;
     this.schema = schema;
     this.defaults = defaults;
+  }
+
+  // Names of defaults already introduced to this install, or null if the
+  // registry has never been written (i.e. storage predates this mechanism).
+  getSeededNames() {
+    const stored = localStorage.getItem(this.seededKey);
+    return stored ? JSON.parse(stored) : null;
+  }
+
+  setSeededNames(names) {
+    localStorage.setItem(this.seededKey, JSON.stringify(names));
   }
 
   // Frame fields whose option lists are scoped per-entity of this type.
@@ -28,21 +40,37 @@ class EntityManager {
       }));
       this.saveAll(seeded);
       localStorage.setItem(this.counterKey, String(this.defaults.length));
+      this.setSeededNames(this.defaults.map((d) => d.name));
       return;
     }
 
-    // Merge: add any new defaults not already present by name
+    const seededNames = this.getSeededNames();
+    if (seededNames === null) {
+      // Migration: storage predates the seeded registry. Treat every current
+      // default as already introduced so earlier deletions/renames aren't
+      // resurrected; only future additions to the defaults will be merged.
+      this.setSeededNames(this.defaults.map((d) => d.name));
+      return;
+    }
+
+    // Merge: add only defaults that have never been introduced before. A
+    // deleted or renamed default keeps its original name in the registry, so
+    // it stays gone across reloads.
     const items = JSON.parse(stored);
     const existingNames = new Set(items.map((item) => item.name));
-    let added = 0;
+    const seen = new Set(seededNames);
+    let changed = false;
     for (const def of this.defaults) {
+      if (seen.has(def.name)) continue;
+      seen.add(def.name);
+      changed = true;
       if (!existingNames.has(def.name)) {
         items.push({ ...def, id: this.getNextId() });
-        added++;
       }
     }
-    if (added > 0) {
+    if (changed) {
       this.saveAll(items);
+      this.setSeededNames([...seen]);
     }
   }
 

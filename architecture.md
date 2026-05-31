@@ -243,8 +243,13 @@ classDiagram
 ```
 
 `EntityManager` is a generic localStorage-backed CRUD class. On `.init()` it
-seeds defaults on first load, and merges any new defaults (by name) on
-subsequent loads. It also owns hidden-field management: each entity record can
+seeds defaults on first load, and on subsequent loads merges only defaults that
+have never been introduced before, tracked via a per-type `<storageKey>-seeded`
+registry of default names. A default the user has deleted or renamed keeps its
+original name in that registry, so it is not resurrected on reload; only newly
+added defaults are merged in. (Storage predating the registry is migrated by
+recording all current default names as already seeded, preserving prior
+deletions.) It also owns hidden-field management: each entity record can
 carry a `hidden-fields` array of frame field names to suppress in the frame
 form and table. `getEntitySpecificFrameFields()` returns the frame schema
 fields whose options are scoped to this entity type (`entity_specific`).
@@ -459,8 +464,10 @@ flowchart TD
 | ----------------- | ---------------- | -------------------------------------------------------------------------------------------------------- |
 | `cameras`         | `CameraManager`  | JSON array of camera objects                                                                             |
 | `camera-counter`  | `CameraManager`  | Auto-increment counter for IDs                                                                           |
+| `cameras-seeded`  | `CameraManager`  | JSON array of default camera names already introduced (suppresses re-seeding deleted/renamed defaults)   |
 | `films`           | `FilmManager`    | JSON array of film objects                                                                               |
 | `film-counter`    | `FilmManager`    | Auto-increment counter for IDs                                                                           |
+| `films-seeded`    | `FilmManager`    | JSON array of default film names already introduced (suppresses re-seeding deleted/renamed defaults)     |
 | `rolls`           | `RollManager`    | JSON array of roll objects (each contains `frames[]`)                                                    |
 | `roll-counter`    | `RollManager`    | Auto-increment counter for roll IDs                                                                      |
 | `current-roll-id` | `RollManager`    | ID of the currently active roll                                                                          |
