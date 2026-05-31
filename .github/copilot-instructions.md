@@ -10,7 +10,7 @@ Rolleirecord is a vanilla JS PWA for logging analog film photography metadata. I
 - **Format:** `npm run format` (prettier, formats `site/src/`, `site/styles.css`, `site/index.html`)
 - **Format check:** `npm run format:check`
 - No test suite exists. No build step on main branch.
-- **Always run `npm run lint` and `npm run format` before committing.**
+- Linting and formatting are part of the pre-commit ritual — see [Shipping changes](#shipping-changes).
 
 ## Git Commits
 
@@ -24,6 +24,10 @@ Use **Conventional Commits** for commit titles:
 - `docs: <description>` — documentation only
 
 The body can be free-form. Keep the title under 72 characters.
+
+## Shipping changes
+
+Wrapping up a change for commit follows a fixed ritual: sync `site/sw.js` (asset manifest + `CACHE_NAME`), update `architecture.md` when structure changes, run `npm run lint` and `npm run format`, then create a Conventional Commit. This is automated by the **`ship-change` skill** (`.github/skills/ship-change/`) — prefer invoking it (e.g. "ship this change") over performing the steps by hand. The sections below remain the canonical reference for each individual rule.
 
 ## Architecture
 
@@ -43,7 +47,7 @@ The rest of this section is working guidance (gotchas and conventions) that comp
 
 ### Service worker
 
-`site/sw.js` caches all assets for offline use. Bump the `ASSETS` list **and** `CACHE_NAME` whenever you add/rename a file (any of the three HTML entry points or any `src/*.js`).
+`site/sw.js` caches all assets for offline use. Bump the `ASSETS` list **and** `CACHE_NAME` whenever you add/rename a file (any of the three HTML entry points or any `src/*.js`). The `ship-change` skill handles this at commit time.
 
 ### Modal & editor surfaces — do not conflate
 
