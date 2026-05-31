@@ -27,84 +27,47 @@ The body can be free-form. Keep the title under 72 characters.
 
 ## Architecture
 
-### Script loading & globals
+Files in `site/src/` are plain scripts (`sourceType: "script"`), **not** ES modules — they share state through globals, loaded in dependency order across three HTML entry points (`index.html`, `entity-editor.html`, `settings.html`) that share the same `src/` directory.
 
-Files in `site/src/` are plain scripts (`sourceType: "script"`), not ES modules. They share state through globals, loaded in dependency order. There are two HTML entry points that share the same `src/` directory:
+> **`architecture.md` is the canonical structural reference** — load orders, the full dependency graph, per-module tables, the data model, and the export/import JSON shape. **For any structural or architectural question, read `architecture.md` first**, and update it when you add/move a file or change module wiring.
 
-**`index.html` — main app:**
+The rest of this section is working guidance (gotchas and conventions) that complements — but does not duplicate — `architecture.md`.
 
-`config.js` → `entities.js` → `rolls.js` → `table.js` → `selectors.js` → `export.js` → `frame.js` → `app.js`
+### Schema-driven UI
 
-**`entity-editor.html` — camera/film editor page:**
-
-`config.js` → `entities.js` → `rolls.js` → `entity-editor.js`
-
-**`settings.html` — settings page:**
-
-`config.js` → `entities.js` → `rolls.js` → `exif.js` → `export.js` → `settings.js`
-
-`exif.js` is only needed for CSV export, so it loads on `settings.html` only, not on `index.html`.
-
-Each file can reference globals defined by any earlier script. `app.js` is the main-app entry point that calls `.init()` on modules during `DOMContentLoaded`. See `dev/architecture.md` for the full dependency graph.
-
-### Data model
-
-- **Entities** (cameras, films): Managed by the `EntityManager` class in `entities.js` (instances `CameraManager`, `FilmManager`, registered in `EntityManagers`), stored in localStorage. Schemas defined in `config.js` (`CAMERA_SCHEMA`, `FILM_SCHEMA`).
-- **Rolls**: Managed by `RollManager` in `rolls.js` with a separate storage model (each roll contains `name`, `camera`, `film`, `frames[]`, `frameCount`, `notes`). Roll create/edit uses its own `RollFormModal` defined in `selectors.js` (alongside `RollSelector`) — rolls do **not** go through `EntityManager`.
-- **Frames**: Stored as arrays inside each roll. Schema is `FRAME_SCHEMA` in `config.js` with field types: `select`, `number`, `text`, `checkbox`, `datetime`, `location`. The `date` field is always auto-populated with the current datetime when a new frame is created — it is not optional/manual input.
-
-### Key patterns
-
-- **Schema-driven UI**: `FRAME_SCHEMA`, `CAMERA_SCHEMA`, `FILM_SCHEMA`, `ROLL_SCHEMA` in `config.js` drive form rendering, validation, export, and type coercion. Add a field to the schema and the UI picks it up.
-- **`safeInputId()`** (in `config.js`): Replaces "name" → "label" in HTML `id`/`name` attributes to prevent iOS Safari autofill. Applied whenever generating input IDs from field names. Data model field names are unchanged.
-- **Entity-specific fields**: `FRAME_SCHEMA` fields can have `entity_specific: "camera"` — these fields have per-camera option lists managed through `OptionsManager` (also defined in `entities.js`).
-- **`hidden-fields`**: Cameras store a `hidden-fields` array listing frame fields to hide for that camera (e.g., cameras without exposure compensation).
+- `FRAME_SCHEMA`, `CAMERA_SCHEMA`, `FILM_SCHEMA`, `ROLL_SCHEMA` in `config.js` drive form rendering, validation, export, and type coercion. Add a field to the schema and the UI picks it up.
+- **`safeInputId()`** (in `config.js`): replaces "name" → "label" in HTML `id`/`name` attributes to prevent iOS Safari autofill. Apply whenever generating input IDs from field names. Data-model field names are unchanged.
+- **Entity-specific fields**: `FRAME_SCHEMA` fields can have `entity_specific: "camera"` — per-camera option lists managed through `OptionsManager` (in `entities.js`).
+- **`hidden-fields`**: each camera stores a `hidden-fields` array of frame fields to hide for that camera.
+- The frame `date` field is always auto-populated with the current datetime on frame creation — it is not manual input.
+- Rolls do **not** go through `EntityManager`; they have their own `RollManager` + `RollFormModal`.
 
 ### Service worker
 
-`site/sw.js` caches all assets for offline use. The `ASSETS` list and `CACHE_NAME` version must be bumped when adding/renaming files (including any of the three HTML entry points — `index.html`, `entity-editor.html`, `settings.html` — and any new `src/*.js` file).
+`site/sw.js` caches all assets for offline use. Bump the `ASSETS` list **and** `CACHE_NAME` whenever you add/rename a file (any of the three HTML entry points or any `src/*.js`).
 
-### Modal & editor surfaces
+### Modal & editor surfaces — do not conflate
 
-There are two distinct add/edit surfaces — do not conflate them:
+- **`frame.js`** (`FrameModal`) — modal for add/edit of individual frames in the main app (`openAddModal()` / `openEditModal()`).
+- **`entity-editor.html` + `src/entity-editor.js`** — dedicated full-page editor for cameras/films (not a modal), navigated to from the settings page.
+- **`selectors.js`** (`RollFormModal`) — modal for create/edit of rolls.
 
-- **`frame.js`** (`FrameModal`) — modal for add/edit of individual frames in the main app. Invoked via `openAddModal()` / `openEditModal()`.
-- **`entity-editor.html` + `src/entity-editor.js`** — a dedicated full-page editor for cameras and films (not a modal). Navigated to from the settings page; uses `EntityManagers[type]` to dispatch on the selected entity type and edits properties / per-entity option lists via `OptionsManager`.
-- **`selectors.js`** (`RollFormModal`) — modal for create/edit of rolls, used alongside `RollSelector`.
+CSS is shared across these surfaces, but their JS is entirely separate. Changes to frame add/edit never require touching the entity editor or roll modal, and vice versa.
 
-CSS is shared across these surfaces, but their JS is entirely separate. Changes to frame add/edit behavior never require touching the entity editor or roll modal, and vice versa.
-
-**Copy-from-previous-frame** is already implemented: `openAddModal()` passes the last frame's id as `refData` to `FrameModal.open()`, which pre-fills form fields from that frame without entering edit mode. This is intentional — do not flag it as a missing feature during code review.
+**Copy-from-previous-frame** is already implemented: `openAddModal()` passes the last frame's id as `refData` to `FrameModal.open()`, which pre-fills fields without entering edit mode. Intentional — do not flag it as missing during review.
 
 ### Pages & where data operations live
 
-`index.html` is the interactive working surface. The header gear button navigates to `settings.html` (it does not open a modal). The split is deliberate: the main page carries only roll operations that change what you are currently viewing; everything terminal/read-only or global lives on the settings page.
+`index.html` is the interactive working surface; the header gear button **navigates** to `settings.html` (no modal). The split is deliberate: **the main page carries only roll operations that change what you're currently viewing; everything terminal/read-only or global lives on the settings page.** When adding a data operation, place it accordingly.
 
-- **Roll import** — an _alternative creation flow_, not a standalone control. The `RollFormModal` create dialog (`selectors.js`) always shows an **"Import from file…"** button that calls `Export.importRoll()`. There are no roll-file buttons in the roll selector bar. Import is the only roll-file op on the main page because it mutates the live view (creates a roll, then `refreshAllUI()`).
-- **`settings.html` + `src/settings.js`** (`SettingsPage`) — a navigable page (mirrors the entity-editor page chrome) hosting: Edit Cameras/Films links (→ `entity-editor.html`), **Export Roll** (JSON), **Export CSV** (exiftool), and developer/global ops (full backup export/import, refresh assets, clear all). These are read-only/terminal or global, so they navigate away from the working view.
+- **Roll import** is an _alternative creation flow_, not a standalone control: the `RollFormModal` create dialog always shows an **"Import from file…"** button (`Export.importRoll()`). It's the only roll-file op on the main page because it mutates the live view.
+- **`settings.html`** hosts Export Roll (JSON), Export CSV (exiftool), entity-edit links, and developer/global ops (full backup, refresh assets, clear all) — all read-only/terminal or global.
 
 ### CSS
 
-`site/styles.css` uses CSS custom properties on `:root` for theming (light/dark via `prefers-color-scheme`). Form modals use a 2-column grid with `.form-group { display: contents }` — label and input become direct grid children.
+`site/styles.css` uses CSS custom properties on `:root` for theming (light/dark via `prefers-color-scheme`). Form modals use a 2-column grid with `.form-group { display: contents }`.
 
-**Height units**: Use `dvh` (dynamic viewport height), not `vh`. iOS Safari calculates `vh` based on the maximum viewport height (browser chrome hidden), causing overflow when the address bar is visible. `dvh` updates dynamically and is used throughout the app intentionally.
-
-### Export/Import format
-
-JSON export produces a roll-level object (not a flat frame array):
-
-```json
-{
-  "name": "Roll Name",
-  "frameCount": 36,
-  "notes": "",
-  "camera": { "name": "...", "format": "...", "size": "...", "hidden-fields": [] },
-  "film": { "name": "...", "iso": 400 },
-  "frames": [{ "id": 1, "shutter": "1/125s", ... }]
-}
-```
-
-Import reconciles camera/film entities via `EntityManager.upsertByName()` — creates if missing, updates if properties differ.
+**Height units**: use `dvh`, not `vh`. iOS Safari computes `vh` from the maximum viewport height (chrome hidden), causing overflow when the address bar is visible; `dvh` updates dynamically and is used throughout intentionally.
 
 ## Conventions
 

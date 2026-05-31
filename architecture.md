@@ -350,6 +350,24 @@ page only `importRoll` is reachable (the roll create dialog's "Import from
 file…" button); `exportRoll`, `exportToExiftoolCSV`, and the storage
 backup/restore functions are wired up by `settings.js`.
 
+**Single-roll JSON format** (`exportRoll` / `importRoll`) — a roll-level object,
+not a flat frame array:
+
+```json
+{
+  "name": "Roll Name",
+  "frameCount": 36,
+  "notes": "",
+  "camera": { "name": "...", "format": "...", "size": "...", "hidden-fields": [] },
+  "film": { "name": "...", "iso": 400 },
+  "frames": [{ "id": 1, "shutter": "1/125s", ... }]
+}
+```
+
+On import, camera/film entities are reconciled via
+`EntityManager.upsertByName()` — created if missing, updated if properties
+differ.
+
 ---
 
 ### `settings.js`
