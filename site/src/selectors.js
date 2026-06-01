@@ -355,22 +355,18 @@ const RollSelector = {
       this._caption.innerHTML = "";
       return;
     }
-    const maxId = RollManager.getMaxFrameId(roll);
-    const progressStr = `${maxId ?? 0} / ${roll.frameCount}`;
+    const group = (icon, text) =>
+      `<span class="roll-caption-group"><svg class="icon"><use href="icons.svg#icon-${icon}"></use></svg>${escapeHtml(text)}</span>`;
+
+    const groups = [];
     if (roll.frameCount) {
-      this._caption.innerHTML = `
-        <svg class="icon"><use href="icons.svg#icon-hash"></use></svg>
-        ${escapeHtml(progressStr)}`;
+      const maxId = RollManager.getMaxFrameId(roll);
+      groups.push(group("hash", `${maxId ?? 0} / ${roll.frameCount}`));
     }
-    const camera = roll.camera || "—";
-    const film = roll.film || "—";
-    this._caption.innerHTML += `
-        <span>·</span>
-        <svg class="icon"><use href="icons.svg#icon-camera"></use></svg>
-        ${escapeHtml(camera)}
-        <span>·</span>
-        <svg class="icon"><use href="icons.svg#icon-film"></use></svg>
-        ${escapeHtml(film)}`;
+    groups.push(group("camera", roll.camera || "—"));
+    groups.push(group("film", roll.film || "—"));
+
+    this._caption.innerHTML = groups.join("<span>·</span>");
   },
 };
 

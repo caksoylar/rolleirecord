@@ -171,6 +171,13 @@ header button {
   align-items: center;
 }
 
+.roll-caption-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+
 button {
   padding: 0.75rem;
   font-size: var(--font-size-sm);
