@@ -359,22 +359,18 @@ const RollSelector = {
     const progressStr = `${maxId ?? 0} / ${roll.frameCount}`;
     if (roll.frameCount) {
       this._caption.innerHTML = `
-      <span class="chip">
         <svg class="icon"><use href="icons.svg#icon-hash"></use></svg>
-        ${escapeHtml(progressStr)}
-      </span>`;
+        ${escapeHtml(progressStr)}`;
     }
     const camera = roll.camera || "—";
     const film = roll.film || "—";
     this._caption.innerHTML += `
-      <span class="chip">
+        <span>·</span>
         <svg class="icon"><use href="icons.svg#icon-camera"></use></svg>
         ${escapeHtml(camera)}
-      </span>
-      <span class="chip">
+        <span>·</span>
         <svg class="icon"><use href="icons.svg#icon-film"></use></svg>
-        ${escapeHtml(film)}
-      </span>`;
+        ${escapeHtml(film)}`;
   },
 };
 
