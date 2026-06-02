@@ -2,20 +2,24 @@
 
 Simple metadata recorder companion for film camera users. Access at https://caksoylar.github.io/rolleirecord/.
 
+Open the web app and record a new frame in your current roll in only seconds. Easily export recorded metadata to embed to your photos using open tools.
+
 ## Features
 
-- **Web app optimized for mobile:** add to your home screen and use _completely offline_
-  - No installation process, no network communication after initial fetching
+- **Web app optimized for mobile.** Add to your home screen and use _completely offline_. No installation process, no network communication after initial fetching
 - Track **multiple rolls** at a time
-- Automatically record **GPS location** and **date** on adding a new frame
-- **Add your camera** or choose from existing list, customize available shutter speeds, apertures, focal lengths, lenses
-- **Export/import:** back-up your roll and restore, use other tools to embed metadata directly in photos (might add an embedder in the app)
-- **No artificial limitations:** no limit on number of rolls, exporting, etc. No monetization at all :)
+- Automatically record **GPS location** and **date** on adding a new frame, default other fields from the previously recorded frame
+- **Add your camera** or choose from existing list, **customize** available shutter speeds, apertures, focal lengths, lenses, filters...
+- **Back-up your roll** and restore, **export metadata** to easily embed to photos using [`exiftool`](https://exiftool.org/)
+- **No artificial limitations;** no limit on number of rolls stored, exporting, etc.
 
 ## Screenshots
 
-<img width="281" height="609" alt="light" src="https://github.com/user-attachments/assets/0a470b7c-0b39-4881-a6fb-b1f0acb55656" />
-<img width="281" height="609" alt="dark" src="https://github.com/user-attachments/assets/5f899fbc-15a4-40f9-b4b1-cbdc573644cb" />
+<img width="375" height="812" alt="light" src="https://github.com/user-attachments/assets/c46280df-a87b-4934-973e-f7481bb33581" />
+<img width="375" height="812" alt="dark" src="https://github.com/user-attachments/assets/262214d9-c3c5-4355-bc66-6c621b740f93" />
+
+<img width="375" height="812" alt="settings" src="https://github.com/user-attachments/assets/54c2311a-b426-467d-8300-6b36a05fe712" />
+<img width="375" height="812" alt="cameras" src="https://github.com/user-attachments/assets/d3b07a15-0ced-45fd-a206-96bad551fc8d" />
 
 ## Development notes
 
