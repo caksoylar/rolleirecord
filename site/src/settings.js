@@ -39,6 +39,13 @@ const SettingsPage = {
       .getElementById("settingsExportCSVBtn")
       .addEventListener("click", () => Export.exportToExiftoolCSV());
 
+    const mapsProviderSelect = document.getElementById("settingsMapsProvider");
+    mapsProviderSelect.value =
+      localStorage.getItem("maps-provider") ?? "google";
+    mapsProviderSelect.addEventListener("change", () => {
+      localStorage.setItem("maps-provider", mapsProviderSelect.value);
+    });
+
     document
       .getElementById("settingsFullExportBtn")
       .addEventListener("click", () => Export.exportStorage());

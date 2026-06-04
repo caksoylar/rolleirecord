@@ -472,3 +472,4 @@ flowchart TD
 | `roll-counter`    | `RollManager`    | Auto-increment counter for roll IDs                                                                      |
 | `current-roll-id` | `RollManager`    | ID of the currently active roll                                                                          |
 | `fieldOptions`    | `OptionsManager` | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options |
+| `maps-provider`   | `SettingsPage`   | Selected maps provider for frame location links (`google` \| `apple` \| `osm`); read by `LocationManager.getMapsUrl()` |

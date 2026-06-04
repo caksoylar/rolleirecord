@@ -5,6 +5,8 @@
 // LOCATION MANAGER - Geolocation API wrapper
 // ============================================================================
 const LocationManager = {
+  PROVIDER_KEY: "maps-provider",
+
   getLocation() {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -49,11 +51,19 @@ const LocationManager = {
   },
 
   getMapsUrl(coordString) {
+    const provider = localStorage.getItem(this.PROVIDER_KEY) ?? "google";
+
     if (!this.isValidCoordinates(coordString)) {
       return null;
     }
     const cleaned = coordString.replace(/\s+/g, "");
-    return `https://www.google.com/maps?q=${cleaned}`;
+    return (
+      {
+        google: `https://www.google.com/maps?q=${cleaned}`,
+        apple: `https://maps.apple.com/place?coordinate=${cleaned}`,
+        osm: `https://www.openstreetmap.org/?mlat=${cleaned.replace(",", "&mlon=")}`,
+      }[provider] ?? null
+    );
   },
 };
 

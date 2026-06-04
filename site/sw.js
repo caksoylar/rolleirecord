@@ -1,4 +1,4 @@
-const CACHE_NAME = "rolleirecord-v25";
+const CACHE_NAME = "rolleirecord-v26";
 const ASSETS = [
   "./",
   "./index.html",
