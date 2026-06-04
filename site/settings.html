@@ -34,6 +34,9 @@
     <main>
       <section class="entity-editor-section">
         <h2 class="section-heading">Edit Entities</h2>
+        <p class="section-caption">
+          Add/remove cameras or films, or edit their properties.
+        </p>
         <div class="settings-actions">
           <button id="settingsEditCamera" class="secondary">
             Edit Cameras
@@ -59,9 +62,8 @@
       <section class="entity-editor-section">
         <h2 class="section-heading">Export Roll Metadata</h2>
         <p class="section-caption">
-          For use with exiftool to embed metadata in scanned photos. Edit the
-          SourceFile column to match your filenames, then call
-          <code>exiftool -csv=&lt;exported&gt;.csv &lt;files&gt;</code>.
+          Export metadata CSV to embed in scanned photos using exiftool's
+          <code>-csv</code> option.
         </p>
         <div class="settings-actions">
           <button id="settingsExportCSVBtn" class="secondary">
@@ -73,8 +75,7 @@
       <section class="entity-editor-section">
         <h2 class="section-heading">Maps Provider</h2>
         <p class="section-caption">
-          Choose which maps service opens when you tap a frame's location
-          coordinates.
+          Maps service to use to open a frame's location coordinates.
         </p>
         <div class="settings-actions">
           <select id="settingsMapsProvider" aria-label="Maps provider">
