@@ -334,7 +334,7 @@ const FrameModal = {
       refreshDateBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        await ModalFlows.fetchAndSetDate();
+        ModalFlows.fetchAndSetDate();
       });
     }
 
