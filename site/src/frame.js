@@ -6,6 +6,7 @@
 // ============================================================================
 const LocationManager = {
   PROVIDER_KEY: "maps-provider",
+  PRECISION: 5,
 
   getLocation() {
     return new Promise((resolve, reject) => {
@@ -33,11 +34,7 @@ const LocationManager = {
   },
 
   formatCoordinates(lat, lng) {
-    return `${lat},${lng}`;
-  },
-
-  displayCoordinates(lat, lng) {
-    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    return `${lat.toFixed(this.PRECISION)},${lng.toFixed(this.PRECISION)}`;
   },
 
   parseCoordinates(coordString) {
