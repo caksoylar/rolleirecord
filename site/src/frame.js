@@ -6,6 +6,7 @@
 // ============================================================================
 const LocationManager = {
   PROVIDER_KEY: "maps-provider",
+  RGC_KEY: "rgc-enabled",
   PRECISION: 5,
 
   getLocation() {
@@ -61,6 +62,15 @@ const LocationManager = {
         osm: `https://www.openstreetmap.org/?mlat=${cleaned.replace(",", "&mlon=")}`,
       }[provider] ?? null
     );
+  },
+
+  getReverseGeocode(coordString) {
+    if (localStorage.getItem(this.RGC_KEY) !== "true" || !navigator.onLine) {
+      return null;
+    }
+    const cleaned = coordString.replace(/\s+/g, "");
+    const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${cleaned.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=12`;
+    return fetch(apiUrl).then((res) => res.json());
   },
 };
 
@@ -213,6 +223,7 @@ const FrameModal = {
             ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
           </div>
           <div class="accuracy-hint"></div>
+          <div class="geocode-hint"></div>
         </div>
       `;
     }
@@ -224,7 +235,8 @@ const FrameModal = {
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""}
           placeholder="Auto-capturing via GPS..." />
-        <div/><div class="accuracy-hint"></div>
+        <div class="accuracy-hint"></div>
+        <div class="geocode-hint"></div>
       </div>
     `;
   },
@@ -359,6 +371,15 @@ const FrameModal = {
           }
         });
       }
+    }
+
+    // Reverse geocode hint (both add and edit modes)
+    const locationInput = document.getElementById("field-location");
+    if (locationInput) {
+      locationInput.addEventListener("change", () =>
+        ModalFlows.updateReverseGeocode(locationInput),
+      );
+      ModalFlows.updateReverseGeocode(locationInput);
     }
 
     // Delete button
@@ -530,6 +551,35 @@ const ModalFlows = {
     FrameModal.open("edit", rowId);
   },
 
+  // Reverse geocode the current location value and render it below the field
+  async updateReverseGeocode(locationField) {
+    const hintEl = locationField
+      .closest(".form-group")
+      ?.querySelector(".geocode-hint");
+    if (!hintEl) return;
+
+    const value = locationField.value.trim();
+    if (!value || !LocationManager.isValidCoordinates(value)) {
+      hintEl.textContent = "";
+      return;
+    }
+
+    const lookup = LocationManager.getReverseGeocode(value);
+    if (!lookup) {
+      hintEl.textContent = "";
+      return;
+    }
+
+    hintEl.textContent = "Looking up location\u2026";
+    try {
+      const data = await lookup;
+      hintEl.textContent = data?.display_name ?? "";
+    } catch (error) {
+      hintEl.textContent = "";
+      console.error("Reverse geocode error:", error);
+    }
+  },
+
   // Fetch location and set to form field
   async fetchAndSetLocation() {
     const locationField = document.getElementById("field-location");
@@ -557,6 +607,8 @@ const ModalFlows = {
       if (helperEl) {
         helperEl.textContent = accuracyText;
       }
+
+      this.updateReverseGeocode(locationField);
 
       locationField.disabled = false;
     } catch (error) {

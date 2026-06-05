@@ -46,6 +46,12 @@ const SettingsPage = {
       localStorage.setItem("maps-provider", mapsProviderSelect.value);
     });
 
+    const toggleRGC = document.getElementById("settingsEnableRGC");
+    toggleRGC.checked = localStorage.getItem("rgc-enabled") === "true";
+    toggleRGC.addEventListener("change", () => {
+      localStorage.setItem("rgc-enabled", toggleRGC.checked);
+    });
+
     document
       .getElementById("settingsFullExportBtn")
       .addEventListener("click", () => Export.exportStorage());

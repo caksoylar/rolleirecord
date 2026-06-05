@@ -169,10 +169,10 @@ erDiagram
 
 ### `util.js`
 
-| Export                      | Kind     | Purpose                                                                       |
-| --------------------------- | -------- | ---------------------------------------------------------------------------- |
-| `escapeHtml(text)`          | function | Escapes text for safe interpolation into HTML strings (used on every page)   |
-| `formatRelativeDate(str)`   | function | Formats an ISO date string as a short relative label (e.g. `5m ago`)         |
+| Export                    | Kind     | Purpose                                                                    |
+| ------------------------- | -------- | -------------------------------------------------------------------------- |
+| `escapeHtml(text)`        | function | Escapes text for safe interpolation into HTML strings (used on every page) |
+| `formatRelativeDate(str)` | function | Formats an ISO date string as a short relative label (e.g. `5m ago`)       |
 
 Pure, dependency-free helpers. Loads first on every entry point so any later
 module can use them.
@@ -181,16 +181,16 @@ module can use them.
 
 ### `config.js`
 
-| Export                   | Kind     | Purpose                                                                                                                                                                |
-| ------------------------ | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FRAME_SCHEMA`           | const    | Schema for frame fields — drives form rendering, table columns, validation, export                                                                                     |
-| `CAMERA_SCHEMA`          | const    | Schema for camera entity forms                                                                                                                                         |
-| `FILM_SCHEMA`            | const    | Schema for film entity forms                                                                                                                                           |
-| `FORMATS`                | const    | Map of film format → valid size strings. Used as `dependent_options` for the camera `size` field (which declares `dependent_on: "format"`) to drive a cascading select |
-| `ROLL_STATUSES`          | const    | Ordered list of roll lifecycle statuses                                                                                                                                |
-| `DEFAULT_CAMERAS`        | const    | Seed data for first load                                                                                                                                               |
-| `DEFAULT_FILMS`          | const    | Seed data for first load                                                                                                                                               |
-| `DEFAULT_FRAME_COUNT`    | const    | Default frame count for new rolls (36)                                                                                                                                 |
+| Export                | Kind  | Purpose                                                                                                                                                                |
+| --------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FRAME_SCHEMA`        | const | Schema for frame fields — drives form rendering, table columns, validation, export                                                                                     |
+| `CAMERA_SCHEMA`       | const | Schema for camera entity forms                                                                                                                                         |
+| `FILM_SCHEMA`         | const | Schema for film entity forms                                                                                                                                           |
+| `FORMATS`             | const | Map of film format → valid size strings. Used as `dependent_options` for the camera `size` field (which declares `dependent_on: "format"`) to drive a cascading select |
+| `ROLL_STATUSES`       | const | Ordered list of roll lifecycle statuses                                                                                                                                |
+| `DEFAULT_CAMERAS`     | const | Seed data for first load                                                                                                                                               |
+| `DEFAULT_FILMS`       | const | Seed data for first load                                                                                                                                               |
+| `DEFAULT_FRAME_COUNT` | const | Default frame count for new rolls (36)                                                                                                                                 |
 
 ---
 
@@ -412,8 +412,8 @@ differ.
 
 Standalone page script loaded by `settings.html`.
 
-| Export         | Kind             | Purpose                                                                                                                                                                                                               |
-| -------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export         | Kind             | Purpose                                                                                                                                                                                                                                                                                      |
+| -------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SettingsPage` | object singleton | Seeds the entity/roll managers, then wires the settings page buttons: Edit Cameras/Films links (→ `entity-editor.html`, carrying the current camera/film name), Export Roll, Export CSV, full backup export/import, refresh assets, clear all (clears storage then returns to `index.html`). |
 
 ---
@@ -460,16 +460,17 @@ flowchart TD
 
 ## localStorage Key Map
 
-| Key               | Owner            | Contents                                                                                                 |
-| ----------------- | ---------------- | -------------------------------------------------------------------------------------------------------- |
-| `cameras`         | `CameraManager`  | JSON array of camera objects                                                                             |
-| `camera-counter`  | `CameraManager`  | Auto-increment counter for IDs                                                                           |
-| `cameras-seeded`  | `CameraManager`  | JSON array of default camera names already introduced (suppresses re-seeding deleted/renamed defaults)   |
-| `films`           | `FilmManager`    | JSON array of film objects                                                                               |
-| `film-counter`    | `FilmManager`    | Auto-increment counter for IDs                                                                           |
-| `films-seeded`    | `FilmManager`    | JSON array of default film names already introduced (suppresses re-seeding deleted/renamed defaults)     |
-| `rolls`           | `RollManager`    | JSON array of roll objects (each contains `frames[]`)                                                    |
-| `roll-counter`    | `RollManager`    | Auto-increment counter for roll IDs                                                                      |
-| `current-roll-id` | `RollManager`    | ID of the currently active roll                                                                          |
-| `fieldOptions`    | `OptionsManager` | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options |
+| Key               | Owner            | Contents                                                                                                               |
+| ----------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `cameras`         | `CameraManager`  | JSON array of camera objects                                                                                           |
+| `camera-counter`  | `CameraManager`  | Auto-increment counter for IDs                                                                                         |
+| `cameras-seeded`  | `CameraManager`  | JSON array of default camera names already introduced (suppresses re-seeding deleted/renamed defaults)                 |
+| `films`           | `FilmManager`    | JSON array of film objects                                                                                             |
+| `film-counter`    | `FilmManager`    | Auto-increment counter for IDs                                                                                         |
+| `films-seeded`    | `FilmManager`    | JSON array of default film names already introduced (suppresses re-seeding deleted/renamed defaults)                   |
+| `rolls`           | `RollManager`    | JSON array of roll objects (each contains `frames[]`)                                                                  |
+| `roll-counter`    | `RollManager`    | Auto-increment counter for roll IDs                                                                                    |
+| `current-roll-id` | `RollManager`    | ID of the currently active roll                                                                                        |
+| `fieldOptions`    | `OptionsManager` | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options               |
 | `maps-provider`   | `SettingsPage`   | Selected maps provider for frame location links (`google` \| `apple` \| `osm`); read by `LocationManager.getMapsUrl()` |
+| `rgc-enabled`     | `SettingsPage`   | Enable reverse geocoding using Nominatim API; read by `LocationManager.getReverseGeocode()`                            |

@@ -6,7 +6,7 @@ Open the web app and record a new frame in your current roll in only seconds. Ea
 
 ## Features
 
-- **Web app optimized for mobile.** Add to your home screen and use _completely offline_. No installation process, no network communication after initial fetching
+- **Web app optimized for mobile.** Add to your home screen and use _completely offline_. No installation process, no network communication after initial fetching[^1]
 - Track **multiple rolls** at a time
 - Automatically record **GPS location** and **date** on adding a new frame, default other fields from the previously recorded frame
 - **Add your camera** or choose from existing list, **customize** available shutter speeds, apertures, focal lengths, lenses, filters...
@@ -28,3 +28,5 @@ This app has zero external dependencies -- all assets are loaded from under the 
 Caveat emptor: While this is not a vibe-coded app, LLMs were used in the development.
 
 SVG icons from https://phosphoricons.com/.
+
+[^1]: Except for the opt-in reverse geocoding support using [Nominatim](https://nominatim.org/).

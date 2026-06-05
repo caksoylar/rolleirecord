@@ -518,12 +518,12 @@ textarea {
   font-size: var(--font-size-base);
 }
 
-/* Accuracy Hint */
-.accuracy-hint {
+.accuracy-hint,
+.geocode-hint {
   font-size: var(--font-size-xxs);
   color: var(--color-text-muted);
-  margin-top: 0.25rem;
   font-style: italic;
+  grid-column: 2 / -1;
 }
 
 /* Entity Editor page */
