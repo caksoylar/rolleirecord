@@ -15,10 +15,10 @@ Open the web app and record a new frame in your current roll in only seconds. Ea
 
 ## Screenshots
 
-<img width="375" height="812" alt="light" src="https://github.com/user-attachments/assets/c46280df-a87b-4934-973e-f7481bb33581" />
-<img width="375" height="812" alt="dark" src="https://github.com/user-attachments/assets/262214d9-c3c5-4355-bc66-6c621b740f93" />
+<img width="375" height="812" alt="light" src="https://github.com/user-attachments/assets/92051acf-50d9-4fdb-8744-971d8775fa0c" />
+<img width="375" height="812" alt="dark" src="https://github.com/user-attachments/assets/342c9d84-2708-43fa-8308-1a384f423495" />
 
-<img width="375" height="812" alt="settings" src="https://github.com/user-attachments/assets/54c2311a-b426-467d-8300-6b36a05fe712" />
+<img width="375" height="812" alt="settings" src="https://github.com/user-attachments/assets/cd80b341-da3f-40e9-9726-558edd7d95bf" />
 <img width="375" height="812" alt="cameras" src="https://github.com/user-attachments/assets/d3b07a15-0ced-45fd-a206-96bad551fc8d" />
 
 ## Development notes
