@@ -97,6 +97,46 @@ h1 {
   font-size: var(--font-size-xl);
 }
 
+@keyframes rec-pulse {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  70%,
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@keyframes rec-settle {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.4;
+  }
+}
+
+.rec-icon circle:first-child {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    rec-pulse 2s ease-out 1,
+    rec-settle 1s linear 1 2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rec-icon circle:first-child {
+    animation: none !important;
+  }
+}
+
+.rec-icon {
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+
 #updateBanner {
   background-color: var(--color-accent);
   color: var(--color-btn-text);
