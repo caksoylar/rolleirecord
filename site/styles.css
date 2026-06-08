@@ -118,16 +118,14 @@ h1 {
   }
 }
 
-.rec-icon circle:first-child {
+#recIconOuter {
   transform-box: fill-box;
   transform-origin: center;
   animation:
     rec-pulse 2s ease-out 1,
     rec-settle 1s linear 1 2s;
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .rec-icon circle:first-child {
+  @media (prefers-reduced-motion: reduce) {
     animation: none !important;
   }
 }

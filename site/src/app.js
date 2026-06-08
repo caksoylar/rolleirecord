@@ -29,4 +29,14 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("updateBanner")
     .addEventListener("click", () => location.reload());
+
+  // Re-trigger rec icon animation when the app is resumed (e.g. switching back on iOS)
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      const elt = document.querySelector("#recIconOuter");
+      if (elt) {
+        elt.replaceWith(elt.cloneNode(true));
+      }
+    }
+  });
 });
