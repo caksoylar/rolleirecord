@@ -205,7 +205,7 @@ const FrameModal = {
   },
 
   _renderLocationField(field, inputId, required, rowData, isEditMode) {
-    const value = isEditMode ? rowData[field.name] || "" : "";
+    const value = isEditMode ? (rowData[field.name] ?? "") : "";
     const mapsUrl = value ? LocationManager.getMapsUrl(value) : null;
 
     if (isEditMode) {
@@ -243,7 +243,7 @@ const FrameModal = {
 
   _renderDateField(field, inputId, required, rowData, isEditMode) {
     const value = isEditMode
-      ? (rowData[field.name] || "").substring(0, 16)
+      ? (rowData[field.name] ?? "").substring(0, 16)
       : "";
 
     return `
@@ -276,7 +276,7 @@ const FrameModal = {
   },
 
   _renderNotesField(field, inputId, required, rowData) {
-    const value = rowData ? rowData[field.name] || "" : "";
+    const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
@@ -293,7 +293,7 @@ const FrameModal = {
   },
 
   _renderTextField(field, inputId, required, rowData) {
-    const value = rowData ? rowData[field.name] || "" : "";
+    const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
       <div class="form-group">
         <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
