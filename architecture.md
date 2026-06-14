@@ -49,7 +49,7 @@ graph LR
     selectors["selectors.js\nRollSelector · RollFormModal · refreshAllUI"]
     exif["exif.js\nbuildExifTags()"]
     export_["export.js\nExport"]
-    frame["frame.js\nFrameModal · LocationManager · UI"]
+    frame["frame.js\nFrameModal · LocationManager"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
     settings["settings.js\nSettingsPage\n(loaded by settings.html)"]
@@ -333,11 +333,10 @@ on `settings.html`.)
 
 ### `frame.js`
 
-| Export            | Kind             | Purpose                                                                                                                                                                   |
-| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FrameModal`      | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Also owns the modal flows: `openAddModal()` auto-population, location/date fetching, reverse geocoding, and form submission (`RollManager.addFrame` / `updateFrame`, then `refreshAllUI()`). |
-| `LocationManager` | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings. Generates Google Maps URLs. Used only by the location field flows in this file. |
-| `UI`              | object           | `openAddModal()` / `openEditModal(frameId)` — public entry points called by the FAB and table row actions.                                                        |
+| Export            | Kind             | Purpose                                                                                                                                                                                                                                                                           |
+| ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FrameModal`      | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Public interface via `openAddModal()` / `openEditModal(frameId)` called by the FAB and table row actions. |
+| `LocationManager` | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings. Generates Google Maps URLs. Used only by the location field flows in this file.                                                                                                         |
 
 `FrameModal` (used inside `index.html`) and `entity-editor.js`'s
 `PropertyEditModal` / `FrameFieldOptionsModal` (used inside

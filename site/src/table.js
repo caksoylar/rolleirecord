@@ -1,12 +1,4 @@
 // ============================================================================
-// TABLE RENDERING & UI VISIBILITY
-// ============================================================================
-
-// ============================================================================
-// UI VISIBILITY - Show/hide elements based on roll state
-// ============================================================================
-
-// ============================================================================
 // TABLE RENDERING
 // ============================================================================
 
@@ -55,7 +47,7 @@ const TableRenderer = {
     rows
       .toSorted((r1, r2) => r2.id - r1.id)
       .forEach((row) => {
-        html += `<tr class="clickable" onclick="UI.openEditModal(${row.id})" style="cursor:pointer">`;
+        html += `<tr class="clickable" onclick="FrameModal.openEditModal(${row.id})" style="cursor:pointer">`;
 
         visibleFields.forEach((field) => {
           const raw = row[field.name] == null ? "" : row[field.name]; // eslint-disable-line eqeqeq

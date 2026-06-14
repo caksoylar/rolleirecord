@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // FAB: add new frame
   document
     .getElementById("addFrameFab")
-    .addEventListener("click", () => UI.openAddModal());
+    .addEventListener("click", () => FrameModal.openAddModal());
 
   // Update banner: reload page to activate new service worker
   document

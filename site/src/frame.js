@@ -431,6 +431,11 @@ const FrameModal = {
     this._fetchAndSetDate();
   },
 
+  // Public entry point: open the edit modal for given row id
+  openEditModal(rowId) {
+    FrameModal.open("edit", rowId);
+  },
+
   // Reverse geocode the current location value and render it below the field
   async _updateReverseGeocode(locationField) {
     const hintEl = locationField
@@ -649,19 +654,5 @@ const FormValidator = {
       valid: errors.length === 0,
       errors: errors,
     };
-  },
-};
-
-// ============================================================================
-// USER INTERFACE HANDLERS (called from onclick in HTML)
-// ============================================================================
-// eslint-disable-next-line no-unused-vars
-const UI = {
-  openAddModal() {
-    FrameModal.openAddModal();
-  },
-
-  openEditModal(rowId) {
-    FrameModal.open("edit", rowId);
   },
 };
