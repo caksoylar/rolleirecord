@@ -74,12 +74,6 @@ const LocationManager = {
   },
 };
 
-// APPLICATION STATE
-let appState = {
-  mode: null, // 'add' or 'edit'
-  currentRowId: null,
-};
-
 // ============================================================================
 // MODAL DIALOG MANAGEMENT
 // ============================================================================
@@ -88,6 +82,8 @@ const FrameModal = {
   element: null,
   bodyElement: null,
   titleElement: null,
+  mode: null,
+  currentRowId: null,
 
   init() {
     this.element = document.getElementById("frameModal");
@@ -405,8 +401,8 @@ const FrameModal = {
   },
 
   open(mode = "add", rowId = null) {
-    appState.mode = mode;
-    appState.currentRowId = mode === "add" ? null : rowId;
+    this.mode = mode;
+    this.currentRowId = mode === "add" ? null : rowId;
 
     if (mode === "add") {
       this.titleElement.textContent = "Add Frame";
@@ -650,7 +646,7 @@ const ModalFlows = {
     event.preventDefault();
 
     const formData = FormValidator.getFormData();
-    const excludeId = appState.mode === "edit" ? appState.currentRowId : null;
+    const excludeId = FrameModal.mode === "edit" ? FrameModal.currentRowId : null;
     const validation = FormValidator.validate(formData, excludeId);
 
     if (!validation.valid) {
@@ -658,10 +654,10 @@ const ModalFlows = {
       return;
     }
 
-    if (appState.mode === "add") {
+    if (FrameModal.mode === "add") {
       RollManager.addFrame(formData);
     } else {
-      RollManager.updateFrame(appState.currentRowId, formData);
+      RollManager.updateFrame(FrameModal.currentRowId, formData);
     }
 
     FrameModal.close();
