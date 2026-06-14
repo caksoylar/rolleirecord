@@ -1,5 +1,5 @@
 // ============================================================================
-// TABLE RENDERING
+// TABLE RENDERING - Show frames in a table with ID + certain fields
 // ============================================================================
 
 // eslint-disable-next-line no-unused-vars

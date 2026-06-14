@@ -1,6 +1,6 @@
 // ============================================================================
 // SETTINGS PAGE - Standalone page for entity editing links, metadata export,
-// and developer/data-management actions. Per-roll JSON export/import lives on
+// and developer/data-management actions. Per-roll JSON import lives on
 // the main app page (the roll selector bar), not here.
 // ============================================================================
 
