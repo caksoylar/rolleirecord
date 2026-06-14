@@ -93,7 +93,7 @@ const FrameModal = {
     // Save button
     this.element
       .querySelector("form")
-      .addEventListener("submit", (e) => ModalFlows.submitForm(e));
+      .addEventListener("submit", (e) => this._submitForm(e));
 
     // Cancel button
     this.element
@@ -342,7 +342,7 @@ const FrameModal = {
       refreshDateBtn.addEventListener("click", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        ModalFlows.fetchAndSetDate();
+        this._fetchAndSetDate();
       });
     }
 
@@ -350,9 +350,7 @@ const FrameModal = {
     if (isEditMode) {
       const refreshBtn = document.getElementById("refresh-location-btn");
       if (refreshBtn) {
-        refreshBtn.addEventListener("click", () =>
-          ModalFlows.fetchAndSetLocation(),
-        );
+        refreshBtn.addEventListener("click", () => this._fetchAndSetLocation());
       }
 
       const mapsBtn = document.getElementById("maps-location-btn");
@@ -373,9 +371,9 @@ const FrameModal = {
     const locationInput = document.getElementById("field-location");
     if (locationInput) {
       locationInput.addEventListener("change", () =>
-        ModalFlows.updateReverseGeocode(locationInput),
+        this._updateReverseGeocode(locationInput),
       );
-      ModalFlows.updateReverseGeocode(locationInput);
+      this._updateReverseGeocode(locationInput);
     }
 
     // Delete button
@@ -419,6 +417,135 @@ const FrameModal = {
 
   close() {
     this.element.classList.remove("active");
+  },
+
+  // Public entry point: open the add modal and auto-populate id, location, date
+  async openAddModal() {
+    const lastId = RollManager.getLastFrameId();
+    this.open("add", lastId);
+    const suggestedId = RollManager.getNextSuggestedFrameId();
+    document.getElementById("field-id").value = suggestedId;
+
+    // Fetch location and date automatically
+    this._fetchAndSetLocation();
+    this._fetchAndSetDate();
+  },
+
+  // Reverse geocode the current location value and render it below the field
+  async _updateReverseGeocode(locationField) {
+    const hintEl = locationField
+      .closest(".form-group")
+      ?.querySelector(".geocode-hint");
+    if (!hintEl) return;
+
+    const value = locationField.value.trim();
+    if (!value || !LocationManager.isValidCoordinates(value)) {
+      hintEl.textContent = "";
+      return;
+    }
+
+    const lookup = LocationManager.getReverseGeocode(value);
+    if (!lookup) {
+      hintEl.textContent = "";
+      return;
+    }
+
+    hintEl.textContent = "Looking up location\u2026";
+    try {
+      const data = await lookup;
+      hintEl.textContent = data?.display_name ?? "";
+    } catch (error) {
+      hintEl.textContent = "";
+      console.error("Reverse geocode error:", error);
+    }
+  },
+
+  // Fetch location and set to form field
+  async _fetchAndSetLocation() {
+    const locationField = document.getElementById("field-location");
+    if (!locationField) return;
+
+    locationField.disabled = true;
+    const originalValue = locationField.value;
+    locationField.value = "Fetching location...";
+
+    try {
+      const location = await LocationManager.getLocation();
+      const formatted = LocationManager.formatCoordinates(
+        location.lat,
+        location.lng,
+      );
+      locationField.value = formatted;
+
+      // Show accuracy as a helper text if available
+      const accuracyText = location.accuracy
+        ? ` (Accuracy: ±${Math.round(location.accuracy)}m)`
+        : "";
+      const helperEl = locationField
+        .closest(".form-group")
+        ?.querySelector(".accuracy-hint");
+      if (helperEl) {
+        helperEl.textContent = accuracyText;
+      }
+
+      this._updateReverseGeocode(locationField);
+
+      locationField.disabled = false;
+    } catch (error) {
+      let errorMsg = "Location unavailable";
+      if (error.code === error.PERMISSION_DENIED) {
+        errorMsg =
+          "Permission denied. Enable in Settings > Privacy > Location Services";
+      } else if (error.code === error.TIMEOUT) {
+        errorMsg = "Location request timed out";
+      } else if (error.code === error.POSITION_UNAVAILABLE) {
+        errorMsg = "Location unavailable";
+      }
+      locationField.value = originalValue;
+      locationField.disabled = false;
+      locationField.placeholder = errorMsg;
+      console.error("Geolocation error:", error);
+    }
+  },
+
+  _fetchAndSetDate() {
+    const dateField = document.getElementById("field-date");
+    if (!dateField) return;
+
+    const now = new Date();
+
+    const pad = (n) => String(n).padStart(2, "0");
+
+    const year = now.getFullYear();
+    const month = pad(now.getMonth() + 1);
+    const day = pad(now.getDate());
+    const hours = pad(now.getHours());
+    const minutes = pad(now.getMinutes());
+
+    dateField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+  },
+
+  // Handle form submission
+  _submitForm(event) {
+    event.preventDefault();
+
+    const formData = FormValidator.getFormData();
+    const excludeId = this.mode === "edit" ? this.currentRowId : null;
+    const validation = FormValidator.validate(formData, excludeId);
+
+    if (!validation.valid) {
+      alert("Validation errors:\n" + validation.errors.join("\n"));
+      return;
+    }
+
+    if (this.mode === "add") {
+      RollManager.addFrame(formData);
+    } else {
+      RollManager.updateFrame(this.currentRowId, formData);
+    }
+
+    this.close();
+    refreshAllUI();
   },
 };
 
@@ -526,152 +653,12 @@ const FormValidator = {
 };
 
 // ============================================================================
-// MODAL FLOWS AND FORM SUBMISSION
-// ============================================================================
-
-const ModalFlows = {
-  // Handle add new row
-  async openAddModal() {
-    const lastId = RollManager.getLastFrameId();
-    FrameModal.open("add", lastId);
-    const suggestedId = RollManager.getNextSuggestedFrameId();
-    document.getElementById("field-id").value = suggestedId;
-
-    // Fetch location and date automatically
-    this.fetchAndSetLocation();
-    this.fetchAndSetDate();
-  },
-
-  // Handle edit existing row
-  openEditModal(rowId) {
-    FrameModal.open("edit", rowId);
-  },
-
-  // Reverse geocode the current location value and render it below the field
-  async updateReverseGeocode(locationField) {
-    const hintEl = locationField
-      .closest(".form-group")
-      ?.querySelector(".geocode-hint");
-    if (!hintEl) return;
-
-    const value = locationField.value.trim();
-    if (!value || !LocationManager.isValidCoordinates(value)) {
-      hintEl.textContent = "";
-      return;
-    }
-
-    const lookup = LocationManager.getReverseGeocode(value);
-    if (!lookup) {
-      hintEl.textContent = "";
-      return;
-    }
-
-    hintEl.textContent = "Looking up location\u2026";
-    try {
-      const data = await lookup;
-      hintEl.textContent = data?.display_name ?? "";
-    } catch (error) {
-      hintEl.textContent = "";
-      console.error("Reverse geocode error:", error);
-    }
-  },
-
-  // Fetch location and set to form field
-  async fetchAndSetLocation() {
-    const locationField = document.getElementById("field-location");
-    if (!locationField) return;
-
-    locationField.disabled = true;
-    const originalValue = locationField.value;
-    locationField.value = "Fetching location...";
-
-    try {
-      const location = await LocationManager.getLocation();
-      const formatted = LocationManager.formatCoordinates(
-        location.lat,
-        location.lng,
-      );
-      locationField.value = formatted;
-
-      // Show accuracy as a helper text if available
-      const accuracyText = location.accuracy
-        ? ` (Accuracy: ±${Math.round(location.accuracy)}m)`
-        : "";
-      const helperEl = locationField
-        .closest(".form-group")
-        ?.querySelector(".accuracy-hint");
-      if (helperEl) {
-        helperEl.textContent = accuracyText;
-      }
-
-      this.updateReverseGeocode(locationField);
-
-      locationField.disabled = false;
-    } catch (error) {
-      let errorMsg = "Location unavailable";
-      if (error.code === error.PERMISSION_DENIED) {
-        errorMsg =
-          "Permission denied. Enable in Settings > Privacy > Location Services";
-      } else if (error.code === error.TIMEOUT) {
-        errorMsg = "Location request timed out";
-      } else if (error.code === error.POSITION_UNAVAILABLE) {
-        errorMsg = "Location unavailable";
-      }
-      locationField.value = originalValue;
-      locationField.disabled = false;
-      locationField.placeholder = errorMsg;
-      console.error("Geolocation error:", error);
-    }
-  },
-
-  fetchAndSetDate() {
-    const dateField = document.getElementById("field-date");
-    if (!dateField) return;
-
-    const now = new Date();
-
-    const pad = (n) => String(n).padStart(2, "0");
-
-    const year = now.getFullYear();
-    const month = pad(now.getMonth() + 1);
-    const day = pad(now.getDate());
-    const hours = pad(now.getHours());
-    const minutes = pad(now.getMinutes());
-
-    dateField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
-  },
-
-  // Handle form submission
-  submitForm(event) {
-    event.preventDefault();
-
-    const formData = FormValidator.getFormData();
-    const excludeId = FrameModal.mode === "edit" ? FrameModal.currentRowId : null;
-    const validation = FormValidator.validate(formData, excludeId);
-
-    if (!validation.valid) {
-      alert("Validation errors:\n" + validation.errors.join("\n"));
-      return;
-    }
-
-    if (FrameModal.mode === "add") {
-      RollManager.addFrame(formData);
-    } else {
-      RollManager.updateFrame(FrameModal.currentRowId, formData);
-    }
-
-    FrameModal.close();
-    refreshAllUI();
-  },
-};
-
-// ============================================================================
 // USER INTERFACE HANDLERS (called from onclick in HTML)
 // ============================================================================
 // eslint-disable-next-line no-unused-vars
 const UI = {
   openAddModal() {
-    ModalFlows.openAddModal();
+    FrameModal.openAddModal();
   },
 
   openEditModal(rowId) {
