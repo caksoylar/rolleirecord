@@ -74,18 +74,34 @@ const LocationManager = {
     return fetch(apiUrl).then((res) => res.json());
   },
 
+  // Map a 0..1 fraction to a hex color along a white->blue ramp.
+  colorForFraction(t) {
+    const scaled = 0.5 * Math.sign(2 * t - 1) * (2 * t - 1) ** 2;
+    const channel = Math.round(255 * (0.5 - scaled));
+    const toHex = (v) => v.toString(16).padStart(2, "0");
+    return `#${toHex(channel)}${toHex(channel)}ff`;
+  },
+
   // Build an anonymous uMap URL that preloads a marker per frame with valid
-  // coordinates, named "Frame <id>". Returns null when no frame has a location.
+  // coordinates and continuous color, named "Frame <id>". Returns null when
+  // no frame has a location.
   buildUmapUrl(frames) {
-    const rows = (frames || [])
+    const located = (frames || [])
       .filter((f) => f.location && this.isValidCoordinates(f.location))
-      .map((f) => {
-        const { lat, lng } = this.parseCoordinates(f.location);
-        return `Frame ${f.id},${this.formatCoordinates(lat,lng)}`;
-      });
-    if (rows.length === 0) return null;
-    const csv = ["name,latitude,longitude", ...rows].join("\n");
-    return `https://umap.openstreetmap.fr/en/map/?data=${encodeURIComponent(csv)}&dataFormat=csv`;
+      .sort((a, b) => Number(a.id) - Number(b.id));
+    if (located.length === 0) return null;
+    const rows = located.map((f, i) => {
+      const { lat, lng } = this.parseCoordinates(f.location);
+      const fraction = located.length > 1 ? i / (located.length - 1) : 0;
+      return `Frame ${f.id},${this.formatCoordinates(lat, lng)},${this.colorForFraction(fraction)}`;
+    });
+    const csv = ["name,latitude,longitude,color", ...rows].join("\n");
+    const params = new URLSearchParams({
+      data: csv,
+      dataFormat: "csv",
+      showLabel: "true",
+    });
+    return `https://umap.openstreetmap.fr/en/map/?${params.toString()}`;
   },
 };
 
