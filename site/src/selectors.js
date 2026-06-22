@@ -62,6 +62,7 @@ class RollFormModal {
           <div class="modal-footer">
             <button type="submit" class="save-btn"></button>
             <button type="button" class="secondary cancel-btn">Cancel</button>
+            <button type="button" class="secondary map-btn" style="display:none"><svg class="icon"><use href="icons.svg#icon-map"></use></svg> Map</button>
             <button type="button" class="secondary import-btn" style="display:none">Import</button>
             <button type="button" class="danger delete-btn" style="display:none">Delete</button>
           </div>
@@ -94,6 +95,16 @@ class RollFormModal {
       this._mandatory = false;
       this.close();
       Export.importRoll();
+    });
+
+    this.element.querySelector(".map-btn").addEventListener("click", () => {
+      const roll = RollManager.getRollById(this._editingId);
+      const url = LocationManager.buildUmapUrl(roll?.frames);
+      if (!url) {
+        alert("No frames with coordinates to map.");
+        return;
+      }
+      window.open(url, "_blank", "noopener");
     });
   }
 
@@ -228,6 +239,7 @@ class RollFormModal {
       ? "none"
       : "";
     this.element.querySelector(".import-btn").style.display = "";
+    this.element.querySelector(".map-btn").style.display = "none";
 
     this.element.classList.add("active");
     this.element.querySelector("#Roll-label").focus();
@@ -247,6 +259,7 @@ class RollFormModal {
     this.element.querySelector(".delete-btn").style.display = "";
     this.element.querySelector(".cancel-btn").style.display = "";
     this.element.querySelector(".import-btn").style.display = "none";
+    this.element.querySelector(".map-btn").style.display = "";
 
     this.element.classList.add("active");
     this.element.querySelector("#Roll-label").focus();

@@ -73,6 +73,20 @@ const LocationManager = {
     const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${cleaned.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=12`;
     return fetch(apiUrl).then((res) => res.json());
   },
+
+  // Build an anonymous uMap URL that preloads a marker per frame with valid
+  // coordinates, named "Frame <id>". Returns null when no frame has a location.
+  buildUmapUrl(frames) {
+    const rows = (frames || [])
+      .filter((f) => f.location && this.isValidCoordinates(f.location))
+      .map((f) => {
+        const { lat, lng } = this.parseCoordinates(f.location);
+        return `Frame ${f.id},${this.formatCoordinates(lat,lng)}`;
+      });
+    if (rows.length === 0) return null;
+    const csv = ["name,latitude,longitude", ...rows].join("\n");
+    return `https://umap.openstreetmap.fr/en/map/?data=${encodeURIComponent(csv)}&dataFormat=csv`;
+  },
 };
 
 // ============================================================================
