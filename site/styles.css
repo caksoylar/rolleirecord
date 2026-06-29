@@ -142,7 +142,7 @@ h1 {
   padding: 0.5rem;
   font-size: var(--font-size-sm);
   cursor: pointer;
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   margin-bottom: 0.5rem;
 }
 
@@ -174,7 +174,7 @@ header button {
 .roll-selector-bar {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -182,7 +182,7 @@ header button {
 .entity-selector-bar {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 1rem;
   margin-bottom: 1rem;
 }
@@ -261,7 +261,7 @@ table {
   border-spacing: 0;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 1px 3px var(--color-shadow);
   margin-bottom: 1rem;
@@ -730,7 +730,7 @@ textarea {
   align-items: center;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   padding: 0.5rem;
 }
 
