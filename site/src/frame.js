@@ -165,6 +165,8 @@ const FrameModal = {
         html += this._renderCheckboxField(field, inputId, rowData);
       } else if (field.name === "notes") {
         html += this._renderNotesField(field, inputId, required, rowData);
+      } else if (field.name === "id") {
+        html += this._renderIdField(field, inputId, required, rowData);
       } else {
         html += this._renderTextField(field, inputId, required, rowData);
       }
@@ -319,6 +321,22 @@ const FrameModal = {
     `;
   },
 
+  _renderIdField(field, inputId, required, rowData) {
+    const value = rowData ? (rowData[field.name] ?? "") : "";
+    return `
+      <div class="form-group">
+        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+        <div class="stepper-field-wrap">
+          <input type="number" id="${inputId}" name="${field.name}"
+            value="${escapeHtml(String(value))}" ${required}
+            ${field.readonly ? "readonly" : ""} />
+          <button type="button" class="secondary stepper-btn down" title="Decrease"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
+          <button type="button" class="secondary stepper-btn up" title="Increase"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
+        </div>
+      </div>
+    `;
+  },
+
   _renderTextField(field, inputId, required, rowData) {
     const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
@@ -342,6 +360,18 @@ const FrameModal = {
           "";
       });
     }
+
+    // Frame # stepper buttons
+    const idInput = document.getElementById("field-id");
+    this.bodyElement.querySelectorAll(".stepper-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!idInput) return;
+        if (btn.classList.contains("up")) idInput.stepUp();
+        else idInput.stepDown();
+      });
+    });
 
     // Custom value select/input toggles
     this.bodyElement.querySelectorAll(".custom-select-wrap").forEach((wrap) => {
