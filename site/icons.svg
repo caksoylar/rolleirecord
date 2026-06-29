@@ -220,4 +220,60 @@
     <line x1="112" y1="40" x2="80" y2="216" />
     <line x1="32" y1="160" x2="208" y2="160" />
   </symbol>
+  <!-- Phosphor icons, caret-right -->
+  <symbol
+    id="icon-chevron"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <polyline points="96 48 176 128 96 208" />
+  </symbol>
+  <!-- Phosphor icons, download-simple -->
+  <symbol
+    id="icon-download"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <line x1="128" y1="144" x2="128" y2="32" />
+    <polyline points="216 144 216 208 40 208 40 144" />
+    <polyline points="168 104 128 144 88 104" />
+  </symbol>
+  <!-- Phosphor icons, upload-simple -->
+  <symbol
+    id="icon-upload"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <line x1="128" y1="144" x2="128" y2="32" />
+    <polyline points="216 144 216 208 40 208 40 144" />
+    <polyline points="88 72 128 32 168 72" />
+  </symbol>
+  <!-- Phosphor icons, file-csv -->
+  <symbol
+    id="icon-csv"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <polyline points="148 32 148 92 208 92" />
+    <path d="M48,108V40a8,8,0,0,1,8-8h96l56,56v20" />
+    <path d="M76,200.87A22.12,22.12,0,0,1,60,208c-13.26,0-24-12.54-24-28s10.74-28,24-28a22.12,22.12,0,0,1,16,7.13" />
+    <path d="M139.9,153.6s-29.43-7.78-31.8,11,38.43,10.12,35.78,30.72c-2.47,19.16-31.78,11-31.78,11" />
+    <polyline points="172 152 192 208 212 152" />
+  </symbol>
 </svg>

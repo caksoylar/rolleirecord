@@ -32,86 +32,127 @@
       </h1>
     </header>
     <main>
-      <section class="settings-section">
-        <h2 class="section-heading">Edit Entities</h2>
-        <p class="section-caption">
-          Add/remove cameras or films, or edit their properties.
-        </p>
-        <div class="settings-actions">
-          <button id="settingsEditCamera" class="secondary">
-            Edit Cameras
-          </button>
-          <button id="settingsEditFilms" class="secondary">Edit Films</button>
-        </div>
-      </section>
+      <p class="settings-group-label">Entities</p>
+      <div class="settings-list">
+        <button type="button" id="settingsEditCamera" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-camera"></use></svg
+          ></span>
+          <span class="row-label"><span class="row-title">Cameras</span></span>
+          <span class="row-chevron"
+            ><svg class="icon"><use href="icons.svg#icon-chevron"></use></svg
+          ></span>
+        </button>
+        <button type="button" id="settingsEditFilms" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-film"></use></svg
+          ></span>
+          <span class="row-label"><span class="row-title">Films</span></span>
+          <span class="row-chevron"
+            ><svg class="icon"><use href="icons.svg#icon-chevron"></use></svg
+          ></span>
+        </button>
+      </div>
 
-      <section class="settings-section">
-        <h2 class="section-heading">Back Up Roll</h2>
-        <p class="section-caption">
-          Save the current roll to a JSON file you can re-import later. Import a
-          roll from the
-          <strong>+ Create new roll → Import</strong> flow on the main page.
-        </p>
-        <div class="settings-actions">
-          <button id="settingsExportRollBtn" class="secondary">
-            Export Roll
-          </button>
-        </div>
-      </section>
+      <p class="settings-group-label">Export</p>
+      <div class="settings-list">
+        <button type="button" id="settingsExportRollBtn" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-download"></use></svg
+          ></span>
+          <span class="row-label">
+            <span class="row-title">Export Roll</span>
+            <span class="row-sub"
+              >Back up the current roll as JSON you can re-import later</span
+            >
+          </span>
+        </button>
+        <button type="button" id="settingsExportCSVBtn" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-csv"></use></svg
+          ></span>
+          <span class="row-label">
+            <span class="row-title">Export CSV</span>
+            <span class="row-sub"
+              >Metadata for exiftool's <code>-csv</code> option</span
+            >
+          </span>
+        </button>
+      </div>
 
-      <section class="settings-section">
-        <h2 class="section-heading">Export Roll Metadata</h2>
-        <p class="section-caption">
-          Export metadata CSV to embed in scanned photos using exiftool's
-          <code>-csv</code> option.
-        </p>
-        <div class="settings-actions">
-          <button id="settingsExportCSVBtn" class="secondary">
-            Export CSV
-          </button>
-        </div>
-      </section>
-
-      <section class="settings-section">
-        <h2 class="section-heading">Maps</h2>
-        <p class="section-caption">
-          Maps service to use to open a frame's location coordinates.
-        </p>
-        <div class="settings-actions">
-          <select id="settingsMapsProvider" aria-label="Maps provider">
+      <p class="settings-group-label">Maps</p>
+      <div class="settings-list">
+        <div class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-map"></use></svg
+          ></span>
+          <span class="row-label"
+            ><span class="row-title">Maps service</span></span
+          >
+          <select
+            id="settingsMapsProvider"
+            class="row-select"
+            aria-label="Maps provider"
+          >
             <option value="google">Google Maps</option>
             <option value="apple">Apple Maps</option>
             <option value="osm">OpenStreetMap</option>
           </select>
         </div>
-        <div class="settings-actions" style="margin-top: 1rem">
-          <label class="toggle-row" title="Enable reverse geocoding">
-            <input type="checkbox" id="settingsEnableRGC" />
-            <span>Enable reverse geocoding with Nominatim</span>
-          </label>
-        </div>
-      </section>
+        <label class="settings-row" title="Enable reverse geocoding">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-pin"></use></svg
+          ></span>
+          <span class="row-label">
+            <span class="row-title">Reverse geocoding</span>
+            <span class="row-sub">Resolve coordinates with Nominatim</span>
+          </span>
+          <input type="checkbox" id="settingsEnableRGC" class="row-checkbox" />
+        </label>
+      </div>
 
-      <section class="settings-section">
-        <h2 class="section-heading">Developer</h2>
-        <p class="section-caption">
-          Full backup covers every roll, camera, and film stored on this device.
-        </p>
-        <div class="settings-actions">
-          <button id="settingsFullExportBtn" class="secondary">
-            Export Full Backup
-          </button>
-          <button id="settingsFullImportBtn" class="secondary">
-            Import Full Backup
-          </button>
-          <button id="settingsRefreshCacheBtn" class="secondary">
-            Refresh Assets
-          </button>
-          <button id="settingsClearAllBtn" class="danger">
-            Clear All Data
-          </button>
-        </div>
-      </section>
+      <p class="settings-group-label">Developer</p>
+      <div class="settings-list">
+        <button type="button" id="settingsFullExportBtn" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-download"></use></svg
+          ></span>
+          <span class="row-label">
+            <span class="row-title">Export Full Backup</span>
+            <span class="row-sub"
+              >Every roll, camera, and film stored on this device</span
+            >
+          </span>
+        </button>
+        <button type="button" id="settingsFullImportBtn" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-upload"></use></svg
+          ></span>
+          <span class="row-label"
+            ><span class="row-title">Import Full Backup</span></span
+          >
+        </button>
+        <button type="button" id="settingsRefreshCacheBtn" class="settings-row">
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-refresh"></use></svg
+          ></span>
+          <span class="row-label"
+            ><span class="row-title">Refresh Assets</span></span
+          >
+        </button>
+        <button
+          type="button"
+          id="settingsClearAllBtn"
+          class="settings-row danger-row"
+        >
+          <span class="row-icon"
+            ><svg class="icon"><use href="icons.svg#icon-delete"></use></svg
+          ></span>
+          <span class="row-label"
+            ><span class="row-title">Clear All Data</span></span
+          >
+        </button>
+      </div>
     </main>
 
     <script src="src/util.js"></script>

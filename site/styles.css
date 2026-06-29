@@ -405,12 +405,6 @@ tbody tr.clickable:hover {
   margin-bottom: 0.5rem;
 }
 
-.settings-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
 .form-group {
   display: contents;
 }
@@ -434,7 +428,7 @@ tbody tr.clickable:hover {
 
 label {
   display: block;
-  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
   font-weight: 600;
   font-size: var(--font-size-sm);
 }
@@ -495,11 +489,6 @@ textarea {
 .modal-footer button {
   flex: 1;
   min-width: 6rem;
-}
-
-.settings-actions button {
-  flex: 1;
-  min-width: 8rem;
 }
 
 .options-list {
@@ -593,6 +582,124 @@ textarea {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
   margin: 0 0 0.75rem 0;
+}
+
+/* Settings list-row pattern (grouped, tappable rows) */
+.settings-group-label {
+  margin: 0 0 0.5rem 0.25rem;
+  font-size: var(--font-size-xxs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+
+.settings-list {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 1px 3px var(--color-shadow);
+  margin: 0 0 1.5rem;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  min-height: 52px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+}
+
+.settings-row:last-child {
+  border-bottom: none;
+}
+
+.settings-row:hover,
+.settings-row:active {
+  opacity: 1;
+  background: var(--color-surface-alt);
+}
+
+.settings-row .row-icon,
+.settings-row .row-chevron {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.settings-row .row-icon .icon,
+.settings-row .row-chevron .icon {
+  display: block;
+}
+
+.settings-row .row-icon {
+  color: var(--color-text-secondary);
+}
+
+.settings-row .row-icon .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.settings-row .row-chevron {
+  color: var(--color-text-muted);
+}
+
+.settings-row .row-chevron .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.settings-row .row-label {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
+.settings-row .row-label .row-title {
+  font-weight: 500;
+}
+
+.settings-row .row-label .row-sub {
+  font-size: var(--font-size-xxs);
+  color: var(--color-text-muted);
+  white-space: normal;
+}
+
+.settings-row.danger-row .row-title,
+.settings-row.danger-row .row-icon {
+  color: var(--color-danger);
+}
+
+/* Native select sitting at the right edge of a settings row */
+.settings-row .row-select {
+  flex: 0 0 auto;
+  width: auto;
+  min-height: 0;
+  padding: 0.4rem 2rem 0.4rem 0.6rem;
+  background-color: var(--color-surface-alt);
+  font-size: var(--font-size-sm);
+}
+
+/* Checkbox sitting at the right edge of a settings row */
+.settings-row .row-checkbox {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: pointer;
 }
 
 .entity-prop-list {
