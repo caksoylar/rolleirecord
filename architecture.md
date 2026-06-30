@@ -12,7 +12,7 @@ Three HTML entry points share the same `src/` directory:
 
 ```
 util.js → config.js → entities.js → rolls.js → table.js →
-selectors.js → export.js → frame.js → app.js
+selectors.js → exif.js → export.js → frame.js → app.js
 ```
 
 **`entity-editor.html` — camera/film editor page**:
@@ -29,9 +29,10 @@ util.js → config.js → entities.js → rolls.js → exif.js → export.js →
 
 `util.js` holds pure, dependency-free helpers (`escapeHtml`,
 `formatRelativeDate`) and loads first on every page.
-`exif.js` feeds only CSV export, so it loads on `settings.html` only.
-`export.js` loads on both `index.html` (for roll import) and `settings.html`
-(for roll/CSV export).
+`exif.js` feeds CSV export and now loads on both `index.html` (for
+`RollActionsModal`'s Export CSV) and `settings.html`.
+`export.js` loads on both `index.html` (for roll import and roll/CSV export via
+the roll actions modal) and `settings.html` (for full backup export/restore).
 
 Each file may reference globals defined by any earlier script.
 
@@ -99,8 +100,9 @@ graph LR
 > provider with no forward references.
 > `app.js` no longer owns settings logic — the header gear button simply
 > navigates to `settings.html`. `selectors.js` depends on `export.js` for the
-> roll-import flow (the create dialog's "Import from file…" button).
-> `settings.js` depends on `exif.js` + `export.js` for roll/CSV/backup export.
+> roll-import flow (`NewRollModal`'s "Import from file…" button) and for
+> roll/CSV export via `RollActionsModal`.
+> `settings.js` depends on `exif.js` + `export.js` for backup export/import.
 
 ---
 
@@ -186,6 +188,7 @@ module can use them.
 | `FRAME_SCHEMA`        | const | Schema for frame fields — drives form rendering, table columns, validation, export                                                                                     |
 | `CAMERA_SCHEMA`       | const | Schema for camera entity forms                                                                                                                                         |
 | `FILM_SCHEMA`         | const | Schema for film entity forms                                                                                                                                           |
+| `ROLL_FIELDS`         | const | Schema for roll fields (name, camera, film, frameCount, status, notes) — drives the roll actions modal property editor and new-roll staging form                       |
 | `FORMATS`             | const | Map of film format → valid size strings. Used as `dependent_options` for the camera `size` field (which declares `dependent_on: "format"`) to drive a cascading select |
 | `ROLL_STATUSES`       | const | Ordered list of roll lifecycle statuses                                                                                                                                |
 | `DEFAULT_CAMERAS`     | const | Seed data for first load                                                                                                                                               |
@@ -293,17 +296,35 @@ A pure provider — depends only on earlier modules (`util`, `config`, `rolls`,
 classDiagram
     class RollSelector {
         <<singleton>>
-        -_modal: RollFormModal
         +init()
         +render()
     }
-    class RollFormModal {
-        +openCreate(opts)
-        +openEdit(rollId)
+    class NewRollModal {
+        <<singleton>>
+        -_stagingData
+        -_mandatory
+        +init()
+        +open(opts)
+        +close()
+        +renderProperties()
+    }
+    class RollActionsModal {
+        <<singleton>>
+        +init()
+        +open()
+        +close()
+        +renderProperties()
+    }
+    class RollPropertyEditModal {
+        <<singleton>>
+        +init()
+        +open(fieldName, data, onSaved)
         +close()
     }
 
-    RollSelector --> RollFormModal : owns
+    RollSelector --> NewRollModal : opens
+    RollActionsModal --> RollPropertyEditModal : opens
+    NewRollModal --> RollPropertyEditModal : opens
 ```
 
 In addition to the singletons above, `selectors.js` defines `refreshAllUI()` —
@@ -313,21 +334,33 @@ orchestrates `RollSelector` and `TableRenderer`, and every caller
 (`selectors.js`, `export.js`, `frame.js`, `app.js`) loads at or after this
 point, so no forward references are introduced.
 
-`RollSelector` renders the header dropdown and an edit button. The dropdown
-lists rolls plus a `+ Create new roll` sentinel; selecting it opens
-`RollFormModal` in create mode. The edit button opens the modal in edit mode
-for the currently selected roll. `RollFormModal` builds its own DOM (it is
-not derived from a generic entity modal) — it has a fixed set of fields
-(name, camera, film, frame count, status, notes) and contains plain
-`<select>` elements for camera and film (cameras/films are managed on the
-separate `entity-editor.html` page).
+`RollSelector` renders the header dropdown. The dropdown lists rolls plus a
+`+ Create new roll` sentinel; selecting it opens `NewRollModal`.
 
-In create mode, `RollFormModal` also shows an **"Import from file…"** button
-that calls `Export.importRoll()` — import is offered as an alternative
-creation flow rather than a standalone control, so there are no roll-file
-buttons in the roll selector bar. (This is the only roll-file operation on the
-main page, because import mutates the live view; roll/CSV/backup _export_ lives
-on `settings.html`.)
+`NewRollModal` is a bottom-sheet for creating a roll. It holds a `_stagingData`
+object pre-filled with defaults and renders each field from `ROLL_FIELDS` as a
+tappable `settings-row`. Tapping a row opens `RollPropertyEditModal` with the
+staging data; saves update the staging object in memory. The footer has
+**Create Roll**, **Cancel**, and **Import from file…** buttons. The import
+button calls `Export.importRoll()` as an alternative creation path.
+
+`RollActionsModal` is a bottom-sheet opened by the bottom-left FAB
+(`#rollActionsFab`). It contains:
+- **Properties** — live roll fields rendered from `ROLL_FIELDS` as `settings-row`
+  items; tapping a row opens `RollPropertyEditModal` which saves directly to
+  `RollManager`.
+- **Map** — opens frame coordinates in the configured maps provider.
+- **Export** — JSON roll export and CSV exiftool export (previously on
+  `settings.html`).
+- **Danger Zone** — delete roll.
+
+`RollPropertyEditModal` is a generic single-field bottom-sheet that appears on
+top of either `RollActionsModal` or `NewRollModal` (z-index 1010, transparent
+backdrop). It accepts `(fieldName, data, onSaved)` — a plain data object and a
+callback — so it is not coupled to any specific data source. The `onSaved`
+callback may return `false` to cancel the close (used by `RollActionsModal` for
+the camera-change confirmation prompt). While active, `RollPropertyEditModal`
+dims the parent sheet via a `dimmed` class on its `.modal-content`.
 
 ---
 
@@ -369,7 +402,8 @@ and `/entity-editor.html?type=film`.
 | --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `buildExifTags(meta)` | function | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. |
 
-Loaded on `settings.html` only (CSV export is a settings-page action).
+Loaded on both `index.html` and `settings.html` (CSV export is now available
+via `RollActionsModal` on the main page).
 
 ---
 
@@ -379,12 +413,10 @@ Loaded on `settings.html` only (CSV export is a settings-page action).
 | -------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Export` | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
-Loaded on **both** `index.html` and `settings.html`. The functions are kept in
-one file despite the page split because they are small, similar, and coupled
-(e.g. `importRoll` reaches into the live UI via `refreshAllUI()`). On the main
-page only `importRoll` is reachable (the roll create dialog's "Import from
-file…" button); `exportRoll`, `exportToExiftoolCSV`, and the storage
-backup/restore functions are wired up by `settings.js`.
+Loaded on **both** `index.html` and `settings.html`. On the main page,
+`importRoll` is reachable via `NewRollModal`'s "Import from file…" button, and
+`exportRoll` / `exportToExiftoolCSV` are reachable via `RollActionsModal`.
+The storage backup/restore functions are wired up by `settings.js` only.
 
 **Single-roll JSON format** (`exportRoll` / `importRoll`) — a roll-level object,
 not a flat frame array:
@@ -412,7 +444,7 @@ Standalone page script loaded by `settings.html`.
 
 | Export         | Kind             | Purpose                                                                                                                                                                                                                                                                                      |
 | -------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `SettingsPage` | object singleton | Seeds the entity/roll managers, then wires the settings page buttons: Edit Cameras/Films links (→ `entity-editor.html`, carrying the current camera/film name), Export Roll, Export CSV, full backup export/import, refresh assets, clear all (clears storage then returns to `index.html`). |
+| `SettingsPage` | object singleton | Seeds the entity/roll managers, then wires the settings page buttons: Edit Cameras/Films links (→ `entity-editor.html`, carrying the current camera/film name), full backup export/import, refresh assets, clear all (clears storage then returns to `index.html`). |
 
 ---
 

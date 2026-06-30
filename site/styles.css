@@ -316,6 +316,20 @@ tbody tr.clickable:hover {
 }
 
 /* Floating Action Button */
+#rollActionsFab {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  min-width: unset;
+  min-height: unset;
+  border-radius: 50%;
+  padding: 0;
+  box-shadow: 0 3px 8px var(--color-shadow);
+  z-index: 100;
+}
+
 #addFrameFab {
   position: fixed;
   bottom: 1.5rem;
@@ -349,7 +363,8 @@ tbody tr.clickable:hover {
 /* Camera/film modals open on top of the roll modal: raise z-index and
    suppress the backdrop so it doesn't stack with the roll modal's */
 #CameraModal,
-#FilmModal {
+#FilmModal,
+#rollPropertyEditModal {
   background: transparent;
   z-index: 1010;
 }
@@ -359,7 +374,8 @@ tbody tr.clickable:hover {
 }
 
 .modal-content {
-  background-color: var(--color-surface);
+  position: relative;
+  background-color: var(--color-bg);
   width: 100%;
   max-width: 600px;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
@@ -367,6 +383,15 @@ tbody tr.clickable:hover {
   margin-top: auto;
   max-height: 90dvh;
   overflow-y: auto;
+}
+
+.modal-content.dimmed::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-backdrop);
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 .modal-header {

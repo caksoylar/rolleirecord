@@ -11,6 +11,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // Initialize modules
   FrameModal.init();
   RollSelector.init();
+  NewRollModal.init();
+  RollActionsModal.init();
+  RollPropertyEditModal.init();
 
   // Render initial table
   TableRenderer.render();
@@ -24,6 +27,11 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .getElementById("addFrameFab")
     .addEventListener("click", () => FrameModal.openAddModal());
+
+  // FAB: roll actions
+  document
+    .getElementById("rollActionsFab")
+    .addEventListener("click", () => RollActionsModal.open());
 
   // Update banner: reload page to activate new service worker
   document

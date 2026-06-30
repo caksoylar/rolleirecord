@@ -31,14 +31,6 @@ const SettingsPage = {
         window.location.href = `entity-editor.html?${params}`;
       });
 
-    document
-      .getElementById("settingsExportRollBtn")
-      .addEventListener("click", () => Export.exportRoll());
-
-    document
-      .getElementById("settingsExportCSVBtn")
-      .addEventListener("click", () => Export.exportToExiftoolCSV());
-
     const mapsProviderSelect = document.getElementById("settingsMapsProvider");
     mapsProviderSelect.value =
       localStorage.getItem("maps-provider") ?? "google";

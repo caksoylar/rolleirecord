@@ -156,8 +156,31 @@ const DEFAULT_FILMS = [
 ];
 
 // Roll status options
-// eslint-disable-next-line no-unused-vars
 const ROLL_STATUSES = ["Loaded", "Finished", "Developed", "Scanned"];
+
+// Schema for roll fields used in the roll actions modal property editor.
+// camera/film options are resolved at render time from their managers.
+// eslint-disable-next-line no-unused-vars
+const ROLL_FIELDS = [
+  { name: "name", label: "Roll Name", type: "text", required: true },
+  {
+    name: "camera",
+    label: "Camera",
+    type: "select",
+    required: true,
+    optionsFrom: "cameras",
+  },
+  {
+    name: "film",
+    label: "Film",
+    type: "select",
+    required: true,
+    optionsFrom: "films",
+  },
+  { name: "frameCount", label: "Frame Count", type: "number" },
+  { name: "status", label: "Status", type: "select", options: ROLL_STATUSES },
+  { name: "notes", label: "Notes", type: "textarea" },
+];
 
 const FORMATS = {
   "35mm": ["24×36mm", "24×18mm (half)"],

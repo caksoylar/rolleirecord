@@ -276,4 +276,18 @@
     <path d="M139.9,153.6s-29.43-7.78-31.8,11,38.43,10.12,35.78,30.72c-2.47,19.16-31.78,11-31.78,11" />
     <polyline points="172 152 192 208 212 152" />
   </symbol>
+  <!-- Phosphor icons, list -->
+  <symbol
+    id="icon-list"
+    viewBox="0 0 256 256"
+    fill="none"
+    stroke="currentColor"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="24"
+  >
+    <line x1="40" y1="128" x2="216" y2="128" />
+    <line x1="40" y1="64" x2="216" y2="64" />
+    <line x1="40" y1="192" x2="216" y2="192" />
+  </symbol>
 </svg>

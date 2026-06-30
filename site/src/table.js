@@ -76,5 +76,7 @@ const TableRenderer = {
 
     const addFab = document.getElementById("addFrameFab");
     if (addFab) addFab.style.display = hasRoll ? "" : "none";
+    const rollFab = document.getElementById("rollActionsFab");
+    if (rollFab) rollFab.style.display = hasRoll ? "" : "none";
   },
 };

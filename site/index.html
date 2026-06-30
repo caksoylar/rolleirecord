@@ -80,6 +80,11 @@
       </div>
     </main>
 
+    <!-- FAB: Roll actions -->
+    <button id="rollActionsFab" title="Roll actions" style="display: none">
+      <svg class="icon"><use href="icons.svg#icon-list"></use></svg>
+    </button>
+
     <!-- FAB: Add new frame -->
     <button id="addFrameFab" title="Add new frame" style="display: none">
       <svg class="icon"><use href="icons.svg#icon-add"></use></svg>
@@ -110,12 +115,155 @@
       </div>
     </div>
 
+    <!-- New Roll Modal -->
+    <div
+      class="modal"
+      id="newRollModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="newRollModalTitle"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="newRollModalTitle">New Roll</h2>
+        </div>
+        <p class="settings-group-label">Properties</p>
+        <div id="newRollPropertiesList" class="settings-list">
+          <!-- Populated dynamically by NewRollModal -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="newRollCreateBtn" class="save-btn">
+            Create Roll
+          </button>
+          <button type="button" id="newRollCancelBtn" class="secondary">
+            Cancel
+          </button>
+          <button type="button" id="newRollImportBtn" class="secondary">
+            Import from file…
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roll Actions Modal -->
+    <div
+      class="modal"
+      id="rollActionsModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rollActionsModalTitle"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="rollActionsModalTitle">Roll</h2>
+        </div>
+        <p class="settings-group-label">Properties</p>
+        <div id="rollPropertiesList" class="settings-list">
+          <!-- Populated dynamically by RollActionsModal -->
+        </div>
+        <p class="settings-group-label">Map</p>
+        <div class="settings-list">
+          <button type="button" id="rollActionsMapBtn" class="settings-row">
+            <span class="row-icon"
+              ><svg class="icon"><use href="icons.svg#icon-map"></use></svg
+            ></span>
+            <span class="row-label"
+              ><span class="row-title">View on Map</span
+              ><span class="row-sub">Open frame locations in maps</span></span
+            >
+            <span class="row-chevron"
+              ><svg class="icon"><use href="icons.svg#icon-chevron"></use></svg
+            ></span>
+          </button>
+        </div>
+        <p class="settings-group-label">Export</p>
+        <div class="settings-list">
+          <button
+            type="button"
+            id="rollActionsExportJsonBtn"
+            class="settings-row"
+          >
+            <span class="row-icon"
+              ><svg class="icon"><use href="icons.svg#icon-download"></use></svg
+            ></span>
+            <span class="row-label"
+              ><span class="row-title">Export Roll</span
+              ><span class="row-sub">Back up as JSON for re-import</span></span
+            >
+          </button>
+          <button
+            type="button"
+            id="rollActionsExportCsvBtn"
+            class="settings-row"
+          >
+            <span class="row-icon"
+              ><svg class="icon"><use href="icons.svg#icon-csv"></use></svg
+            ></span>
+            <span class="row-label"
+              ><span class="row-title">Export CSV</span
+              ><span class="row-sub"
+                >Metadata for exiftool's <code>-csv</code> option</span
+              ></span
+            >
+          </button>
+        </div>
+        <p class="settings-group-label">Danger Zone</p>
+        <div class="settings-list">
+          <button
+            type="button"
+            id="rollActionsDeleteBtn"
+            class="settings-row danger-row"
+          >
+            <span class="row-icon"
+              ><svg class="icon"><use href="icons.svg#icon-delete"></use></svg
+            ></span>
+            <span class="row-label"
+              ><span class="row-title">Delete Roll</span
+              ><span class="row-sub"
+                >Permanently remove this roll and all its frames</span
+              ></span
+            >
+          </button>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="secondary" id="rollActionsCloseBtn">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roll Property Edit Modal: single-field input (nested on top of roll actions modal) -->
+    <div
+      class="modal"
+      id="rollPropertyEditModal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="rollPropertyEditTitle"
+    >
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="rollPropertyEditTitle" class="modal-title"></h2>
+        </div>
+        <form id="rollPropertyEditForm" autocomplete="off">
+          <div class="modal-body" id="rollPropertyEditBody">
+            <!-- Single form-group rendered here -->
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="save-btn">Save</button>
+            <button type="button" class="secondary cancel-btn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <script src="src/util.js"></script>
     <script src="src/config.js"></script>
     <script src="src/entities.js"></script>
     <script src="src/rolls.js"></script>
     <script src="src/table.js"></script>
     <script src="src/selectors.js"></script>
+    <script src="src/exif.js"></script>
     <script src="src/export.js"></script>
     <script src="src/frame.js"></script>
     <script src="src/app.js"></script>
