@@ -595,7 +595,6 @@ textarea {
   font-size: var(--font-size-xxs);
   color: var(--color-text-muted);
   font-style: italic;
-  grid-column: 2 / -1;
 }
 
 /* Entity Editor page */
@@ -729,4 +728,48 @@ textarea {
 
 .settings-row--muted .row-label {
   opacity: 0.5;
+}
+
+/* Inline input field on the right side of a settings row */
+.settings-row .row-input {
+  min-height: 0;
+  padding: 0.4rem 0.6rem;
+  background-color: var(--color-surface-alt);
+  font-size: var(--font-size-sm);
+  width: 9rem;
+  flex-shrink: 1;
+}
+
+/* Right-side container for input + action buttons */
+.settings-row .row-control {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.settings-row .row-control .row-input {
+  flex: 1;
+  width: auto;
+  min-width: 0;
+}
+
+/* Right-side position for custom-select wrapper */
+.settings-row .custom-select-wrap {
+  flex: 0 0 auto;
+}
+
+/* Compact custom-value input in settings-row context */
+.settings-row .custom-value-input {
+  min-height: 0;
+  padding: 0.4rem 0.6rem;
+  font-size: var(--font-size-sm);
+  width: 8rem;
+}
+
+/* Compact action buttons inside settings-row controls */
+.settings-row .row-control button,
+.settings-row .custom-cancel-btn {
+  min-height: 0;
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--radius);
 }

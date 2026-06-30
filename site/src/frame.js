@@ -199,10 +199,10 @@ const FrameModal = {
       !dynamicOptions.includes(currentValue);
 
     let html = `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+      <div class="settings-row form-group">
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
         <div class="custom-select-wrap">
-          <select id="${inputId}" name="${field.name}" ${required} ${isCustom ? 'style="display:none"' : ""}>
+          <select id="${inputId}" name="${field.name}" class="row-select" ${required} ${isCustom ? 'style="display:none"' : ""}>
     `;
 
     dynamicOptions.forEach((option) => {
@@ -239,33 +239,36 @@ const FrameModal = {
 
     if (isEditMode) {
       return `
-        <div class="form-group">
-          <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-          <div style="display: flex; gap: 0.5rem;">
+        <div class="settings-row form-group">
+          <span class="row-label">
+            <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
+            <span class="accuracy-hint row-sub"></span>
+            <span class="geocode-hint row-sub"></span>
+          </span>
+          <div class="row-control">
             <input type="text" id="${inputId}" name="${field.name}"
               value="${escapeHtml(String(value))}" ${required}
-              ${field.readonly ? "readonly" : ""} style="flex: 1;" />
-            <button type="button" id="refresh-location-btn" class="secondary"
-              style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
+              ${field.readonly ? "readonly" : ""} class="row-input" />
+            <button type="button" id="refresh-location-btn" class="secondary">
               <svg class="icon"><use href="icons.svg#icon-pin"></use></svg>
             </button>
-            ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" style="flex: 0 0 auto; padding: 0.5rem 0.75rem;" title="Open in Google Maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
+            ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" title="Open in maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
           </div>
-          <div class="accuracy-hint"></div>
-          <div class="geocode-hint"></div>
         </div>
       `;
     }
 
     return `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+      <div class="settings-row form-group">
+        <span class="row-label">
+          <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
+          <span class="accuracy-hint row-sub"></span>
+          <span class="geocode-hint row-sub"></span>
+        </span>
         <input type="text" id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""}
-          placeholder="Auto-capturing via GPS..." />
-        <div class="accuracy-hint"></div>
-        <div class="geocode-hint"></div>
+          class="row-input" placeholder="Auto-capturing via GPS..." />
       </div>
     `;
   },
@@ -276,14 +279,13 @@ const FrameModal = {
       : "";
 
     return `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-        <div style="display: flex; gap: 0.5rem;">
+      <div class="settings-row form-group">
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
+        <div class="row-control">
           <input type="datetime-local" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
-            ${field.readonly ? "readonly" : ""} style="flex: 1;" />
-          <button type="button" id="refresh-date-btn" class="secondary"
-            style="flex: 0 0 auto; padding: 0.5rem 0.75rem;">
+            ${field.readonly ? "readonly" : ""} class="row-input" />
+          <button type="button" id="refresh-date-btn" class="secondary">
             <svg class="icon"><use href="icons.svg#icon-refresh"></use></svg>
           </button>
         </div>
@@ -296,23 +298,23 @@ const FrameModal = {
       ? rowData[field.name] === true
       : !!field.defaultValue;
     return `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}</label>
+      <label for="${inputId}" class="settings-row form-group">
+        <span class="row-label"><span class="row-title">${field.label}</span></span>
         <input type="checkbox" id="${inputId}" name="${field.name}"
-          ${checked ? "checked" : ""} />
-      </div>
+          class="row-checkbox" ${checked ? "checked" : ""} />
+      </label>
     `;
   },
 
   _renderNotesField(field, inputId, required, rowData) {
     const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-        <div class="notes-field-wrap">
+      <div class="settings-row form-group">
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
+        <div class="notes-field-wrap row-control">
           <input type="text" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
-            ${field.readonly ? "readonly" : ""} />
+            ${field.readonly ? "readonly" : ""} class="row-input" />
           <button type="button" class="secondary notes-clear-btn" title="Clear">
             <svg class="icon"><use href="icons.svg#icon-close"></use></svg>
           </button>
@@ -324,16 +326,18 @@ const FrameModal = {
   _renderIdField(field, inputId, required, rowData) {
     const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
-        <div class="stepper-field-wrap">
+      <div class="settings-row form-group">
+        <span class="row-label">
+          <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
+          <span class="id-validation-hint row-sub"></span>
+        </span>
+        <div class="stepper-field-wrap row-control">
           <input type="number" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
-            ${field.readonly ? "readonly" : ""} />
+            ${field.readonly ? "readonly" : ""} class="row-input" />
           <button type="button" class="secondary stepper-btn down" title="Decrease"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
           <button type="button" class="secondary stepper-btn up" title="Increase"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
         </div>
-        <div class="id-validation-hint"></div>
       </div>
     `;
   },
@@ -341,12 +345,12 @@ const FrameModal = {
   _renderTextField(field, inputId, required, rowData) {
     const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
-      <div class="form-group">
-        <label for="${inputId}">${field.label}${field.required ? " *" : ""}</label>
+      <div class="settings-row form-group">
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
         <input type="${field.type === "number" ? "number" : "text"}"
           id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
-          ${field.readonly ? "readonly" : ""} />
+          ${field.readonly ? "readonly" : ""} class="row-input" />
       </div>
     `;
   },
