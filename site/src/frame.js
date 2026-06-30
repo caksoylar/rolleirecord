@@ -246,7 +246,7 @@ const FrameModal = {
           <div class="row-control">
             <input type="text" id="${inputId}" name="${field.name}"
               value="${escapeHtml(String(value))}" ${required}
-              ${field.readonly ? "readonly" : ""} class="row-input" />
+              ${field.readonly ? "readonly" : ""} />
             <button type="button" id="refresh-location-btn" class="secondary">
               <svg class="icon"><use href="icons.svg#icon-pin"></use></svg>
             </button>
@@ -268,7 +268,7 @@ const FrameModal = {
         <input type="text" id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""}
-          class="row-input" placeholder="Auto-capturing via GPS..." />
+          placeholder="Auto-capturing via GPS..." />
         <div class="form-hint-row">
           <span class="accuracy-hint"></span>
           <span class="geocode-hint"></span>
@@ -288,7 +288,7 @@ const FrameModal = {
         <div class="row-control">
           <input type="datetime-local" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
-            ${field.readonly ? "readonly" : ""} class="row-input" />
+            ${field.readonly ? "readonly" : ""} />
           <button type="button" id="refresh-date-btn" class="secondary">
             <svg class="icon"><use href="icons.svg#icon-refresh"></use></svg>
           </button>
@@ -315,10 +315,10 @@ const FrameModal = {
     return `
       <div class="settings-row form-group">
         <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
-        <div class="notes-field-wrap row-control">
+        <div class="row-control">
           <input type="text" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
-            ${field.readonly ? "readonly" : ""} class="row-input" />
+            ${field.readonly ? "readonly" : ""} />
           <button type="button" class="secondary notes-clear-btn" title="Clear">
             <svg class="icon"><use href="icons.svg#icon-close"></use></svg>
           </button>
@@ -334,10 +334,10 @@ const FrameModal = {
         <span class="row-label">
           <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
         </span>
-        <div class="stepper-field-wrap row-control">
+        <div class="row-control">
           <input type="number" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
-            ${field.readonly ? "readonly" : ""} class="row-input" />
+            ${field.readonly ? "readonly" : ""} />
           <button type="button" class="secondary stepper-btn down" title="Decrease"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
           <button type="button" class="secondary stepper-btn up" title="Increase"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
         </div>
@@ -356,7 +356,7 @@ const FrameModal = {
         <input type="${field.type === "number" ? "number" : "text"}"
           id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
-          ${field.readonly ? "readonly" : ""} class="row-input" />
+          ${field.readonly ? "readonly" : ""} />
       </div>
     `;
   },

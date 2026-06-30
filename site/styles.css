@@ -447,23 +447,6 @@ tbody tr.clickable:hover {
   gap: 0.5rem;
 }
 
-.custom-input-wrap,
-.notes-field-wrap {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.custom-input-wrap input,
-.notes-field-wrap input {
-  flex: 1;
-}
-
-.custom-input-wrap .custom-cancel-btn,
-.notes-clear-btn {
-  flex: 0 0 auto;
-  padding: 0.5rem 0.75rem;
-}
-
 label {
   display: block;
   margin-right: 0.5rem;
@@ -562,21 +545,6 @@ textarea {
   cursor: not-allowed;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-}
-
-.stepper-field-wrap {
-  display: flex;
-  gap: 0.5rem;
-  align-items: stretch;
-}
-
-.stepper-field-wrap input {
-  flex: 1;
-}
-
-.stepper-btn {
-  flex: 0 0 auto;
-  padding: 0 0.75rem;
 }
 
 .toggle-row {
@@ -753,7 +721,7 @@ textarea {
 }
 
 /* Inline input field on the right side of a settings row */
-.settings-row .row-input {
+.settings-row input {
   min-height: 0;
   padding: 0.4rem 0.6rem;
   background-color: var(--color-surface-alt);
@@ -769,7 +737,7 @@ textarea {
   gap: 0.35rem;
 }
 
-.settings-row .row-control .row-input {
+.settings-row .row-control input {
   flex: 1;
   width: fit-content;
   min-width: 2rem;
