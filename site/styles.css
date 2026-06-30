@@ -435,6 +435,19 @@ tbody tr.clickable:hover {
   display: contents;
 }
 
+.settings-row.form-group {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.form-hint-row {
+  flex: 0 0 100%;
+  font-size: var(--font-size-xxs);
+  color: var(--color-text-muted);
+  display: flex;
+  gap: 0.5rem;
+}
+
 .custom-input-wrap,
 .notes-field-wrap {
   display: flex;
@@ -673,11 +686,6 @@ textarea {
   background: var(--color-surface-alt);
 }
 
-.settings-row button {
-  color: var(--color-text);
-  background-color: unset;
-}
-
 .settings-row .row-icon .icon,
 .settings-row .row-chevron .icon {
   display: block;
@@ -779,7 +787,9 @@ textarea {
 /* Compact action buttons inside settings-row controls */
 .settings-row .row-control button,
 .settings-row .custom-cancel-btn {
+  color: var(--color-text);
   min-height: 0;
-  padding: 0.4rem 0.5rem;
-  border-radius: var(--radius);
+  padding: 0;
+  background-color: unset;
+  box-shadow: unset;
 }

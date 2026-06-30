@@ -242,8 +242,6 @@ const FrameModal = {
         <div class="settings-row form-group">
           <span class="row-label">
             <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
-            <span class="accuracy-hint row-sub"></span>
-            <span class="geocode-hint row-sub"></span>
           </span>
           <div class="row-control">
             <input type="text" id="${inputId}" name="${field.name}"
@@ -254,6 +252,10 @@ const FrameModal = {
             </button>
             ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" title="Open in maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
           </div>
+          <div class="form-hint-row">
+            <span class="accuracy-hint"></span>
+            <span class="geocode-hint"></span>
+          </div>
         </div>
       `;
     }
@@ -262,13 +264,15 @@ const FrameModal = {
       <div class="settings-row form-group">
         <span class="row-label">
           <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
-          <span class="accuracy-hint row-sub"></span>
-          <span class="geocode-hint row-sub"></span>
         </span>
         <input type="text" id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""}
           class="row-input" placeholder="Auto-capturing via GPS..." />
+        <div class="form-hint-row">
+          <span class="accuracy-hint"></span>
+          <span class="geocode-hint"></span>
+        </div>
       </div>
     `;
   },
@@ -329,7 +333,6 @@ const FrameModal = {
       <div class="settings-row form-group">
         <span class="row-label">
           <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
-          <span class="id-validation-hint row-sub"></span>
         </span>
         <div class="stepper-field-wrap row-control">
           <input type="number" id="${inputId}" name="${field.name}"
@@ -337,6 +340,9 @@ const FrameModal = {
             ${field.readonly ? "readonly" : ""} class="row-input" />
           <button type="button" class="secondary stepper-btn down" title="Decrease"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
           <button type="button" class="secondary stepper-btn up" title="Increase"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
+        </div>
+        <div class="form-hint-row">
+          <span class="id-validation-hint"></span>
         </div>
       </div>
     `;
