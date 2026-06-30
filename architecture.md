@@ -12,7 +12,7 @@ Three HTML entry points share the same `src/` directory:
 
 ```
 util.js → config.js → entities.js → rolls.js → table.js →
-selectors.js → exif.js → export.js → frame.js → app.js
+selectors.js → export.js → frame.js → app.js
 ```
 
 **`entity-editor.html` — camera/film editor page**:
@@ -24,13 +24,11 @@ util.js → config.js → entities.js → rolls.js → entity-editor.js
 **`settings.html` — settings page**:
 
 ```
-util.js → config.js → entities.js → rolls.js → exif.js → export.js → settings.js
+util.js → config.js → entities.js → rolls.js → export.js → settings.js
 ```
 
 `util.js` holds pure, dependency-free helpers (`escapeHtml`,
 `formatRelativeDate`) and loads first on every page.
-`exif.js` feeds CSV export and now loads on both `index.html` (for
-`RollActionsModal`'s Export CSV) and `settings.html`.
 `export.js` loads on both `index.html` (for roll import and roll/CSV export via
 the roll actions modal) and `settings.html` (for full backup export/restore).
 
@@ -48,8 +46,7 @@ graph LR
     rolls["rolls.js\nRollManager"]
     table["table.js\nTableRenderer"]
     selectors["selectors.js\nRollSelector · RollFormModal · refreshAllUI"]
-    exif["exif.js\nbuildExifTags()"]
-    export_["export.js\nExport"]
+    export_["export.js\nbuildExifTags · Export"]
     frame["frame.js\nFrameModal · LocationManager"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
@@ -65,7 +62,6 @@ graph LR
     config --> table
     config --> frame
     config --> export_
-    config --> exif
     config --> entity_editor
     config --> settings
 
@@ -89,7 +85,6 @@ graph LR
     selectors --> app
     selectors --> export_
     selectors --> frame
-    exif --> export_
     export_ --> settings
     frame --> app
 ```
@@ -102,7 +97,7 @@ graph LR
 > navigates to `settings.html`. `selectors.js` depends on `export.js` for the
 > roll-import flow (`NewRollModal`'s "Import from file…" button) and for
 > roll/CSV export via `RollActionsModal`.
-> `settings.js` depends on `exif.js` + `export.js` for backup export/import.
+> `settings.js` depends on `export.js` for backup export/import.
 
 ---
 
@@ -396,22 +391,12 @@ and `/entity-editor.html?type=film`.
 
 ---
 
-### `exif.js`
-
-| Export                | Kind     | Purpose                                                                                                                                          |
-| --------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `buildExifTags(meta)` | function | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. |
-
-Loaded on both `index.html` and `settings.html` (CSV export is now available
-via `RollActionsModal` on the main page).
-
----
-
 ### `export.js`
 
-| Export   | Kind             | Purpose                                                                                                                                                                                                                                                                |
-| -------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Export` | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
+| Export                | Kind             | Purpose                                                                                                                                                                                                                                                                |
+| --------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `buildExifTags(meta)` | function         | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. Private to this module. |
+| `Export`              | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
 Loaded on **both** `index.html` and `settings.html`. On the main page,
 `importRoll` is reachable via `NewRollModal`'s "Import from file…" button, and
