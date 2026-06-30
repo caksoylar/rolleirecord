@@ -333,6 +333,7 @@ const FrameModal = {
           <button type="button" class="secondary stepper-btn down" title="Decrease"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
           <button type="button" class="secondary stepper-btn up" title="Increase"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
         </div>
+        <div class="id-validation-hint"></div>
       </div>
     `;
   },
@@ -370,7 +371,25 @@ const FrameModal = {
         if (!idInput) return;
         if (btn.classList.contains("up")) idInput.stepUp();
         else idInput.stepDown();
+        idInput.dispatchEvent(new Event("change", { bubbles: true }));
       });
+    });
+
+    // Frame # validation hint
+    idInput.addEventListener("change", (e) => {
+      const excludeId = isEditMode ? rowData.id : null;
+      const hintText = RollManager.isFrameIdUnique(
+        e.target.valueAsNumber,
+        excludeId,
+      )
+        ? ""
+        : "Frame ID already exists!";
+      const hintEl = idInput
+        .closest(".form-group")
+        ?.querySelector(".id-validation-hint");
+      if (hintEl) {
+        hintEl.textContent = hintText;
+      }
     });
 
     // Custom value select/input toggles

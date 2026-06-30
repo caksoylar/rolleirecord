@@ -565,7 +565,8 @@ textarea {
 }
 
 .accuracy-hint,
-.geocode-hint {
+.geocode-hint,
+.id-validation-hint {
   font-size: var(--font-size-xxs);
   color: var(--color-text-muted);
   font-style: italic;
