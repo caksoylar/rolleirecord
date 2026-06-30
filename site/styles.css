@@ -619,6 +619,10 @@ textarea {
   margin: 0 0 1rem;
 }
 
+.settings-list button {
+  border-radius: unset;
+}
+
 .settings-row {
   display: flex;
   align-items: center;
