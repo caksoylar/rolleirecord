@@ -685,63 +685,19 @@ textarea {
 
 /* Checkbox sitting at the right edge of a settings row */
 .settings-row .row-checkbox {
+  flex: 0 0 1.25rem;
   width: 1.25rem;
   height: 1.25rem;
   accent-color: var(--color-accent);
   cursor: pointer;
 }
 
-.entity-prop-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.entity-prop-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 0.75rem;
-  align-items: center;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 0.5rem;
-}
-
-.entity-prop-label {
-  font-weight: 600;
-  color: var(--color-text);
-  padding-left: 0.5rem;
-}
-
-.entity-prop-value {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  text-align: right;
-  word-break: break-word;
-  padding-left: 0.5rem;
-}
-
-.entity-prop-value--list {
-  text-align: left;
-  grid-column: 1 / 3;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-xs);
-}
-
-.entity-prop-toggle {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
-  grid-column: 3 / -1;
-}
-
-.entity-prop-row--muted .entity-prop-value,
-.entity-prop-row--muted .entity-prop-label {
-  opacity: 0.5;
-}
-
 .entity-prop-empty {
   color: var(--color-text-muted);
   text-align: center;
   padding: 1rem;
+}
+
+.settings-row--muted .row-label {
+  opacity: 0.5;
 }

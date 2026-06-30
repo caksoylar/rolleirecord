@@ -202,15 +202,13 @@ const PropertiesSection = {
         const value = entity[field.name];
         // eslint-disable-next-line eqeqeq
         const display = value === "" || value == null ? "—" : String(value);
-        const editBtn = `<button type="button" class="secondary entity-prop-edit" data-field="${field.name}" title="Edit ${escapeHtml(field.label)}">
-              <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
-            </button>`;
         return `
-          <div class="entity-prop-row">
-            <span class="entity-prop-label">${escapeHtml(field.label)}</span>
-            <span class="entity-prop-value">${escapeHtml(display)}</span>
-            ${editBtn}
-          </div>`;
+          <button type="button" class="settings-row" data-field="${field.name}">
+            <span class="row-label">
+              <span class="row-title">${escapeHtml(field.label)}</span>
+              <span class="row-sub">${escapeHtml(display)}</span>
+            </span>
+          </button>`;
       })
       .join("");
   },
@@ -360,9 +358,14 @@ const FrameFieldsSection = {
     this.listEl = document.getElementById("frameFieldsList");
 
     this.listEl.addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-field]");
-      if (!btn) return;
-      FrameFieldOptionsModal.open(btn.dataset.field);
+      if (e.target.closest("input.field-enabled-toggle")) return;
+      const row = e.target.closest(".settings-row[data-field]");
+      if (!row) return;
+      const fieldName = row.dataset.field;
+      const manager = getManager();
+      const entity = manager.getById(currentEntityId);
+      if (!entity || manager.isFieldHidden(fieldName, entity.name)) return;
+      FrameFieldOptionsModal.open(fieldName);
     });
 
     this.listEl.addEventListener("change", (e) => {
@@ -395,19 +398,14 @@ const FrameFieldsSection = {
           entity.name,
         );
         const isHidden = manager.isFieldHidden(field.name, entity.name);
-        const muted = isHidden ? "entity-prop-row--muted" : "";
-        const toggle = `<label class="toggle-row entity-prop-toggle" title="Enabled for this ${getEntityType()}">
-              <input type="checkbox" class="field-enabled-toggle" data-field="${field.name}" ${isHidden ? "" : "checked"} />
-              <span>Enabled</span>
-            </label>`;
+        const muted = isHidden ? "settings-row--muted" : "";
         return `
-          <div class="entity-prop-row ${muted}">
-            <span class="entity-prop-label">${escapeHtml(field.label)}</span>
-            ${toggle}
-            <span class="entity-prop-value entity-prop-value--list">${escapeHtml(opts.join(", ") || "—")}</span>
-            <button type="button" class="secondary entity-prop-edit" data-field="${field.name}" title="Edit options" ${isHidden ? "disabled" : ""}>
-              <svg class="icon"><use href="icons.svg#icon-edit"></use></svg>
-            </button>
+          <div class="settings-row ${muted}" data-field="${field.name}">
+            <span class="row-label">
+              <span class="row-title">${escapeHtml(field.label)}</span>
+              <span class="row-sub">${escapeHtml(opts.join(", ") || "—")}</span>
+            </span>
+            <input type="checkbox" class="row-checkbox field-enabled-toggle" data-field="${field.name}" ${isHidden ? "" : "checked"} title="Enabled for this ${getEntityType()}" />
           </div>`;
       })
       .join("");
