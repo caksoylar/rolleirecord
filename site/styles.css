@@ -445,7 +445,6 @@ tbody tr.clickable:hover {
   font-size: var(--font-size-xxs);
   color: var(--color-text-muted);
   display: flex;
-  gap: 0.5rem;
 }
 
 label {
@@ -513,53 +512,6 @@ textarea {
 .modal-footer button {
   flex: 1;
   min-width: 6rem;
-}
-
-.options-list {
-  margin-bottom: 1rem;
-}
-
-.options-list label,
-.options-list .options-list-heading {
-  margin-bottom: 1rem;
-}
-
-.option-input-group {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  align-items: center;
-}
-
-.option-input-group input {
-  flex: 1;
-  padding: 0.75rem;
-}
-
-.option-input-group button {
-  padding: 0.75rem;
-  font-size: var(--font-size-xs);
-}
-
-.move-option-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-}
-
-.toggle-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: var(--font-size-sm);
-}
-
-.toggle-row input[type="checkbox"] {
-  width: 1.25rem;
-  height: 1.25rem;
-  padding: 0;
-  accent-color: var(--color-accent);
 }
 
 /* Empty State */
@@ -735,13 +687,17 @@ textarea {
 .settings-row .row-control {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.25rem;
 }
 
 .settings-row .row-control input {
   flex: 1;
   width: fit-content;
   min-width: 2rem;
+}
+
+.settings-row .row-control .danger {
+  color: var(--color-danger);
 }
 
 /* Right-side position for custom-select wrapper */
@@ -764,4 +720,15 @@ textarea {
   min-height: 0;
   padding: 0;
   background-color: unset;
+}
+
+/* Field option editor input boxes */
+.settings-row .option-input {
+  flex: 1 0 auto;
+  max-width: unset;
+}
+
+.move-option-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

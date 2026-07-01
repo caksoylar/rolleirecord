@@ -574,7 +574,7 @@ const FrameModal = {
 
       // Show accuracy as a helper text if available
       const accuracyText = location.accuracy
-        ? ` (Accuracy: ±${Math.round(location.accuracy)}m)`
+        ? `(Accuracy: ±${Math.round(location.accuracy)}m) `
         : "";
       const helperEl = locationField
         .closest(".form-group")

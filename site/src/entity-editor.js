@@ -441,11 +441,6 @@ const FrameFieldOptionsModal = {
       if (e.target === this.modalEl) this.close();
     });
 
-    document.getElementById("addOptionBtn").addEventListener("click", (e) => {
-      e.preventDefault();
-      this._addOption();
-    });
-
     this.modalEl.querySelector(".reset-btn").addEventListener("click", () => {
       if (!confirm("Reset this list to the schema defaults?")) return;
       const defaults = OptionsManager.getDefaultOptions(this.currentField.name);
@@ -477,7 +472,7 @@ const FrameFieldOptionsModal = {
     if (!field) return;
 
     this.currentField = field;
-    this.titleEl.textContent = `${field.label} — options`;
+    this.titleEl.textContent = `${field.label} options`;
     const current = OptionsManager.getOptions(
       field.name,
       getEntityType(),
@@ -488,19 +483,31 @@ const FrameFieldOptionsModal = {
   },
 
   _renderOptions(options) {
-    this.containerEl.innerHTML = options
-      .map((option, index) => {
-        const canMoveUp = index > 0;
-        const canMoveDown = index < options.length - 1;
-        return `
-          <div class="option-input-group">
+    this.containerEl.innerHTML =
+      options
+        .map((option, index) => {
+          const canMoveUp = index > 0;
+          const canMoveDown = index < options.length - 1;
+          return `
+          <div class="settings-row">
             <input type="text" class="option-input" value="${escapeHtml(option)}" data-index="${index}" />
-            <button type="button" class="move-option-btn secondary up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
-            <button type="button" class="move-option-btn secondary down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
-            <button type="button" class="remove-option-btn danger" data-index="${index}" title="Remove"><svg class="icon"><use href="icons.svg#icon-delete"></use></svg></button>
+            <div class="row-control">
+              <button type="button" class="move-option-btn up" data-index="${index}" ${!canMoveUp ? "disabled" : ""} title="Move up"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
+              <button type="button" class="move-option-btn down" data-index="${index}" ${!canMoveDown ? "disabled" : ""} title="Move down"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
+              <button type="button" class="remove-option-btn danger" data-index="${index}" title="Remove"><svg class="icon"><use href="icons.svg#icon-delete"></use></svg></button>
+            </div>
           </div>`;
-      })
-      .join("");
+        })
+        .join("") +
+      `
+          <button type="button" id="addOptionBtn" class="settings-row">
+            + Add Option
+          </button>`;
+
+    document.getElementById("addOptionBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      this._addOption();
+    });
   },
 
   _collect() {
