@@ -197,6 +197,7 @@ header button {
 .roll-selector-bar select,
 .entity-selector-bar select {
   padding: 0.6rem;
+  max-width: unset;
 }
 
 .roll-caption {
