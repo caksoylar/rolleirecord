@@ -382,7 +382,7 @@ tbody tr.clickable:hover {
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding: 1.25rem;
   margin-top: auto;
-  max-height: 90dvh;
+  max-height: 95dvh;
   overflow-y: auto;
 }
 
