@@ -130,6 +130,11 @@ const FrameModal = {
     this.element
       .querySelector(".cancel-btn")
       .addEventListener("click", () => this.close());
+
+    // Close on click outside
+    this.element.addEventListener("click", (e) => {
+      if (e.target === this.element) this.close();
+    });
   },
 
   // Render form fields based on schema
