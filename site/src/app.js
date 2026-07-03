@@ -10,8 +10,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Initialize modules
   FrameModal.init();
-  RollSelector.init();
   NewRollModal.init();
+  RollSelector.init();
   RollActionsModal.init();
   RollPropertyEditModal.init();
 
