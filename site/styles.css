@@ -466,7 +466,7 @@ textarea {
   border-radius: var(--radius);
   transition: border-color var(--transition-speed);
   field-sizing: content;
-  max-width: 12rem;
+  width: fit-content;
 }
 
 input[type="checkbox"] {
@@ -679,7 +679,7 @@ textarea {
   padding: 0.4rem 0.6rem;
   background-color: var(--color-surface-alt);
   font-size: var(--font-size-sm);
-  width: 9rem;
+  min-width: 2.5rem;
   flex-shrink: 1;
 }
 
@@ -690,10 +690,21 @@ textarea {
   gap: 0.25rem;
 }
 
+.settings-row.form-group:has(.row-control) .row-label {
+  flex: 0 1 auto;
+}
+
+.settings-row.form-group .row-control {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
 .settings-row .row-control input {
-  flex: 1;
+  /* Filled inputs shrink instead of forcing the row to wrap */
+  flex: 0 1 auto;
   width: fit-content;
-  min-width: 2rem;
+  min-width: 2.5rem;
 }
 
 .settings-row .row-control .danger {
@@ -710,7 +721,7 @@ textarea {
   min-height: 0;
   padding: 0.4rem 0.6rem;
   font-size: var(--font-size-sm);
-  width: 8rem;
+  width: fit-content;
 }
 
 /* Compact action buttons inside settings-row controls */
