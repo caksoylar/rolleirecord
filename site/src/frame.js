@@ -257,8 +257,10 @@ const FrameModal = {
             </button>
             ${mapsUrl ? `<button type="button" id="maps-location-btn" class="secondary" title="Open in maps"><svg class="icon"><use href="icons.svg#icon-map"></use></svg></button>` : ""}
           </div>
-          <div class="form-hint-row">
+          <div class="form-hint-row" style="display: none">
             <span class="accuracy-hint"></span>
+          </div>
+          <div class="form-hint-row" style="display: none">
             <span class="geocode-hint"></span>
           </div>
         </div>
@@ -274,8 +276,10 @@ const FrameModal = {
           value="${escapeHtml(String(value))}" ${required}
           ${field.readonly ? "readonly" : ""}
           placeholder="Auto-capturing via GPS..." />
-        <div class="form-hint-row">
+        <div class="form-hint-row" style="display: none">
           <span class="accuracy-hint"></span>
+        </div>
+        <div class="form-hint-row" style="display: none">
           <span class="geocode-hint"></span>
         </div>
       </div>
@@ -346,7 +350,7 @@ const FrameModal = {
           <button type="button" class="secondary stepper-btn down" title="Decrease"><svg class="icon"><use href="icons.svg#icon-down"></use></svg></button>
           <button type="button" class="secondary stepper-btn up" title="Increase"><svg class="icon"><use href="icons.svg#icon-up"></use></svg></button>
         </div>
-        <div class="form-hint-row">
+        <div class="form-hint-row" style="display: none">
           <span class="id-validation-hint"></span>
         </div>
       </div>
@@ -403,7 +407,7 @@ const FrameModal = {
         .closest(".form-group")
         ?.querySelector(".id-validation-hint");
       if (hintEl) {
-        hintEl.textContent = hintText;
+        this._setHintText(hintEl, hintText);
       }
     });
 
@@ -531,6 +535,13 @@ const FrameModal = {
     FrameModal.open("edit", rowId);
   },
 
+  // Set a hint span's text and show/hide its enclosing row based on emptiness
+  _setHintText(hintEl, text) {
+    hintEl.textContent = text;
+    const row = hintEl.closest(".form-hint-row");
+    if (row) row.style.display = text ? "" : "none";
+  },
+
   // Reverse geocode the current location value and render it below the field
   async _updateReverseGeocode(locationField) {
     const hintEl = locationField
@@ -540,22 +551,22 @@ const FrameModal = {
 
     const value = locationField.value.trim();
     if (!value || !LocationManager.isValidCoordinates(value)) {
-      hintEl.textContent = "";
+      this._setHintText(hintEl, "");
       return;
     }
 
     const lookup = LocationManager.getReverseGeocode(value);
     if (!lookup) {
-      hintEl.textContent = "";
+      this._setHintText(hintEl, "");
       return;
     }
 
-    hintEl.textContent = "Looking up location\u2026";
+    this._setHintText(hintEl, "Looking up location\u2026");
     try {
       const data = await lookup;
-      hintEl.textContent = data?.display_name ?? "";
+      this._setHintText(hintEl, data?.display_name ?? "");
     } catch (error) {
-      hintEl.textContent = "";
+      this._setHintText(hintEl, "");
       console.error("Reverse geocode error:", error);
     }
   },
@@ -579,13 +590,13 @@ const FrameModal = {
 
       // Show accuracy as a helper text if available
       const accuracyText = location.accuracy
-        ? `(Accuracy: ±${Math.round(location.accuracy)}m) `
+        ? `Accuracy: ±${Math.round(location.accuracy)}m`
         : "";
       const helperEl = locationField
         .closest(".form-group")
         ?.querySelector(".accuracy-hint");
       if (helperEl) {
-        helperEl.textContent = accuracyText;
+        this._setHintText(helperEl, accuracyText);
       }
 
       this._updateReverseGeocode(locationField);
