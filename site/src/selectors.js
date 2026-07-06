@@ -159,6 +159,32 @@ const RollActionsModal = {
     });
 
     document
+      .getElementById("rollActionsInterpolateBtn")
+      .addEventListener("click", () => {
+        const roll = RollManager.getCurrentRoll();
+        if (!roll) return;
+
+        const newFrames = FrameInterpolator.interpolateFramesInRoll(
+          roll.frames,
+        );
+        if (newFrames.length === 0) {
+          alert("No gaps found between logged frames.");
+          return;
+        }
+
+        if (
+          !confirm(
+            `Fill in ${newFrames.length} missing frame(s) using the nearest logged frame's data?`,
+          )
+        )
+          return;
+
+        newFrames.forEach((frame) => RollManager.addFrame(frame));
+        refreshAllUI();
+        this.close();
+      });
+
+    document
       .getElementById("rollActionsMapBtn")
       .addEventListener("click", () => {
         const roll = RollManager.getCurrentRoll();

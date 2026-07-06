@@ -762,3 +762,65 @@ const FormValidator = {
     };
   },
 };
+
+// ============================================================================
+// FRAME INTERPOLATION - Fill in missing frames between two logged frames
+// ============================================================================
+
+// eslint-disable-next-line no-unused-vars
+const FrameInterpolator = {
+  // Interpolate the frame data at `index`, given the nearest logged frames
+  // before (`prevFrame`) and after (`nextFrame`) it. `index` is strictly
+  // between the indices of prevFrame and nextFrame.
+  interpolateFrame(index, prevFrame, nextFrame) {
+    const fraction = (index - prevFrame.id) / (nextFrame.id - prevFrame.id);
+
+    const frame = {
+      ...prevFrame,
+      id: index,
+      notes: `Interpolated from frames ${prevFrame.id} and ${nextFrame.id}`,
+    };
+
+    if (prevFrame.date && nextFrame.date) {
+      const prevTime = new Date(prevFrame.date).getTime();
+      const nextTime = new Date(nextFrame.date).getTime();
+      frame.date = new Date(
+        prevTime + fraction * (nextTime - prevTime),
+      ).toISOString();
+    }
+
+    if (
+      prevFrame.location &&
+      nextFrame.location &&
+      LocationManager.isValidCoordinates(prevFrame.location) &&
+      LocationManager.isValidCoordinates(nextFrame.location)
+    ) {
+      const prevCoords = LocationManager.parseCoordinates(prevFrame.location);
+      const nextCoords = LocationManager.parseCoordinates(nextFrame.location);
+      frame.location = LocationManager.formatCoordinates(
+        prevCoords.lat + fraction * (nextCoords.lat - prevCoords.lat),
+        prevCoords.lng + fraction * (nextCoords.lng - prevCoords.lng),
+      );
+    }
+
+    return frame;
+  },
+
+  // Find every gap in frame ids within a roll's frames and fill each one in
+  // by calling interpolateFrame with the surrounding existing frames.
+  interpolateFramesInRoll(frames) {
+    const sorted = [...frames].sort((a, b) => a.id - b.id);
+    const newFrames = [];
+
+    for (let i = 0; i < sorted.length - 1; i++) {
+      const prevFrame = sorted[i];
+      const nextFrame = sorted[i + 1];
+
+      for (let id = prevFrame.id + 1; id < nextFrame.id; id++) {
+        newFrames.push(this.interpolateFrame(id, prevFrame, nextFrame));
+      }
+    }
+
+    return newFrames;
+  },
+};
