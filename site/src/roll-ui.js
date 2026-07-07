@@ -180,6 +180,8 @@ const RollActionsModal = {
           return;
 
         newFrames.forEach((frame) => RollManager.addFrame(frame));
+        const framesDesc = newFrames.map((frame) => frame.id).join(", ");
+        confirm(`Created frame(s) ${framesDesc} using interpolation`);
         refreshAllUI();
         this.close();
       });
