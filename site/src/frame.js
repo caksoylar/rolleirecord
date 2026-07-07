@@ -624,16 +624,7 @@ const FrameModal = {
     if (!dateField) return;
 
     const now = new Date();
-
-    const pad = (n) => String(n).padStart(2, "0");
-
-    const year = now.getFullYear();
-    const month = pad(now.getMonth() + 1);
-    const day = pad(now.getDate());
-    const hours = pad(now.getHours());
-    const minutes = pad(now.getMinutes());
-
-    dateField.value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    dateField.value = formatDate(now);
   },
 
   // Handle form submission
@@ -784,9 +775,9 @@ const FrameInterpolator = {
     if (prevFrame.date && nextFrame.date) {
       const prevTime = new Date(prevFrame.date).getTime();
       const nextTime = new Date(nextFrame.date).getTime();
-      frame.date = new Date(
-        prevTime + fraction * (nextTime - prevTime),
-      ).toISOString();
+      frame.date = formatDate(
+        new Date(prevTime + fraction * (nextTime - prevTime)),
+      );
     }
 
     if (

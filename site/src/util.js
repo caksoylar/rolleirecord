@@ -12,6 +12,20 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// Format a date object with the timezone-based representation
+// eslint-disable-next-line no-unused-vars
+function formatDate(date) {
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
 // Format an ISO date string as a short relative label (e.g. "5m ago").
 // eslint-disable-next-line no-unused-vars
 function formatRelativeDate(dateStr) {
