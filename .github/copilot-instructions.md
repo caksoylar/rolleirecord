@@ -53,7 +53,7 @@ The rest of this section is working guidance (gotchas and conventions) that comp
 
 - **`frame.js`** (`FrameModal`) — modal for add/edit of individual frames in the main app (`openAddModal()` / `openEditModal()`).
 - **`entity-editor.html` + `src/entity-editor.js`** — dedicated full-page editor for cameras/films (not a modal), navigated to from the settings page.
-- **`selectors.js`** (`RollFormModal`) — modal for create/edit of rolls.
+- **`roll-ui.js`** (`RollFormModal`) — modal for create/edit of rolls.
 
 CSS is shared across these surfaces, but their JS is entirely separate. Changes to frame add/edit never require touching the entity editor or roll modal, and vice versa.
 

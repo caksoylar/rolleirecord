@@ -12,7 +12,7 @@ Three HTML entry points share the same `src/` directory:
 
 ```
 util.js → config.js → entities.js → rolls.js → table.js →
-selectors.js → export.js → frame.js → app.js
+roll-ui.js → export.js → frame.js → app.js
 ```
 
 **`entity-editor.html` — camera/film editor page**:
@@ -45,7 +45,7 @@ graph LR
     entities["entities.js\nCameraManager · FilmManager · OptionsManager"]
     rolls["rolls.js\nRollManager"]
     table["table.js\nTableRenderer"]
-    selectors["selectors.js\nRollSelector · RollFormModal · refreshAllUI"]
+    roll_ui["roll-ui.js\nRollSelector · RollFormModal · refreshAllUI"]
     export_["export.js\nbuildExifTags · Export"]
     frame["frame.js\nFrameModal · LocationManager"]
     app["app.js\ninit · gear → settings.html"]
@@ -53,7 +53,7 @@ graph LR
     settings["settings.js\nSettingsPage\n(loaded by settings.html)"]
 
     util --> table
-    util --> selectors
+    util --> roll_ui
     util --> frame
     util --> entity_editor
 
@@ -66,35 +66,35 @@ graph LR
     config --> settings
 
     entities --> rolls
-    entities --> selectors
+    entities --> roll_ui
     entities --> frame
     entities --> export_
     entities --> entity_editor
     entities --> settings
 
-    rolls --> selectors
+    rolls --> roll_ui
     rolls --> table
     rolls --> frame
     rolls --> export_
     rolls --> settings
     rolls --> entity_editor
 
-    table --> selectors
+    table --> roll_ui
     table --> app
 
-    selectors --> app
-    selectors --> export_
-    selectors --> frame
+    roll_ui --> app
+    roll_ui --> export_
+    roll_ui --> frame
     export_ --> settings
     frame --> app
 ```
 
 > `util.js` holds pure, dependency-free helpers and is consumed by any page
-> that renders HTML. `refreshAllUI()` now lives in `selectors.js` (it
+> that renders HTML. `refreshAllUI()` now lives in `roll-ui.js` (it
 > orchestrates `RollSelector` + `TableRenderer`), so `table.js` is a pure
 > provider with no forward references.
 > `app.js` no longer owns settings logic — the header gear button simply
-> navigates to `settings.html`. `selectors.js` depends on `export.js` for the
+> navigates to `settings.html`. `roll-ui.js` depends on `export.js` for the
 > roll-import flow (`NewRollModal`'s "Import from file…" button) and for
 > roll/CSV export via `RollActionsModal`.
 > `settings.js` depends on `export.js` for backup export/import.
@@ -285,7 +285,7 @@ A pure provider — depends only on earlier modules (`util`, `config`, `rolls`,
 
 ---
 
-### `selectors.js`
+### `roll-ui.js`
 
 ```mermaid
 classDiagram
@@ -322,11 +322,11 @@ classDiagram
     NewRollModal --> RollPropertyEditModal : opens
 ```
 
-In addition to the singletons above, `selectors.js` defines `refreshAllUI()` —
+In addition to the singletons above, `roll-ui.js` defines `refreshAllUI()` —
 a free function that re-renders both roll-dependent surfaces
 (`RollSelector.render()` + `TableRenderer.render()`). It lives here because it
 orchestrates `RollSelector` and `TableRenderer`, and every caller
-(`selectors.js`, `export.js`, `frame.js`, `app.js`) loads at or after this
+(`roll-ui.js`, `export.js`, `frame.js`, `app.js`) loads at or after this
 point, so no forward references are introduced.
 
 `RollSelector` renders the header dropdown. The dropdown lists rolls plus a
@@ -365,7 +365,7 @@ dims the parent sheet via a `dimmed` class on its `.modal-content`.
 | -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `FrameModal`         | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Public interface via `openAddModal()` / `openEditModal(frameId)` called by the FAB and table row actions. |
 | `LocationManager`    | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings. Generates Google Maps URLs. Used only by the location field flows in this file.                                                                                                         |
-| `FrameInterpolator`  | object singleton | Fills gaps in a roll's frame numbering. `interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `selectors.js`'s `RollActionsModal` interpolate button. |
+| `FrameInterpolator`  | object singleton | Fills gaps in a roll's frame numbering. `interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `roll-ui.js`'s `RollActionsModal` interpolate button. |
 
 `FrameModal` (used inside `index.html`) and `entity-editor.js`'s
 `PropertyEditModal` / `FrameFieldOptionsModal` (used inside

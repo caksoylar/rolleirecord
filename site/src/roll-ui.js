@@ -1,5 +1,5 @@
 // ============================================================================
-// SELECTORS - Roll selector + roll create/edit modal
+// ROLL UI - Roll selector + roll create/edit modal
 // ============================================================================
 
 // Sentinel value used by the roll dropdown's "+ Create new roll" entry

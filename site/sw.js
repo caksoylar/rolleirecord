@@ -1,4 +1,4 @@
-const CACHE_NAME = "rolleirecord-v40";
+const CACHE_NAME = "rolleirecord-v41";
 const ASSETS = [
   "./",
   "./index.html",
@@ -20,7 +20,7 @@ const ASSETS = [
   "./src/export.js",
   "./src/frame.js",
   "./src/rolls.js",
-  "./src/selectors.js",
+  "./src/roll-ui.js",
   "./src/settings.js",
   "./src/table.js",
   "./src/util.js",
