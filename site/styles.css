@@ -445,6 +445,15 @@ tbody tr.clickable:hover {
   font-size: var(--font-size-xxs);
   color: var(--color-text-muted);
   display: flex;
+  justify-content: flex-end;
+  text-align: right;
+  min-width: 0;
+}
+
+.form-hint-row span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 label {
