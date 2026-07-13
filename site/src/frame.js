@@ -760,10 +760,23 @@ const FormValidator = {
 
 // eslint-disable-next-line no-unused-vars
 const FrameInterpolator = {
+  // Calculate distance between two points in km using a simple Euclidean approximation
+  // https://medium.com/mapbox/fast-geodesic-approximations-with-cheap-ruler-106f229ad016
+  _simpleDistance(loc1, loc2) {
+    const dy = (20004 * (loc1.lat - loc2.lat)) / 180;
+    const dx =
+      ((40075 * (loc1.lng - loc2.lng)) / 360) *
+      Math.cos((((loc1.lat + loc2.lat) / 2) * Math.PI) / 180);
+    return Math.sqrt(dx ** 2 + dy ** 2);
+  },
+
   // Interpolate the frame data at `index`, given the nearest logged frames
   // before (`prevFrame`) and after (`nextFrame`) it. `index` is strictly
   // between the indices of prevFrame and nextFrame.
+  // Return null if date or location difference is too large.
   interpolateFrame(index, prevFrame, nextFrame) {
+    const DURATION_LIMIT = 60 * 60 * 1000; // 1 hour, in ms
+    const DISTANCE_LIMIT = 1; // 1 km
     const fraction = (index - prevFrame.id) / (nextFrame.id - prevFrame.id);
 
     const frame = {
@@ -775,6 +788,9 @@ const FrameInterpolator = {
     if (prevFrame.date && nextFrame.date) {
       const prevTime = new Date(prevFrame.date).getTime();
       const nextTime = new Date(nextFrame.date).getTime();
+      if (prevTime > nextTime || nextTime - prevTime > DURATION_LIMIT) {
+        return null;
+      }
       frame.date = formatDate(
         new Date(prevTime + fraction * (nextTime - prevTime)),
       );
@@ -788,6 +804,9 @@ const FrameInterpolator = {
     ) {
       const prevCoords = LocationManager.parseCoordinates(prevFrame.location);
       const nextCoords = LocationManager.parseCoordinates(nextFrame.location);
+      if (this._simpleDistance(prevCoords, nextCoords) > DISTANCE_LIMIT) {
+        return null;
+      }
       frame.location = LocationManager.formatCoordinates(
         prevCoords.lat + fraction * (nextCoords.lat - prevCoords.lat),
         prevCoords.lng + fraction * (nextCoords.lng - prevCoords.lng),
@@ -799,19 +818,26 @@ const FrameInterpolator = {
 
   // Find every gap in frame ids within a roll's frames and fill each one in
   // by calling interpolateFrame with the surrounding existing frames.
+  // Return failed indices separately for reporting.
   interpolateFramesInRoll(frames) {
     const sorted = [...frames].sort((a, b) => a.id - b.id);
     const newFrames = [];
+    const failedIds = [];
 
     for (let i = 0; i < sorted.length - 1; i++) {
       const prevFrame = sorted[i];
       const nextFrame = sorted[i + 1];
 
       for (let id = prevFrame.id + 1; id < nextFrame.id; id++) {
-        newFrames.push(this.interpolateFrame(id, prevFrame, nextFrame));
+        const newFrame = this.interpolateFrame(id, prevFrame, nextFrame);
+        if (newFrame !== null) {
+          newFrames.push(newFrame);
+        } else {
+          failedIds.push(id);
+        }
       }
     }
 
-    return newFrames;
+    return { newFrames, failedIds };
   },
 };
