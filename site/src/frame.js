@@ -298,9 +298,6 @@ const FrameModal = {
           <input type="datetime-local" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
             ${field.readonly ? "readonly" : ""} />
-          <button type="button" id="refresh-date-btn" class="secondary">
-            <svg class="icon"><use href="icons.svg#icon-refresh"></use></svg>
-          </button>
         </div>
       </div>
     `;
@@ -434,16 +431,6 @@ const FrameModal = {
         select.value = select.options[0].value;
       });
     });
-
-    // Date refresh button
-    const refreshDateBtn = document.getElementById("refresh-date-btn");
-    if (refreshDateBtn) {
-      refreshDateBtn.addEventListener("click", async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this._fetchAndSetDate();
-      });
-    }
 
     // Location buttons (edit mode only)
     if (isEditMode) {
