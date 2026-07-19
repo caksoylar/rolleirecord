@@ -125,9 +125,16 @@ function buildExifTags(meta) {
     }
   }
 
-  // Notes → UserComment
-  if (meta.notes) {
-    tags["UserComment"] = meta.notes;
+  // Notes & Filter → UserComment
+  const userComment = [
+    meta.notes,
+    meta.filter && meta.filter !== "None" ? `Filter: ${meta.filter}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  if (userComment) {
+    tags["UserComment"] = userComment;
   }
 
   // Film stock → ImageDescription
