@@ -292,6 +292,7 @@ td {
 th:first-of-type,
 td:first-of-type {
   text-align: right;
+  font-weight: 600;
 }
 
 tr:last-child td {
