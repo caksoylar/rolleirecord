@@ -187,7 +187,7 @@ const RollActionsModal = {
 
         newFrames.forEach((frame) => RollManager.addFrame(frame));
         const framesDesc = newFrames.map((frame) => frame.id).join(", ");
-        confirm(`Filled in frame(s) ${framesDesc} using interpolation.`);
+        alert(`Filled in frame(s) ${framesDesc} using interpolation.`);
         refreshAllUI();
         this.close();
       });
