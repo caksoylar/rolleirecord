@@ -646,6 +646,7 @@ textarea {
 
 .settings-row .row-label .row-title {
   font-weight: 500;
+  font-size: var(--font-size-sm);
 }
 
 .settings-row .row-label .row-sub {
