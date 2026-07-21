@@ -196,7 +196,7 @@ const FrameModal = {
 
     let html = `
       <div class="settings-row form-group">
-        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}</span></label>
         <div class="custom-select-wrap">
           <select id="${inputId}" name="${field.name}" class="row-select" ${required} ${isCustom ? 'style="display:none"' : ""}>
     `;
@@ -237,7 +237,7 @@ const FrameModal = {
       return `
         <div class="settings-row form-group">
           <span class="row-label">
-            <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
+            <span class="row-title">${field.label}</span>
           </span>
           <div class="row-control">
             <input type="text" id="${inputId}" name="${field.name}"
@@ -261,7 +261,7 @@ const FrameModal = {
     return `
       <div class="settings-row form-group">
         <span class="row-label">
-          <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
+          <span class="row-title">${field.label}</span>
         </span>
         <input type="text" id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
@@ -284,7 +284,7 @@ const FrameModal = {
 
     return `
       <div class="settings-row form-group">
-        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}</span></label>
         <div class="row-control">
           <input type="datetime-local" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
@@ -311,7 +311,7 @@ const FrameModal = {
     const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
       <div class="settings-row form-group">
-        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}</span></label>
         <div class="row-control">
           <input type="text" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
@@ -329,7 +329,7 @@ const FrameModal = {
     return `
       <div class="settings-row form-group">
         <span class="row-label">
-          <span class="row-title">${field.label}${field.required ? " *" : ""}</span>
+          <span class="row-title">${field.label}</span>
         </span>
         <div class="row-control">
           <input type="number" id="${inputId}" name="${field.name}"
@@ -349,7 +349,7 @@ const FrameModal = {
     const value = rowData ? (rowData[field.name] ?? "") : "";
     return `
       <div class="settings-row form-group">
-        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}${field.required ? " *" : ""}</span></label>
+        <label for="${inputId}" class="row-label"><span class="row-title">${field.label}</span></label>
         <input type="${field.type === "number" ? "number" : "text"}"
           id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
