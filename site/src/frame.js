@@ -70,7 +70,7 @@ const LocationManager = {
       return null;
     }
     const cleaned = coordString.replace(/\s+/g, "");
-    const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${cleaned.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=12`;
+    const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${cleaned.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=16`;
     return fetch(apiUrl).then((res) => res.json());
   },
 
