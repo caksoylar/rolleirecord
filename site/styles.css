@@ -478,10 +478,9 @@ textarea {
   width: fit-content;
 }
 
-.modal-body
-input,
-select,
-textarea {
+.modal-body input,
+.modal-body select,
+.modal-body textarea {
   width: 100%;
 }
 

@@ -83,7 +83,6 @@ const LocationManager = {
     if (located.length === 0) return null;
     const rows = located.map((f, i) => {
       const { lat, lng } = this.parseCoordinates(f.location);
-      const fraction = located.length > 1 ? i / (located.length - 1) : 0;
       return `Frame ${f.id},${this.formatCoordinates(lat, lng)}`;
     });
     const csv = ["name,latitude,longitude", ...rows].join("\n");
