@@ -83,13 +83,16 @@ const RollManager = {
     const rolls = this.getRolls();
     const rollId = this.getNextRollId();
     const now = new Date().toISOString();
+    const film = data.film || FilmManager.getAll()[0]?.name || "";
+    const boxSpeed = FilmManager.getByName(film)?.iso ?? null;
 
     const newRoll = {
       id: rollId,
       name: data.name,
       frameCount: data.frameCount ?? this.DEFAULT_FRAME_COUNT,
       camera: data.camera || CameraManager.getAll()[0]?.name || "",
-      film: data.film || FilmManager.getAll()[0]?.name || "",
+      film,
+      ei: data.ei ?? boxSpeed,
       status: data.status || "Loaded",
       notes: data.notes || "",
       frames: data.frames || [],

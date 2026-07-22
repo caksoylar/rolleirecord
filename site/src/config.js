@@ -177,6 +177,12 @@ const ROLL_FIELDS = [
     required: true,
     optionsFrom: "films",
   },
+  {
+    name: "ei",
+    label: "Exposure Index (EI)",
+    type: "number",
+    required: true,
+  },
   { name: "frameCount", label: "Frame Count", type: "number" },
   { name: "status", label: "Status", type: "select", options: ROLL_STATUSES },
   { name: "notes", label: "Notes", type: "textarea" },

@@ -147,12 +147,13 @@ function buildExifTags(meta) {
 
 // eslint-disable-next-line no-unused-vars
 const Export = {
-  // Build clean frame data for CSV export (flat rows with camera/film/iso)
+  // Build clean frame data for CSV export (flat rows with camera, film, and EI)
   _getFrameData() {
     const rows = RollManager.getFrames();
+    const roll = RollManager.getCurrentRoll();
     const camera = RollManager.getCurrentCamera();
     const film = RollManager.getCurrentFilm();
-    const iso = FilmManager.getByName(film)?.iso ?? "";
+    const ei = roll?.ei ?? FilmManager.getByName(film)?.iso ?? "";
 
     return rows.map((row) => {
       const clean = Object.fromEntries(
@@ -160,7 +161,7 @@ const Export = {
       );
       clean.camera = camera;
       clean.film = film;
-      clean.iso = iso;
+      clean.iso = ei;
       return clean;
     });
   },
@@ -301,6 +302,7 @@ const Export = {
     const data = {
       name: roll.name,
       frameCount: roll.frameCount ?? null,
+      ei: roll.ei ?? FilmManager.getByName(filmName)?.iso ?? null,
       status: roll.status || "Loaded",
       notes: roll.notes || "",
       camera: this._cleanEntity(CameraManager.getByName(cameraName)),
@@ -350,6 +352,7 @@ const Export = {
       const newRoll = RollManager.createRoll({
         name: rollName,
         frameCount: data.frameCount,
+        ei: data.ei,
         status: data.status,
         notes: data.notes || "",
         camera: cameraName,

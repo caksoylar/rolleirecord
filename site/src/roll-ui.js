@@ -282,6 +282,9 @@ const NewRollModal = {
         btn.dataset.field,
         { ...this._stagingData },
         (field, value) => {
+          if (field.name === "film") {
+            this._stagingData.ei = FilmManager.getByName(value)?.iso ?? null;
+          }
           this._stagingData[field.name] = value;
           this.renderProperties();
         },
@@ -313,6 +316,7 @@ const NewRollModal = {
       name: "",
       camera: RollManager.getCurrentCamera(),
       film: RollManager.getCurrentFilm(),
+      ei: FilmManager.getByName(RollManager.getCurrentFilm())?.iso ?? null,
       frameCount: DEFAULT_FRAME_COUNT,
       status: ROLL_STATUSES[0],
       notes: "",

@@ -110,6 +110,7 @@ erDiagram
         string name
         string camera FK
         string film FK
+        int ei
         string status
         int frameCount
         string notes
@@ -159,6 +160,10 @@ erDiagram
 > `OptionsManager`'s storage keys via `renameEntityKeys`, but does **not**
 > currently cascade to existing rolls. Roll references continue to point at
 > the old name until manually updated via the Roll edit modal.
+>
+> Each roll stores its exposure index (`ei`) separately from its film's box
+> speed (`film.iso`). New rolls default EI to the selected film's box speed;
+> CSV/ExifTool exports use the roll EI for their ISO metadata.
 
 ---
 
