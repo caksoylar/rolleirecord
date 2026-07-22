@@ -411,6 +411,7 @@ not a flat frame array:
 {
   "name": "Roll Name",
   "frameCount": 36,
+  "status": "Loaded",
   "notes": "",
   "camera": { "name": "...", "format": "...", "size": "...", "hidden-fields": [] },
   "film": { "name": "...", "iso": 400 },

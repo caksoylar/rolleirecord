@@ -301,6 +301,7 @@ const Export = {
     const data = {
       name: roll.name,
       frameCount: roll.frameCount ?? null,
+      status: roll.status || "Loaded",
       notes: roll.notes || "",
       camera: this._cleanEntity(CameraManager.getByName(cameraName)),
       film: this._cleanEntity(FilmManager.getByName(filmName)),
@@ -349,6 +350,7 @@ const Export = {
       const newRoll = RollManager.createRoll({
         name: rollName,
         frameCount: data.frameCount,
+        status: data.status,
         notes: data.notes || "",
         camera: cameraName,
         film: filmName,
