@@ -8,6 +8,8 @@
 const LocationManager = {
   PROVIDER_KEY: "maps-provider",
   RGC_KEY: "rgc-enabled",
+  RGC_CACHE_KEY: "reverse-geocode-cache-v1",
+  RGC_CACHE_MAX_ENTRIES: 1000,
   PRECISION: 5,
 
   getLocation() {
@@ -65,13 +67,55 @@ const LocationManager = {
     );
   },
 
+  _getReverseGeocodeCache() {
+    const stored = localStorage.getItem(this.RGC_CACHE_KEY);
+    if (!stored) return {};
+
+    const cache = JSON.parse(stored);
+    return cache && typeof cache === "object" && !Array.isArray(cache)
+      ? cache
+      : {};
+  },
+
+  _saveReverseGeocodeCache(cache) {
+    const keys = Object.keys(cache);
+    const excess = keys.length - this.RGC_CACHE_MAX_ENTRIES;
+    if (excess > 0) {
+      keys.slice(0, excess).forEach((key) => delete cache[key]);
+    }
+    localStorage.setItem(this.RGC_CACHE_KEY, JSON.stringify(cache));
+  },
+
   getReverseGeocode(coordString) {
+    if (!this.isValidCoordinates(coordString)) {
+      return null;
+    }
+    const { lat, lng } = this.parseCoordinates(coordString);
+    const key = this.formatCoordinates(lat, lng);
+    const cache = this._getReverseGeocodeCache();
+    if (cache[key]) {
+      return cache[key];
+    }
     if (localStorage.getItem(this.RGC_KEY) !== "true" || !navigator.onLine) {
       return null;
     }
-    const cleaned = coordString.replace(/\s+/g, "");
-    const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${cleaned.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=16`;
-    return fetch(apiUrl).then((res) => res.json());
+
+    const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${key.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=16`;
+    return fetch(apiUrl)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Reverse geocode request failed: ${res.status}`);
+        }
+        return res.json();
+      })
+      .then((data) => {
+        const displayName = data?.display_name;
+        if (!displayName) return null;
+
+        cache[key] = displayName;
+        this._saveReverseGeocodeCache(cache);
+        return displayName;
+      });
   },
 
   // Build an anonymous uMap URL that preloads a marker per frame with valid
@@ -81,7 +125,7 @@ const LocationManager = {
       .filter((f) => f.location && this.isValidCoordinates(f.location))
       .sort((a, b) => Number(a.id) - Number(b.id));
     if (located.length === 0) return null;
-    const rows = located.map((f, i) => {
+    const rows = located.map((f, _) => {
       const { lat, lng } = this.parseCoordinates(f.location);
       return `Frame ${f.id},${this.formatCoordinates(lat, lng)}`;
     });
@@ -537,11 +581,16 @@ const FrameModal = {
       this._setHintText(hintEl, "");
       return;
     }
+    // Cached results are returned immediately; network lookups return a Promise.
+    if (typeof lookup === "string") {
+      this._setHintText(hintEl, lookup);
+      return;
+    }
 
     this._setHintText(hintEl, "Looking up location\u2026");
     try {
-      const data = await lookup;
-      this._setHintText(hintEl, data?.display_name ?? "");
+      const displayName = await lookup;
+      this._setHintText(hintEl, displayName ?? "");
     } catch (error) {
       this._setHintText(hintEl, "");
       console.error("Reverse geocode error:", error);
