@@ -12,6 +12,46 @@ const LocationManager = {
   RGC_CACHE_MAX_ENTRIES: 1000,
   PRECISION: 5,
 
+  /**
+   * Serializes cache-miss reverse-geocoding work and waits one second after
+   * each task settles before allowing the next one to start. The lock is
+   * released after failures as well as successful tasks.
+   *
+   * @param {() => Promise<string | null>} task
+   * @returns {Promise<string | null>}
+   */
+  _queueReverseGeocode: (() => {
+    // Starts unlocked so the first request can proceed immediately.
+    let lock = Promise.resolve();
+    // Nominatim permits at most one request per second.
+    const delayMs = 1000;
+
+    return async (task) => {
+      // Wait only for requests queued before this one.
+      const previousLock = lock;
+      // Receives the resolver for this request's lock.
+      let release;
+
+      // Make later callers wait until this request releases its lock.
+      lock = new Promise((resolve) => {
+        release = resolve;
+      });
+
+      // Acquire the mutex after the preceding request releases it.
+      await previousLock;
+
+      try {
+        // Run the cache check, request, and cache update while holding the mutex.
+        return await task();
+      } finally {
+        // Keep the mutex after failures too, preserving the request interval.
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        // Allow the next queued request to acquire the mutex.
+        release();
+      }
+    };
+  })(),
+
   getLocation() {
     return new Promise((resolve, reject) => {
       if (!navigator.geolocation) {
@@ -101,21 +141,26 @@ const LocationManager = {
     }
 
     const apiUrl = `https://nominatim.openstreetmap.org/reverse?lat=${key.replace(",", "&lon=")}&format=json&addressdetails=0&zoom=16`;
-    return fetch(apiUrl)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`Reverse geocode request failed: ${res.status}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        const displayName = data?.display_name;
-        if (!displayName) return null;
+    return this._queueReverseGeocode(async () => {
+      // A preceding queued request may have populated this key.
+      const latestCache = this._getReverseGeocodeCache();
+      if (latestCache[key]) {
+        return latestCache[key];
+      }
 
-        cache[key] = displayName;
-        this._saveReverseGeocodeCache(cache);
-        return displayName;
-      });
+      const response = await fetch(apiUrl);
+      if (!response.ok) {
+        throw new Error(`Reverse geocode request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const displayName = data?.display_name;
+      if (!displayName) return null;
+
+      latestCache[key] = displayName;
+      this._saveReverseGeocodeCache(latestCache);
+      return displayName;
+    });
   },
 
   // Build an anonymous uMap URL that preloads a marker per frame with valid
