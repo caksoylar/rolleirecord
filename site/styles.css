@@ -136,12 +136,8 @@ h1 {
 }
 
 #updateBanner {
-  background-color: var(--color-accent);
-  color: var(--color-btn-text);
   text-align: center;
   padding: 0.5rem;
-  font-size: var(--font-size-sm);
-  cursor: pointer;
   border-radius: var(--radius-lg);
   margin-bottom: 0.5rem;
 }
@@ -156,9 +152,7 @@ header {
 header button {
   padding: 0.5rem;
   background: none;
-  border: none;
   color: var(--color-text);
-  cursor: pointer;
 }
 
 /* Selector Bars */
@@ -414,7 +408,6 @@ button.secondary {
   max-width: 600px;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   padding: 1.25rem;
-  margin-top: auto;
   max-height: 95dvh;
   overflow-y: auto;
 }
@@ -434,7 +427,6 @@ button.secondary {
 
 .modal-header h2 {
   font-size: var(--font-size-lg);
-  margin: 0;
 }
 
 .modal-body {
@@ -443,25 +435,6 @@ button.secondary {
   grid-template-columns: max-content 1fr;
   gap: 0.35rem;
   align-items: center;
-}
-
-.settings-section {
-  margin-bottom: 1rem;
-}
-
-.settings-section h3 {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--color-text-secondary);
-  margin-bottom: 0.5rem;
-}
-
-.settings-caption {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
-  margin-bottom: 0.5rem;
 }
 
 .form-group {
@@ -516,10 +489,6 @@ textarea {
   width: 100%;
 }
 
-input[type="checkbox"] {
-  height: 1.25rem;
-}
-
 input:not([type="checkbox"]),
 select {
   -webkit-appearance: none;
@@ -568,10 +537,6 @@ textarea {
   color: var(--color-text-muted);
 }
 
-.empty-state p {
-  font-size: var(--font-size-base);
-}
-
 .accuracy-hint,
 .geocode-hint,
 .id-validation-hint {
@@ -590,21 +555,6 @@ textarea {
   text-decoration: none;
   margin-right: 0.5rem;
   font-weight: 600;
-}
-
-.settings-section {
-  margin-bottom: 1.5rem;
-}
-
-.section-heading {
-  font-size: var(--font-size-lg);
-  margin: 0 0 0.5rem 0;
-}
-
-.section-caption {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  margin: 0 0 0.75rem 0;
 }
 
 /* Settings list-row pattern (grouped, tappable rows) */
@@ -694,7 +644,6 @@ textarea {
 /* Native select sitting at the right edge of a settings row */
 .settings-row .row-select {
   width: fit-content;
-  min-height: 0;
   padding: 0.4rem 2rem 0.4rem 0.6rem;
   background-color: var(--color-surface-alt);
   font-size: var(--font-size-sm);
@@ -723,12 +672,10 @@ textarea {
 
 /* Inline input field on the right side of a settings row */
 .settings-row input {
-  min-height: 0;
   padding: 0.4rem 0.6rem;
   background-color: var(--color-surface-alt);
   font-size: var(--font-size-sm);
   min-width: 2.5rem;
-  flex-shrink: 1;
 }
 
 /* Right-side container for input + action buttons */
@@ -748,13 +695,6 @@ textarea {
   justify-content: flex-end;
 }
 
-.settings-row .row-control input {
-  /* Filled inputs shrink instead of forcing the row to wrap */
-  flex: 0 1 auto;
-  width: fit-content;
-  min-width: 2.5rem;
-}
-
 .settings-row .row-control .danger {
   color: var(--color-danger);
 }
@@ -762,14 +702,6 @@ textarea {
 /* Right-side position for custom-select wrapper */
 .settings-row .custom-select-wrap {
   flex: 0 0 auto;
-}
-
-/* Compact custom-value input in settings-row context */
-.settings-row .custom-value-input {
-  min-height: 0;
-  padding: 0.4rem 0.6rem;
-  font-size: var(--font-size-sm);
-  width: fit-content;
 }
 
 /* Compact action buttons inside settings-row controls */
@@ -784,7 +716,6 @@ textarea {
 /* Field option editor input boxes */
 .settings-row .option-input {
   flex: 1 0 auto;
-  max-width: unset;
 }
 
 .move-option-btn:disabled {
