@@ -14,11 +14,11 @@ const RollManager = {
     const rolls = this.getRolls();
 
     // Ensure current roll is set if rolls exist, cleared if not
-    const currentRollId = this.getCurrentRollId();
+    const currentRollId = this._getCurrentRollId();
     if (rolls.length === 0) {
       localStorage.removeItem(this.CURRENT_ROLL_KEY);
     } else if (!currentRollId || !rolls.find((r) => r.id === currentRollId)) {
-      this.setCurrentRollId(rolls[0].id);
+      this._setCurrentRollId(rolls[0].id);
     }
   },
 
@@ -29,22 +29,22 @@ const RollManager = {
   },
 
   // Save all rolls
-  saveRolls(rolls) {
+  _saveRolls(rolls) {
     localStorage.setItem(this.ROLLS_KEY, JSON.stringify(rolls));
   },
 
   // Get current roll ID
-  getCurrentRollId() {
+  _getCurrentRollId() {
     return localStorage.getItem(this.CURRENT_ROLL_KEY);
   },
 
   // Set current roll ID
-  setCurrentRollId(rollId) {
+  _setCurrentRollId(rollId) {
     localStorage.setItem(this.CURRENT_ROLL_KEY, rollId);
   },
 
   // Get next roll ID
-  getNextRollId() {
+  _getNextRollId() {
     let counter = localStorage.getItem(this.ROLL_ID_COUNTER_KEY);
     counter = counter ? parseInt(counter, 10) + 1 : 1;
     localStorage.setItem(this.ROLL_ID_COUNTER_KEY, counter.toString());
@@ -52,16 +52,16 @@ const RollManager = {
   },
 
   // Get roll by ID
-  getRollById(rollId) {
+  _getRollById(rollId) {
     const rolls = this.getRolls();
     return rolls.find((r) => r.id === rollId) || null;
   },
 
   // Get current roll
   getCurrentRoll() {
-    const currentId = this.getCurrentRollId();
+    const currentId = this._getCurrentRollId();
     if (!currentId) return null;
-    return this.getRollById(currentId);
+    return this._getRollById(currentId);
   },
 
   // Get the camera name for the current roll, falling back to the first
@@ -81,7 +81,7 @@ const RollManager = {
   // Create new roll from a data object
   createRoll(data) {
     const rolls = this.getRolls();
-    const rollId = this.getNextRollId();
+    const rollId = this._getNextRollId();
     const now = new Date().toISOString();
     const film = data.film || FilmManager.getAll()[0]?.name || "";
     const boxSpeed = FilmManager.getByName(film)?.iso ?? null;
@@ -101,11 +101,11 @@ const RollManager = {
     };
 
     rolls.push(newRoll);
-    this.saveRolls(rolls);
+    this._saveRolls(rolls);
 
     // Set as current roll if it's the first one
     if (rolls.length === 1) {
-      this.setCurrentRollId(rollId);
+      this._setCurrentRollId(rollId);
     }
 
     return newRoll;
@@ -117,12 +117,12 @@ const RollManager = {
 
     const filtered = rolls.filter((r) => r.id !== rollId);
     if (filtered.length === rolls.length) return false;
-    this.saveRolls(filtered);
+    this._saveRolls(filtered);
 
     // If deleted roll was current, switch to first remaining or clear
-    if (this.getCurrentRollId() === rollId) {
+    if (this._getCurrentRollId() === rollId) {
       if (filtered.length > 0) {
-        this.setCurrentRollId(filtered[0].id);
+        this._setCurrentRollId(filtered[0].id);
       } else {
         localStorage.removeItem(this.CURRENT_ROLL_KEY);
       }
@@ -132,7 +132,7 @@ const RollManager = {
   },
 
   // Rename roll
-  renameRoll(rollId, newName) {
+  _renameRoll(rollId, newName) {
     return this.updateRoll(rollId, { name: newName });
   },
 
@@ -144,7 +144,7 @@ const RollManager = {
     if (roll) {
       Object.assign(roll, rollData);
       roll.updatedAt = new Date().toISOString();
-      this.saveRolls(rolls);
+      this._saveRolls(rolls);
     }
 
     return roll || null;
@@ -152,9 +152,9 @@ const RollManager = {
 
   // Set current roll
   setCurrentRoll(rollId) {
-    const roll = this.getRollById(rollId);
+    const roll = this._getRollById(rollId);
     if (roll) {
-      this.setCurrentRollId(rollId);
+      this._setCurrentRollId(rollId);
     }
     return roll || null;
   },

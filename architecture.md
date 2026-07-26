@@ -185,7 +185,7 @@ module can use them.
 
 | Export                | Kind  | Purpose                                                                                                                                                                |
 | --------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FRAME_SCHEMA`        | const | Schema for frame fields — drives form rendering, table columns, validation, export                                                                                     |
+| `FRAME_SCHEMA`        | const | Schema for frame fields — drives form rendering, card exposure details (`in_card`), validation, and export                                                            |
 | `CAMERA_SCHEMA`       | const | Schema for camera entity forms                                                                                                                                         |
 | `FILM_SCHEMA`         | const | Schema for film entity forms                                                                                                                                           |
 | `ROLL_FIELDS`         | const | Schema for roll fields (name, camera, film, frameCount, status, notes) — drives the roll actions modal property editor and new-roll staging form                       |
@@ -215,13 +215,15 @@ classDiagram
         +update(id, data) object
         +delete(id) bool
         +upsertByName(data) object
-        +getDisplayName(id) string
         +getEntitySpecificFrameFields() array
         +getHiddenFields(name) array
         +isFieldHidden(field, name) bool
         +toggleHiddenField(field, name)
-        -saveAll(items)
-        -getNextId() string
+        -_getSeededNames() array
+        -_setSeededNames(names)
+        -_saveAll(items)
+        -_getNextId() string
+        -_getDisplayName(id) string
     }
 
     class CameraManager {
@@ -289,6 +291,13 @@ It depends on the earlier `config`, `rolls`, and `entities` modules, and uses
 `LocationManager` at render time to resolve location labels. Rendering occurs
 after `frame.js` has loaded, so that lookup introduces no load-order dependency.
 
+Private helpers select the active camera's non-hidden `FRAME_SCHEMA` fields
+marked `in_card`, render their header/label and value as the left-side exposure
+summary, and sort frames by descending ID before creating the card list. Date
+values are locale-formatted, and missing date/location values use explicit
+unavailable labels. Reverse geocoding returns the coordinate string while an
+asynchronous lookup is pending, then re-renders once a label is available.
+
 ---
 
 ### `roll-ui.js`
@@ -306,21 +315,21 @@ classDiagram
         -_mandatory
         +init()
         +open(opts)
-        +close()
-        +renderProperties()
+        -_close()
+        -_renderProperties()
     }
     class RollActionsModal {
         <<singleton>>
         +init()
         +open()
-        +close()
-        +renderProperties()
+        -_close()
+        -_renderProperties()
     }
     class RollPropertyEditModal {
         <<singleton>>
         +init()
         +open(fieldName, data, onSaved)
-        +close()
+        -_close()
     }
 
     RollSelector --> NewRollModal : opens
@@ -371,7 +380,7 @@ dims the parent sheet via a `dimmed` class on its `.modal-content`.
 | -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `FrameModal`         | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Public interface via `openAddModal()` / `openEditModal(frameId)` called by the FAB and table row actions. |
 | `LocationManager`    | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings; generates Maps URLs; and reverse-geocodes locations through Nominatim (results cached in localStorage up to 1,000 entries). |
-| `FrameInterpolator`  | object singleton | Fills gaps in a roll's frame numbering. `interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `roll-ui.js`'s `RollActionsModal` interpolate button. |
+| `FrameInterpolator`  | object singleton | Fills gaps in a roll's frame numbering. Private `_interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). Public `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `roll-ui.js`'s `RollActionsModal` interpolate button. |
 
 `FrameModal` (used inside `index.html`) and `entity-editor.js`'s
 `PropertyEditModal` / `FrameFieldOptionsModal` (used inside
@@ -402,7 +411,7 @@ and `/entity-editor.html?type=film`.
 
 | Export                | Kind             | Purpose                                                                                                                                                                                                                                                                |
 | --------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `buildExifTags(meta)` | function         | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. Private to this module. |
+| `_buildExifTags(meta)` | function         | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. Private to this module. |
 | `Export`              | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
 Loaded on **both** `index.html` and `settings.html`. On the main page,
@@ -456,9 +465,9 @@ button at `settings.html`. It no longer owns any settings/export logic.
 ```mermaid
 flowchart TD
     schema["FRAME_SCHEMA.fields"]
-    form["FrameModal\nrenderFormFields()"]
-    table["TableRenderer\nrenderHeaders() / renderRows()"]
-    export_["Export\n_coerceFrames() / buildExifTags()"]
+    form["FrameModal\n_renderFormFields()"]
+    table["TableRenderer\n_renderFrames()"]
+    export_["Export\n_coerceFrames() / _buildExifTags()"]
     options["entity-editor.js\nFrameFieldOptionsModal"]
     hidden["EntityManager\nhidden-fields[]"]
 
@@ -472,8 +481,8 @@ flowchart TD
     hidden -->|"filters columns"| table
 ```
 
-- Fields with `column_width` + `header` → appear as table columns
-- Fields with `hideable: true` → can be toggled per-entity via `hidden-fields`
+- Fields with `in_card: true` → appear in the frame card exposure summary
+- Entity-specific fields can be toggled per-entity via `hidden-fields`
 - Fields with `entity_specific: "<type>"` → option lists are stored per-entity-of-that-type in `OptionsManager`
 - Fields with `custom_value: true` → allow typing a value not in the option list
 - Field `type` drives input rendering, type coercion on save, and EXIF tag mapping

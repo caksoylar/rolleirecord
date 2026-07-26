@@ -5,7 +5,7 @@
 // eslint-disable-next-line no-unused-vars
 const TableRenderer = {
   // Preserve the camera-aware field visibility used by the compact table.
-  getVisibleFields() {
+  _getVisibleFields() {
     const camera = RollManager.getCurrentCamera();
     return FRAME_SCHEMA.fields.filter(
       (field) =>
@@ -13,14 +13,14 @@ const TableRenderer = {
     );
   },
 
-  getExposureDetails(row) {
-    return this.getVisibleFields()
+  _getExposureDetails(row) {
+    return this._getVisibleFields()
       .filter((field) => row[field.name])
       .map((field) => `${field.header || field.label} ${row[field.name]}`)
       .join(" · ");
   },
 
-  formatDate(value) {
+  _formatDate(value) {
     if (!value) return "Date unavailable";
     const date = new Date(value);
     if (isNaN(date.getTime())) return value;
@@ -30,7 +30,7 @@ const TableRenderer = {
     });
   },
 
-  getLocationLabel(location) {
+  _getLocationLabel(location) {
     if (!location) return "Location unavailable";
 
     const lookup = LocationManager.getReverseGeocode(location);
@@ -47,9 +47,9 @@ const TableRenderer = {
     return lookup || location;
   },
 
-  renderFrameRow(row) {
-    const exposure = this.getExposureDetails(row);
-    const location = this.getLocationLabel(row.location);
+  _renderFrameRow(row) {
+    const exposure = this._getExposureDetails(row);
+    const location = this._getLocationLabel(row.location);
     const notes = row.notes
       ? `<span class="frame-row-notes">"${escapeHtml(String(row.notes))}"</span>`
       : "";
@@ -70,18 +70,18 @@ const TableRenderer = {
           ${notes}
         </span>
         <span class="frame-row-right">
-          <span class="frame-row-date">${escapeHtml(this.formatDate(row.date))}</span>
+          <span class="frame-row-date">${escapeHtml(this._formatDate(row.date))}</span>
           <span class="frame-row-location">${escapeHtml(location)}</span>
         </span>
       </button>`;
   },
 
   // Render all frames newest first.
-  renderFrames() {
+  _renderFrames() {
     const rows = RollManager.getFrames();
     return `<div class="frame-list">${rows
       .toSorted((r1, r2) => r2.id - r1.id)
-      .map((row) => this.renderFrameRow(row))
+      .map((row) => this._renderFrameRow(row))
       .join("")}</div>`;
   },
 
@@ -93,7 +93,7 @@ const TableRenderer = {
       container.innerHTML =
         '<div class="empty-state"><p>No rolls yet</p><p>Create a new roll to get started</p></div>';
     } else {
-      container.innerHTML = this.renderFrames();
+      container.innerHTML = this._renderFrames();
     }
 
     const addFab = document.getElementById("addFrameFab");

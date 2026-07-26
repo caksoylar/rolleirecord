@@ -208,16 +208,16 @@ const FrameModal = {
     // Cancel button
     this.element
       .querySelector(".cancel-btn")
-      .addEventListener("click", () => this.close());
+      .addEventListener("click", () => this._close());
 
     // Close on click outside
     this.element.addEventListener("click", (e) => {
-      if (e.target === this.element) this.close();
+      if (e.target === this.element) this._close();
     });
   },
 
   // Render form fields based on schema
-  renderFormFields(rowData = null, isEditMode = false) {
+  _renderFormFields(rowData = null, isEditMode = false) {
     const camera = RollManager.getCurrentCamera();
     let html = "";
 
@@ -547,7 +547,7 @@ const FrameModal = {
       deleteBtn.onclick = () => {
         if (confirm("Are you sure you want to delete this frame?")) {
           RollManager.deleteFrame(rowData.id);
-          this.close();
+          this._close();
           refreshAllUI();
         }
       };
@@ -563,31 +563,31 @@ const FrameModal = {
     }
   },
 
-  open(mode = "add", rowId = null) {
+  _open(mode = "add", rowId = null) {
     this.mode = mode;
     this.currentRowId = mode === "add" ? null : rowId;
 
     if (mode === "add") {
       this.titleElement.textContent = "Add Frame";
       const refData = RollManager.getFrameById(rowId);
-      this.renderFormFields(refData, false);
+      this._renderFormFields(refData, false);
     } else {
       this.titleElement.textContent = "Edit Frame";
       const rowData = RollManager.getFrameById(rowId);
-      this.renderFormFields(rowData, true);
+      this._renderFormFields(rowData, true);
     }
 
     this.element.classList.add("active");
   },
 
-  close() {
+  _close() {
     this.element.classList.remove("active");
   },
 
   // Public entry point: open the add modal and auto-populate id, location, date
   async openAddModal() {
     const lastId = RollManager.getLastFrameId();
-    this.open("add", lastId);
+    this._open("add", lastId);
     const suggestedId = RollManager.getNextSuggestedFrameId();
     document.getElementById("field-id").value = suggestedId;
 
@@ -598,7 +598,7 @@ const FrameModal = {
 
   // Public entry point: open the edit modal for given row id
   openEditModal(rowId) {
-    FrameModal.open("edit", rowId);
+    FrameModal._open("edit", rowId);
   },
 
   // Set a hint span's text and show/hide its enclosing row based on emptiness
@@ -702,9 +702,9 @@ const FrameModal = {
   _submitForm(event) {
     event.preventDefault();
 
-    const formData = FormValidator.getFormData();
+    const formData = FormValidator._getFormData();
     const excludeId = this.mode === "edit" ? this.currentRowId : null;
-    const validation = FormValidator.validate(formData, excludeId);
+    const validation = FormValidator._validate(formData, excludeId);
 
     if (!validation.valid) {
       alert("Validation errors:\n" + validation.errors.join("\n"));
@@ -717,7 +717,7 @@ const FrameModal = {
       RollManager.updateFrame(this.currentRowId, formData);
     }
 
-    this.close();
+    this._close();
     refreshAllUI();
   },
 };
@@ -727,7 +727,7 @@ const FrameModal = {
 // ============================================================================
 
 const FormValidator = {
-  getFormData() {
+  _getFormData() {
     const formData = {};
     const camera = RollManager.getCurrentCamera();
 
@@ -768,7 +768,7 @@ const FormValidator = {
     return formData;
   },
 
-  validate(formData, excludeId = null) {
+  _validate(formData, excludeId = null) {
     const errors = [];
 
     // Check required fields
@@ -845,7 +845,7 @@ const FrameInterpolator = {
   // before (`prevFrame`) and after (`nextFrame`) it. `index` is strictly
   // between the indices of prevFrame and nextFrame.
   // Return null if date or location difference is too large.
-  interpolateFrame(index, prevFrame, nextFrame) {
+  _interpolateFrame(index, prevFrame, nextFrame) {
     const DURATION_LIMIT = 60 * 60 * 1000; // 1 hour, in ms
     const DISTANCE_LIMIT = 1; // 1 km
     const fraction = (index - prevFrame.id) / (nextFrame.id - prevFrame.id);
@@ -888,7 +888,7 @@ const FrameInterpolator = {
   },
 
   // Find every gap in frame ids within a roll's frames and fill each one in
-  // by calling interpolateFrame with the surrounding existing frames.
+  // by calling _interpolateFrame with the surrounding existing frames.
   // Return failed indices separately for reporting.
   interpolateFramesInRoll(frames) {
     const sorted = [...frames].sort((a, b) => a.id - b.id);
@@ -900,7 +900,7 @@ const FrameInterpolator = {
       const nextFrame = sorted[i + 1];
 
       for (let id = prevFrame.id + 1; id < nextFrame.id; id++) {
-        const newFrame = this.interpolateFrame(id, prevFrame, nextFrame);
+        const newFrame = this._interpolateFrame(id, prevFrame, nextFrame);
         if (newFrame !== null) {
           newFrames.push(newFrame);
         } else {

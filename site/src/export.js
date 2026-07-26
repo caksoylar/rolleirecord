@@ -3,7 +3,7 @@
 // ============================================================================
 
 // Convert app metadata fields to exiftool tag names.
-function buildExifTags(meta) {
+function _buildExifTags(meta) {
   const frameId = String(meta.id).padStart(2, "0");
   const tags = { SourceFile: `frame_${frameId}.jpg` };
 
@@ -367,7 +367,7 @@ const Export = {
 
   exportToExiftoolCSV() {
     const data = this._getFrameData().sort((f1, f2) => f1.id - f2.id);
-    const exif = data.map(buildExifTags);
+    const exif = data.map(_buildExifTags);
 
     const keys = [...new Set(exif.flatMap((obj) => Object.keys(obj)))];
 

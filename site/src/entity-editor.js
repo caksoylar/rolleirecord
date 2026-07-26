@@ -13,40 +13,40 @@
 let currentEntityId = null;
 
 // Read entity type from URL, default to "camera"
-function getEntityType() {
+function _getEntityType() {
   const params = new URLSearchParams(window.location.search);
   const type = params.get("type") || "camera";
   return type;
 }
 
 // Read entity name from URL, default to null
-function getEntityName() {
+function _getEntityName() {
   const params = new URLSearchParams(window.location.search);
   const name = params.get("name");
   return name;
 }
 
 // Returns the EntityManager for the current type, or null if invalid.
-function getManager() {
-  return EntityManagers[getEntityType()] || null;
+function _getManager() {
+  return EntityManagers[_getEntityType()] || null;
 }
 
-function capitalize(s) {
+function _capitalize(s) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
 // Rolls reference cameras/films by name string. The entity type identifier
 // ("camera" / "film") matches the roll field name, so we can look up
 // referencing rolls directly.
-function rollsReferencing(entityName) {
+function _rollsReferencing(entityName) {
   return RollManager.getRolls().filter(
-    (roll) => roll[getEntityType()] === entityName,
+    (roll) => roll[_getEntityType()] === entityName,
   );
 }
 
 // Cascade a name change to every roll that references the entity by its old name.
-function cascadeRenameOnRolls(oldName, newName) {
-  const field = getEntityType();
+function _cascadeRenameOnRolls(oldName, newName) {
+  const field = _getEntityType();
   RollManager.getRolls().forEach((roll) => {
     if (roll[field] === oldName) {
       RollManager.updateRoll(roll.id, { [field]: newName });
@@ -66,9 +66,9 @@ const EntityEditorSelector = {
 
   init() {
     this.containerEl = document.getElementById("entitySelectorContainer");
-    const type = getEntityType();
+    const type = _getEntityType();
     this.containerEl.innerHTML = `
-      <label title="Select ${capitalize(type)}">
+      <label title="Select ${_capitalize(type)}">
         <svg class="icon"><use href="icons.svg#icon-${type}"></use></svg>
       </label>
       <select id="entitySelect"></select>
@@ -85,7 +85,7 @@ const EntityEditorSelector = {
 
     this.selectEl.addEventListener("change", (e) => {
       currentEntityId = e.target.value;
-      renderEntityEditor();
+      _renderEntityEditor();
     });
 
     this.addBtn.addEventListener("click", () => this._addNew());
@@ -93,7 +93,7 @@ const EntityEditorSelector = {
   },
 
   render() {
-    const manager = getManager();
+    const manager = _getManager();
     const items = manager.getAll();
     if (!items.some((it) => it.id === currentEntityId)) {
       currentEntityId = items[0]?.id || null;
@@ -108,9 +108,9 @@ const EntityEditorSelector = {
   },
 
   _addNew() {
-    const manager = getManager();
-    const type = getEntityType();
-    const name = `New ${capitalize(type)}`;
+    const manager = _getManager();
+    const type = _getEntityType();
+    const name = `New ${_capitalize(type)}`;
     if (manager.getByName(name)) {
       alert(`A ${type} named "${name}" already exists.`);
       return;
@@ -135,12 +135,12 @@ const EntityEditorSelector = {
     });
     const created = manager.create(data);
     currentEntityId = created.id;
-    renderEntityEditor();
+    _renderEntityEditor();
   },
 
   _deleteCurrent() {
-    const manager = getManager();
-    const type = getEntityType();
+    const manager = _getManager();
+    const type = _getEntityType();
     const entity = manager.getById(currentEntityId);
     if (!entity) return;
 
@@ -151,7 +151,7 @@ const EntityEditorSelector = {
       return;
     }
 
-    const referencing = rollsReferencing(entity.name);
+    const referencing = _rollsReferencing(entity.name);
     if (referencing.length > 0) {
       const names = referencing.map((r) => `"${r.name}"`).join(", ");
       alert(
@@ -170,7 +170,7 @@ const EntityEditorSelector = {
     manager.delete(entity.id);
     OptionsManager.deleteEntity(type, entity.name);
     currentEntityId = null;
-    renderEntityEditor();
+    _renderEntityEditor();
   },
 };
 
@@ -191,10 +191,10 @@ const PropertiesSection = {
   },
 
   render() {
-    const manager = getManager();
+    const manager = _getManager();
     const entity = manager.getById(currentEntityId);
     if (!entity) {
-      this.listEl.innerHTML = `<p class="entity-prop-empty">No ${getEntityType()} selected.</p>`;
+      this.listEl.innerHTML = `<p class="entity-prop-empty">No ${_getEntityType()} selected.</p>`;
       return;
     }
     this.listEl.innerHTML = manager.schema.fields
@@ -237,14 +237,14 @@ const PropertyEditModal = {
     });
     this.modalEl
       .querySelector(".cancel-btn")
-      .addEventListener("click", () => this.close());
+      .addEventListener("click", () => this._close());
     this.modalEl.addEventListener("click", (e) => {
-      if (e.target === this.modalEl) this.close();
+      if (e.target === this.modalEl) this._close();
     });
   },
 
   open(fieldName) {
-    const manager = getManager();
+    const manager = _getManager();
     const entity = manager.getById(currentEntityId);
     if (!entity) return;
     const field = manager.schema.fields.find((f) => f.name === fieldName);
@@ -289,7 +289,7 @@ const PropertyEditModal = {
   },
 
   _save() {
-    const manager = getManager();
+    const manager = _getManager();
     const entity = manager.getById(currentEntityId);
     if (!entity || !this.currentField) return;
     const field = this.currentField;
@@ -309,7 +309,7 @@ const PropertyEditModal = {
     // Name change: rename per-entity option-store keys + warn if duplicate
     if (field.name === "name") {
       if (value !== entity.name && manager.getByName(value)) {
-        alert(`A ${getEntityType()} named "${value}" already exists.`);
+        alert(`A ${_getEntityType()} named "${value}" already exists.`);
         return;
       }
     }
@@ -331,15 +331,15 @@ const PropertyEditModal = {
     manager.update(entity.id, update);
 
     if (field.name === "name" && oldName !== value) {
-      OptionsManager.renameEntityKeys(getEntityType(), oldName, value);
-      cascadeRenameOnRolls(oldName, value);
+      OptionsManager.renameEntityKeys(_getEntityType(), oldName, value);
+      _cascadeRenameOnRolls(oldName, value);
     }
 
-    this.close();
-    renderEntityEditor();
+    this._close();
+    _renderEntityEditor();
   },
 
-  close() {
+  _close() {
     this.modalEl.classList.remove("active");
     this.currentField = null;
   },
@@ -362,7 +362,7 @@ const FrameFieldsSection = {
       const row = e.target.closest(".settings-row[data-field]");
       if (!row) return;
       const fieldName = row.dataset.field;
-      const manager = getManager();
+      const manager = _getManager();
       const entity = manager.getById(currentEntityId);
       if (!entity || manager.isFieldHidden(fieldName, entity.name)) return;
       FrameFieldOptionsModal.open(fieldName);
@@ -372,7 +372,7 @@ const FrameFieldsSection = {
       const toggle = e.target.closest("input.field-enabled-toggle");
       if (!toggle) return;
       const fieldName = toggle.dataset.field;
-      const manager = getManager();
+      const manager = _getManager();
       const entity = manager.getById(currentEntityId);
       if (!entity) return;
       manager.toggleHiddenField(fieldName, entity.name);
@@ -381,7 +381,7 @@ const FrameFieldsSection = {
   },
 
   render() {
-    const manager = getManager();
+    const manager = _getManager();
     const fields = manager.getEntitySpecificFrameFields();
     const entity = manager.getById(currentEntityId);
     if (fields.length === 0 || !entity) {
@@ -394,7 +394,7 @@ const FrameFieldsSection = {
       .map((field) => {
         const opts = OptionsManager.getOptions(
           field.name,
-          getEntityType(),
+          _getEntityType(),
           entity.name,
         );
         const isHidden = manager.isFieldHidden(field.name, entity.name);
@@ -405,7 +405,7 @@ const FrameFieldsSection = {
               <span class="row-title">${escapeHtml(field.label)}</span>
               <span class="row-sub">${escapeHtml(opts.join(", ") || "—")}</span>
             </span>
-            <input type="checkbox" class="row-checkbox field-enabled-toggle" data-field="${field.name}" ${isHidden ? "" : "checked"} title="Enabled for this ${getEntityType()}" />
+            <input type="checkbox" class="row-checkbox field-enabled-toggle" data-field="${field.name}" ${isHidden ? "" : "checked"} title="Enabled for this ${_getEntityType()}" />
           </div>`;
       })
       .join("");
@@ -436,9 +436,9 @@ const FrameFieldOptionsModal = {
     });
     this.modalEl
       .querySelector(".cancel-btn")
-      .addEventListener("click", () => this.close());
+      .addEventListener("click", () => this._close());
     this.modalEl.addEventListener("click", (e) => {
-      if (e.target === this.modalEl) this.close();
+      if (e.target === this.modalEl) this._close();
     });
 
     this.modalEl.querySelector(".reset-btn").addEventListener("click", () => {
@@ -463,7 +463,7 @@ const FrameFieldOptionsModal = {
   },
 
   open(fieldName) {
-    const manager = getManager();
+    const manager = _getManager();
     const entity = manager.getById(currentEntityId);
     if (!entity) return;
     const field = manager
@@ -475,7 +475,7 @@ const FrameFieldOptionsModal = {
     this.titleEl.textContent = `${field.label} options`;
     const current = OptionsManager.getOptions(
       field.name,
-      getEntityType(),
+      _getEntityType(),
       entity.name,
     );
     this._renderOptions(current);
@@ -543,20 +543,20 @@ const FrameFieldOptionsModal = {
       alert("At least one option is required.");
       return;
     }
-    const manager = getManager();
+    const manager = _getManager();
     const entity = manager.getById(currentEntityId);
     if (!entity) return;
     OptionsManager.setOptions(
       this.currentField.name,
       opts,
-      getEntityType(),
+      _getEntityType(),
       entity.name,
     );
-    this.close();
-    renderEntityEditor();
+    this._close();
+    _renderEntityEditor();
   },
 
-  close() {
+  _close() {
     this.modalEl.classList.remove("active");
     this.currentField = null;
   },
@@ -566,14 +566,14 @@ const FrameFieldOptionsModal = {
 // Top-level render and init
 // ---------------------------------------------------------------------------
 
-function renderEntityEditor() {
+function _renderEntityEditor() {
   EntityEditorSelector.render();
   PropertiesSection.render();
   FrameFieldsSection.render();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  const type = getEntityType();
+  const type = _getEntityType();
   const manager = EntityManagers[type];
   if (!manager) {
     document.querySelector("main").innerHTML =
@@ -584,8 +584,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initialize all managers so defaults are seeded if needed
   Object.values(EntityManagers).forEach((m) => m.init());
 
-  document.title = `Edit ${capitalize(type)}s`;
-  document.getElementById("pageTitle").textContent = `${capitalize(type)}s`;
+  document.title = `Edit ${_capitalize(type)}s`;
+  document.getElementById("pageTitle").textContent = `${_capitalize(type)}s`;
 
   EntityEditorSelector.init();
   PropertiesSection.init();
@@ -593,6 +593,6 @@ document.addEventListener("DOMContentLoaded", () => {
   PropertyEditModal.init();
   FrameFieldOptionsModal.init();
 
-  currentEntityId = getManager().getByName(getEntityName())?.id;
-  renderEntityEditor();
+  currentEntityId = _getManager().getByName(_getEntityName())?.id;
+  _renderEntityEditor();
 });

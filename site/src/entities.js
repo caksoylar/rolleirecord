@@ -14,12 +14,12 @@ class EntityManager {
 
   // Names of defaults already introduced to this install, or null if the
   // registry has never been written (i.e. storage predates this mechanism).
-  getSeededNames() {
+  _getSeededNames() {
     const stored = localStorage.getItem(this.seededKey);
     return stored ? JSON.parse(stored) : null;
   }
 
-  setSeededNames(names) {
+  _setSeededNames(names) {
     localStorage.setItem(this.seededKey, JSON.stringify(names));
   }
 
@@ -38,18 +38,18 @@ class EntityManager {
         ...item,
         id: `${this.storageKey}-${i + 1}`,
       }));
-      this.saveAll(seeded);
+      this._saveAll(seeded);
       localStorage.setItem(this.counterKey, String(this.defaults.length));
-      this.setSeededNames(this.defaults.map((d) => d.name));
+      this._setSeededNames(this.defaults.map((d) => d.name));
       return;
     }
 
-    const seededNames = this.getSeededNames();
+    const seededNames = this._getSeededNames();
     if (seededNames === null) {
       // Migration: storage predates the seeded registry. Treat every current
       // default as already introduced so earlier deletions/renames aren't
       // resurrected; only future additions to the defaults will be merged.
-      this.setSeededNames(this.defaults.map((d) => d.name));
+      this._setSeededNames(this.defaults.map((d) => d.name));
       return;
     }
 
@@ -65,12 +65,12 @@ class EntityManager {
       seen.add(def.name);
       changed = true;
       if (!existingNames.has(def.name)) {
-        items.push({ ...def, id: this.getNextId() });
+        items.push({ ...def, id: this._getNextId() });
       }
     }
     if (changed) {
-      this.saveAll(items);
-      this.setSeededNames([...seen]);
+      this._saveAll(items);
+      this._setSeededNames([...seen]);
     }
   }
 
@@ -79,7 +79,7 @@ class EntityManager {
     return stored ? JSON.parse(stored) : [];
   }
 
-  saveAll(items) {
+  _saveAll(items) {
     localStorage.setItem(this.storageKey, JSON.stringify(items));
   }
 
@@ -91,7 +91,7 @@ class EntityManager {
     return this.getAll().find((item) => item.name === name) || null;
   }
 
-  getNextId() {
+  _getNextId() {
     let counter = localStorage.getItem(this.counterKey);
     counter = counter ? parseInt(counter, 10) + 1 : 1;
     localStorage.setItem(this.counterKey, String(counter));
@@ -100,9 +100,9 @@ class EntityManager {
 
   create(data) {
     const items = this.getAll();
-    const newItem = { ...data, id: this.getNextId() };
+    const newItem = { ...data, id: this._getNextId() };
     items.push(newItem);
-    this.saveAll(items);
+    this._saveAll(items);
     return newItem;
   }
 
@@ -112,7 +112,7 @@ class EntityManager {
     if (!item) return null;
     const oldName = item.name;
     Object.assign(item, data);
-    this.saveAll(items);
+    this._saveAll(items);
     return { item, oldName };
   }
 
@@ -120,11 +120,11 @@ class EntityManager {
     const items = this.getAll();
     const filtered = items.filter((item) => item.id !== id);
     if (filtered.length === items.length) return false;
-    this.saveAll(filtered);
+    this._saveAll(filtered);
     return true;
   }
 
-  getDisplayName(id) {
+  _getDisplayName(id) {
     const item = this.getById(id);
     return item ? item.name : null;
   }

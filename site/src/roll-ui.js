@@ -122,10 +122,10 @@ const RollActionsModal = {
 
     document
       .getElementById("rollActionsCloseBtn")
-      .addEventListener("click", () => this.close());
+      .addEventListener("click", () => this._close());
 
     this._modalEl.addEventListener("click", (e) => {
-      if (e.target === this._modalEl) this.close();
+      if (e.target === this._modalEl) this._close();
     });
 
     this._propertiesListEl.addEventListener("click", (e) => {
@@ -152,7 +152,7 @@ const RollActionsModal = {
               return false;
           }
           RollManager.updateRoll(current.id, { [field.name]: value });
-          RollActionsModal.renderProperties();
+          RollActionsModal._renderProperties();
           refreshAllUI();
         },
       );
@@ -189,7 +189,7 @@ const RollActionsModal = {
         const framesDesc = newFrames.map((frame) => frame.id).join(", ");
         alert(`Filled in frame(s) ${framesDesc} using interpolation.`);
         refreshAllUI();
-        this.close();
+        this._close();
       });
 
     document
@@ -218,15 +218,15 @@ const RollActionsModal = {
   },
 
   open() {
-    this.renderProperties();
+    this._renderProperties();
     this._modalEl.classList.add("active");
   },
 
-  close() {
+  _close() {
     this._modalEl.classList.remove("active");
   },
 
-  renderProperties() {
+  _renderProperties() {
     const roll = RollManager.getCurrentRoll();
     if (!roll) return;
     this._propertiesListEl.innerHTML = ROLL_FIELDS.map((field) => {
@@ -254,7 +254,7 @@ const RollActionsModal = {
     )
       return;
     RollManager.deleteRoll(roll.id);
-    this.close();
+    this._close();
     refreshAllUI();
   },
 };
@@ -286,7 +286,7 @@ const NewRollModal = {
             this._stagingData.ei = FilmManager.getByName(value)?.iso ?? null;
           }
           this._stagingData[field.name] = value;
-          this.renderProperties();
+          this._renderProperties();
         },
       );
     });
@@ -295,18 +295,18 @@ const NewRollModal = {
       .getElementById("newRollCreateBtn")
       .addEventListener("click", () => this._handleCreate());
 
-    this._cancelBtn.addEventListener("click", () => this.close());
+    this._cancelBtn.addEventListener("click", () => this._close());
 
     document
       .getElementById("newRollImportBtn")
       .addEventListener("click", () => {
         this._mandatory = false;
-        this.close();
+        this._close();
         Export.importRoll();
       });
 
     this._modalEl.addEventListener("click", (e) => {
-      if (e.target === this._modalEl && !this._mandatory) this.close();
+      if (e.target === this._modalEl && !this._mandatory) this._close();
     });
   },
 
@@ -322,15 +322,15 @@ const NewRollModal = {
       notes: "",
     };
     this._cancelBtn.style.display = this._mandatory ? "none" : "";
-    this.renderProperties();
+    this._renderProperties();
     this._modalEl.classList.add("active");
   },
 
-  close() {
+  _close() {
     this._modalEl.classList.remove("active");
   },
 
-  renderProperties() {
+  _renderProperties() {
     this._propertiesListEl.innerHTML = ROLL_FIELDS.map((field) => {
       const value = this._stagingData[field.name];
       // eslint-disable-next-line eqeqeq
@@ -362,7 +362,7 @@ const NewRollModal = {
     }
     const created = RollManager.createRoll(data);
     RollManager.setCurrentRoll(created.id);
-    this.close();
+    this._close();
     refreshAllUI();
   },
 };
@@ -392,10 +392,10 @@ const RollPropertyEditModal = {
 
     this._modalEl
       .querySelector(".cancel-btn")
-      .addEventListener("click", () => this.close());
+      .addEventListener("click", () => this._close());
 
     this._modalEl.addEventListener("click", (e) => {
-      if (e.target === this._modalEl) this.close();
+      if (e.target === this._modalEl) this._close();
     });
   },
 
@@ -474,10 +474,10 @@ const RollPropertyEditModal = {
       return;
     }
     const result = this._onSaved(field, value);
-    if (result !== false) this.close();
+    if (result !== false) this._close();
   },
 
-  close() {
+  _close() {
     this._modalEl.classList.remove("active");
     document
       .querySelectorAll(".modal-content.dimmed")
