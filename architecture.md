@@ -27,8 +27,8 @@ util.js → config.js → entities.js → rolls.js → entity-editor.js
 util.js → config.js → entities.js → rolls.js → export.js → settings.js
 ```
 
-`util.js` holds pure, dependency-free helpers (`escapeHtml`,
-`formatRelativeDate`) and loads first on every page.
+`util.js` holds pure, dependency-free helpers (`escapeHtml`, `formatDate`) and
+loads first on every page.
 `export.js` loads on both `index.html` (for roll import and roll/CSV export via
 the roll actions modal) and `settings.html` (for full backup export/restore).
 
@@ -40,13 +40,13 @@ Each file may reference globals defined by any earlier script.
 
 ```mermaid
 graph LR
-    util["util.js\nescapeHtml · formatRelativeDate"]
+    util["util.js\nescapeHtml · formatDate"]
     config["config.js\nschemas · defaults"]
     entities["entities.js\nCameraManager · FilmManager · OptionsManager"]
     rolls["rolls.js\nRollManager"]
     table["table.js\nTableRenderer"]
-    roll_ui["roll-ui.js\nRollSelector · RollFormModal · refreshAllUI"]
-    export_["export.js\nbuildExifTags · Export"]
+    roll_ui["roll-ui.js\nRollSelector · NewRollModal · refreshAllUI"]
+    export_["export.js\nExport"]
     frame["frame.js\nFrameModal · LocationManager"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
@@ -174,7 +174,6 @@ erDiagram
 | Export                    | Kind     | Purpose                                                                    |
 | ------------------------- | -------- | -------------------------------------------------------------------------- |
 | `escapeHtml(text)`        | function | Escapes text for safe interpolation into HTML strings (used on every page) |
-| `formatRelativeDate(str)` | function | Formats an ISO date string as a short relative label (e.g. `5m ago`)       |
 
 Pure, dependency-free helpers. Loads first on every entry point so any later
 module can use them.
