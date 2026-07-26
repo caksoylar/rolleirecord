@@ -1,69 +1,91 @@
 // ============================================================================
-// TABLE RENDERING - Show frames in a table with ID + certain fields
+// TABLE RENDERING - Show frames as expanded, tappable metadata rows
 // ============================================================================
 
 // eslint-disable-next-line no-unused-vars
 const TableRenderer = {
-  // Get column fields (those with column_width), excluding per-camera hidden fields
+  // Preserve the camera-aware field visibility used by the compact table.
   getVisibleFields() {
     const camera = RollManager.getCurrentCamera();
     return FRAME_SCHEMA.fields.filter(
-      (f) => f.column_width && !CameraManager.isFieldHidden(f.name, camera),
+      (field) =>
+        field.in_card && !CameraManager.isFieldHidden(field.name, camera),
     );
   },
 
-  // Render table headers dynamically from visible fields
-  renderHeaders() {
-    const visibleFields = this.getVisibleFields();
-    const idField = FRAME_SCHEMA.fields.find((f) => f.name === "id");
+  getExposureDetails(row) {
+    return this.getVisibleFields()
+      .filter((field) => row[field.name])
+      .map((field) => `${field.header || field.label} ${row[field.name]}`)
+      .join(" · ");
+  },
 
-    // Normalize widths so visible columns always fill the same proportion
-    const targetTotal = 100 - parseFloat(idField.column_width);
-    const rawTotal = visibleFields
-      .filter((f) => f.name !== "id")
-      .reduce((sum, f) => sum + (parseFloat(f.column_width) || 0), 0);
-    const scale = rawTotal > 0 ? targetTotal / rawTotal : 1;
-
-    let html = "<thead><tr>";
-    visibleFields.forEach((field) => {
-      const w =
-        field.name === "id"
-          ? ""
-          : ` style="width:${(parseFloat(field.column_width) * scale).toFixed(1)}%"`;
-      html += `<th${w}>${field.header || field.label}</th>`;
+  formatDate(value) {
+    if (!value) return "Date unavailable";
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return value;
+    return date.toLocaleString(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
     });
-
-    html += "</tr></thead>";
-    return html;
   },
 
-  // Render table body with all rows
-  renderTableBody() {
+  getLocationLabel(location) {
+    if (!location) return "Location unavailable";
+
+    const lookup = LocationManager.getReverseGeocode(location);
+    if (lookup && typeof lookup.then === "function") {
+      void lookup.then(
+        (label) => {
+          if (label) this.render();
+        },
+        (error) => console.error("Reverse geocode lookup failed:", error),
+      );
+      return location;
+    }
+
+    return lookup || location;
+  },
+
+  renderFrameRow(row) {
+    const exposure = this.getExposureDetails(row);
+    const location = this.getLocationLabel(row.location);
+    const notes = row.notes
+      ? `<span class="frame-row-notes">"${escapeHtml(String(row.notes))}"</span>`
+      : "";
+
+    return `
+      <button
+        type="button"
+        class="frame-row clickable"
+        onclick="FrameModal.openEditModal(${row.id})"
+      >
+        <span class="frame-row-left">
+          <span class="frame-row-id">Frame ${escapeHtml(String(row.id))}</span>
+          ${
+            exposure
+              ? `<span class="frame-row-exposure">${escapeHtml(exposure)}</span>`
+              : ""
+          }
+          ${notes}
+        </span>
+        <span class="frame-row-right">
+          <span class="frame-row-date">${escapeHtml(this.formatDate(row.date))}</span>
+          <span class="frame-row-location">${escapeHtml(location)}</span>
+        </span>
+      </button>`;
+  },
+
+  // Render all frames newest first.
+  renderFrames() {
     const rows = RollManager.getFrames();
-    const visibleFields = this.getVisibleFields();
-
-    let html = "<tbody>";
-
-    rows
+    return `<div class="frame-list">${rows
       .toSorted((r1, r2) => r2.id - r1.id)
-      .forEach((row) => {
-        html += `<tr class="clickable" onclick="FrameModal.openEditModal(${row.id})" style="cursor:pointer">`;
-
-        visibleFields.forEach((field) => {
-          const raw = row[field.name] == null ? "" : row[field.name]; // eslint-disable-line eqeqeq
-          const value =
-            field.type === "datetime" ? formatRelativeDate(raw) : raw;
-          html += `<td>${escapeHtml(String(value))}</td>`;
-        });
-
-        html += "</tr>";
-      });
-
-    html += "</tbody>";
-    return html;
+      .map((row) => this.renderFrameRow(row))
+      .join("")}</div>`;
   },
 
-  // Full table render
+  // Full frame list render
   render() {
     const container = document.getElementById("tableContainer");
     const hasRoll = RollManager.getCurrentRoll() !== null;
@@ -71,7 +93,7 @@ const TableRenderer = {
       container.innerHTML =
         '<div class="empty-state"><p>No rolls yet</p><p>Create a new roll to get started</p></div>';
     } else {
-      container.innerHTML = `<table>${this.renderHeaders()}${this.renderTableBody()}</table>`;
+      container.innerHTML = this.renderFrames();
     }
 
     const addFab = document.getElementById("addFrameFab");

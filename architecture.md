@@ -283,10 +283,11 @@ The `getCurrentCamera()` / `getCurrentFilm()` helpers return the current roll's 
 
 | Export          | Kind             | Purpose                                                                                                                                                                                     |
 | --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TableRenderer` | object singleton | Renders the frame table from `FRAME_SCHEMA`. `getVisibleFields()` filters to columns with `column_width`, excluding per-camera hidden fields. Normalises column widths to always fill 100%. |
+| `TableRenderer` | object singleton | Renders the active roll as expanded, tappable frame rows. Each row groups exposure metadata and notes on the left with an explicit date and reverse-geocoded location on the right. |
 
-A pure provider — depends only on earlier modules (`util`, `config`, `rolls`,
-`entities`) and has no forward references.
+It depends on the earlier `config`, `rolls`, and `entities` modules, and uses
+`LocationManager` at render time to resolve location labels. Rendering occurs
+after `frame.js` has loaded, so that lookup introduces no load-order dependency.
 
 ---
 

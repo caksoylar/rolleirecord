@@ -255,11 +255,7 @@ button.secondary {
   background-color: var(--color-secondary);
 }
 
-table {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: separate;
-  border-spacing: 0;
+.frame-list {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -268,44 +264,81 @@ table {
   margin-bottom: 1rem;
 }
 
-th,
-td {
-  padding: 0.6rem;
-  text-align: center;
+.frame-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.75rem;
   border-bottom: 1px solid var(--color-border);
-  white-space: nowrap;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+  width: 100%;
+  min-height: unset;
+  font-weight: unset;
+}
+
+.frame-row:last-child {
+  border-bottom: none;
+}
+
+.frame-row:focus-visible {
+  position: relative;
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
+}
+
+.frame-row-left,
+.frame-row-right {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.frame-row-right {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.frame-row-left > *,
+.frame-row-right > * {
+  max-width: 100%;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
 }
 
-th {
-  background-color: var(--color-surface-alt);
-  font-weight: 600;
+.frame-row-id {
+  color: var(--color-text);
   font-size: var(--font-size-sm);
+  font-weight: 600;
 }
 
-td {
-  font-size: var(--font-size-sm);
+.frame-row-exposure,
+.frame-row-date,
+.frame-row-location {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xxs);
+}
+
+.frame-row-notes {
   color: var(--color-text-secondary);
+  font-size: var(--font-size-xxs);
+  font-style: italic;
 }
 
-th:first-of-type,
-td:first-of-type {
-  text-align: right;
-  font-weight: 600;
-}
-
-tr:last-child td {
-  border-bottom: none;
+.frame-row:hover {
+  background-color: var(--color-surface-alt);
+  opacity: 1;
 }
 
 .entity-edit-btn {
   font-size: var(--font-size-xs);
   aspect-ratio: 1;
-}
-
-tbody tr.clickable:hover {
-  background-color: var(--color-surface-alt);
 }
 
 /* SVG Icons */

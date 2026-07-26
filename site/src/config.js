@@ -234,7 +234,6 @@ const FRAME_SCHEMA = {
       label: "Frame #",
       header: "#",
       required: true,
-      column_width: "15%",
     },
     {
       name: "shutter",
@@ -242,7 +241,7 @@ const FRAME_SCHEMA = {
       label: "Shutter Speed",
       header: "S",
       entity_specific: "camera",
-      column_width: "25%",
+      in_card: true,
       custom_value: true,
       options: [
         "B",
@@ -267,7 +266,7 @@ const FRAME_SCHEMA = {
       label: "Aperture",
       header: "A",
       entity_specific: "camera",
-      column_width: "25%",
+      in_card: true,
       custom_value: true,
       options: [
         "ƒ/1.8",
@@ -289,9 +288,7 @@ const FRAME_SCHEMA = {
       label: "Focal Length",
       entity_specific: "camera",
       custom_value: true,
-      // form-only: no column_width/header so it doesn't appear as a table column
       options: [
-        "24mm",
         "28mm",
         "35mm",
         "40mm",
@@ -308,9 +305,9 @@ const FRAME_SCHEMA = {
       name: "mode",
       type: "select",
       label: "Shooting Mode",
-      header: "M",
+      header: "Mode",
       entity_specific: "camera",
-      column_width: "10%",
+      in_card: true,
       // custom_value intentionally omitted (false): mode is a fixed enum
       options: ["P", "S", "A", "M"],
       defaultValue: "P",
@@ -339,6 +336,7 @@ const FRAME_SCHEMA = {
         "135mm f/2.8",
       ],
       defaultValue: "50mm f/1.8",
+      in_card: true,
     },
     {
       name: "filter",
@@ -379,8 +377,6 @@ const FRAME_SCHEMA = {
       name: "date",
       type: "datetime",
       label: "Date",
-      header: "◷",
-      column_width: "35%",
     },
     {
       name: "location",
