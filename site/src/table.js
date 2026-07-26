@@ -79,6 +79,9 @@ const TableRenderer = {
   // Render all frames newest first.
   _renderFrames() {
     const rows = RollManager.getFrames();
+    if (rows.length === 0) {
+      return '<div class="empty-state"><p>No frames, tap "+" to add one</p></div>';
+    }
     return `<div class="frame-list">${rows
       .toSorted((r1, r2) => r2.id - r1.id)
       .map((row) => this._renderFrameRow(row))
@@ -91,7 +94,7 @@ const TableRenderer = {
     const hasRoll = RollManager.getCurrentRoll() !== null;
     if (!hasRoll) {
       container.innerHTML =
-        '<div class="empty-state"><p>No rolls yet</p><p>Create a new roll to get started</p></div>';
+        '<div class="empty-state"><p>Create a new roll to get started</p></div>';
     } else {
       container.innerHTML = this._renderFrames();
     }
