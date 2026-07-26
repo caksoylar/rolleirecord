@@ -477,7 +477,7 @@ flowchart TD
     schema --> hidden
 
     hidden -->|"filters fields"| form
-    hidden -->|"filters columns"| table
+    hidden -->|"filters card exposure details"| table
 ```
 
 - Fields with `in_card: true` → appear in the frame card exposure summary

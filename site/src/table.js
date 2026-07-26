@@ -4,7 +4,7 @@
 
 // eslint-disable-next-line no-unused-vars
 const TableRenderer = {
-  // Preserve the camera-aware field visibility used by the compact table.
+  // Preserve the camera-aware field visibility used by frame cards.
   _getVisibleFields() {
     const camera = RollManager.getCurrentCamera();
     return FRAME_SCHEMA.fields.filter(
@@ -57,7 +57,7 @@ const TableRenderer = {
     return `
       <button
         type="button"
-        class="frame-row clickable"
+        class="frame-row"
         onclick="FrameModal.openEditModal(${row.id})"
       >
         <span class="frame-row-left">

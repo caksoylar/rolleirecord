@@ -1,7 +1,7 @@
 // ============================================================================
 // CONFIGURATION - Default data seeds and Schema Definitions
 // ============================================================================
-// Edit this file to customize default cameras, films, and table fields
+// Edit this file to customize default cameras, films, and frame card fields
 
 // Default seed data (used to populate localStorage on first load)
 // eslint-disable-next-line no-unused-vars
@@ -232,7 +232,6 @@ const FRAME_SCHEMA = {
       name: "id",
       type: "number",
       label: "Frame #",
-      header: "#",
       required: true,
     },
     {
