@@ -60,19 +60,20 @@ const TableRenderer = {
         class="frame-row"
         onclick="FrameModal.openEditModal(${row.id})"
       >
-        <span class="frame-row-left">
+        <span class="frame-row-header">
           <span class="frame-row-id">Frame ${escapeHtml(String(row.id))}</span>
-          ${
-            exposure
-              ? `<span class="frame-row-exposure">${escapeHtml(exposure)}</span>`
-              : ""
-          }
-          ${notes}
-        </span>
-        <span class="frame-row-right">
           <span class="frame-row-date">${escapeHtml(this._formatDate(row.date))}</span>
-          <span class="frame-row-location">${escapeHtml(location)}</span>
         </span>
+        ${
+          exposure
+            ? `<span class="frame-row-exposure">${escapeHtml(exposure)}</span>`
+            : ""
+        }
+        <span class="frame-row-location">
+          <svg class="icon" aria-hidden="true"><use href="icons.svg#icon-pin"></use></svg>
+          <span class="frame-row-location-label">${escapeHtml(location)}</span>
+        </span>
+        ${notes}
       </button>`;
   },
 
