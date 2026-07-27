@@ -1,12 +1,12 @@
 # Rolleirecord — Code Architecture
 
-A vanilla JS PWA with **zero runtime dependencies**. All scripts are plain `<script>` tags sharing globals via load order. No bundler, no ES modules on the main branch. Three HTML entry points (main app, entity editor, settings) share one `src/` directory.
+A vanilla JS PWA with **zero runtime dependencies**. All scripts are plain `<script>` tags sharing globals via load order. No bundler, no ES modules on the main branch. Four HTML entry points (main app, entity editor, scan matching export, settings) share one `src/` directory.
 
 ---
 
 ## Script Load Order
 
-Three HTML entry points share the same `src/` directory:
+Four HTML entry points share the same `src/` directory:
 
 **`index.html` — main app** (in dependency order):
 
@@ -19,6 +19,12 @@ roll-ui.js → export.js → frame.js → app.js
 
 ```
 util.js → config.js → entities.js → rolls.js → entity-editor.js
+```
+
+**`export.html` — scan matching and CSV export page**:
+
+```
+util.js → config.js → entities.js → rolls.js → export.js → export-page.js
 ```
 
 **`settings.html` — settings page**:
@@ -47,6 +53,7 @@ graph LR
     table["table.js\nTableRenderer"]
     roll_ui["roll-ui.js\nRollSelector · NewRollModal · refreshAllUI"]
     export_["export.js\nExport"]
+    export_page["export-page.js\nExportPage\n(loaded by export.html)"]
     frame["frame.js\nFrameModal · LocationManager"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
@@ -76,6 +83,7 @@ graph LR
     rolls --> table
     rolls --> frame
     rolls --> export_
+    rolls --> export_page
     rolls --> settings
     rolls --> entity_editor
 
@@ -86,6 +94,7 @@ graph LR
     roll_ui --> export_
     roll_ui --> frame
     export_ --> settings
+    export_ --> export_page
     frame --> app
 ```
 
@@ -95,9 +104,11 @@ graph LR
 > provider with no forward references.
 > `app.js` no longer owns settings logic — the header gear button simply
 > navigates to `settings.html`. `roll-ui.js` depends on `export.js` for the
-> roll-import flow (`NewRollModal`'s "Import from file…" button) and for
-> roll/CSV export via `RollActionsModal`.
-> `settings.js` depends on `export.js` for backup export/import.
+> roll-import flow (`NewRollModal`'s "Import from file…" button) and roll JSON
+> export via `RollActionsModal`; the CSV row navigates to `export.html`.
+> `export-page.js` depends on `export.js` to generate ExifTool CSV rows with
+> scan filenames supplied by the matching UI. `settings.js` depends on
+> `export.js` for backup export/import.
 
 ---
 
@@ -171,9 +182,9 @@ erDiagram
 
 ### `util.js`
 
-| Export                    | Kind     | Purpose                                                                    |
-| ------------------------- | -------- | -------------------------------------------------------------------------- |
-| `escapeHtml(text)`        | function | Escapes text for safe interpolation into HTML strings (used on every page) |
+| Export             | Kind     | Purpose                                                                    |
+| ------------------ | -------- | -------------------------------------------------------------------------- |
+| `escapeHtml(text)` | function | Escapes text for safe interpolation into HTML strings (used on every page) |
 
 Pure, dependency-free helpers. Loads first on every entry point so any later
 module can use them.
@@ -184,7 +195,7 @@ module can use them.
 
 | Export                | Kind  | Purpose                                                                                                                                                                |
 | --------------------- | ----- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FRAME_SCHEMA`        | const | Schema for frame fields — drives form rendering, card exposure details (`in_card`), validation, and export                                                            |
+| `FRAME_SCHEMA`        | const | Schema for frame fields — drives form rendering, card exposure details (`in_card`), validation, and export                                                             |
 | `CAMERA_SCHEMA`       | const | Schema for camera entity forms                                                                                                                                         |
 | `FILM_SCHEMA`         | const | Schema for film entity forms                                                                                                                                           |
 | `ROLL_FIELDS`         | const | Schema for roll fields (name, camera, film, frameCount, status, notes) — drives the roll actions modal property editor and new-roll staging form                       |
@@ -282,8 +293,8 @@ The `getCurrentCamera()` / `getCurrentFilm()` helpers return the current roll's 
 
 ### `table.js`
 
-| Export          | Kind             | Purpose                                                                                                                                                                                     |
-| --------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export          | Kind             | Purpose                                                                                                                                                                             |
+| --------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `TableRenderer` | object singleton | Renders the active roll as expanded, tappable frame rows. Each row groups exposure metadata and notes on the left with an explicit date and reverse-geocoded location on the right. |
 
 It depends on the earlier `config`, `rolls`, and `entities` modules, and uses
@@ -355,12 +366,13 @@ button calls `Export.importRoll()` as an alternative creation path.
 
 `RollActionsModal` is a bottom-sheet opened by the bottom-left FAB
 (`#rollActionsFab`). It contains:
+
 - **Properties** — live roll fields rendered from `ROLL_FIELDS` as `settings-row`
   items; tapping a row opens `RollPropertyEditModal` which saves directly to
   `RollManager`.
 - **Map** — opens frame coordinates in the configured maps provider.
-- **Export** — JSON roll export and CSV exiftool export (previously on
-  `settings.html`).
+- **Export** — JSON roll export and navigation to the scan matching CSV export
+  page (previously both exports ran directly from this modal).
 - **Danger Zone** — delete roll.
 
 `RollPropertyEditModal` is a generic single-field bottom-sheet that appears on
@@ -375,11 +387,11 @@ dims the parent sheet via a `dimmed` class on its `.modal-content`.
 
 ### `frame.js`
 
-| Export               | Kind             | Purpose                                                                                                                                                                                                                                                                           |
-| -------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FrameModal`         | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Public interface via `openAddModal()` / `openEditModal(frameId)` called by the FAB and table row actions. |
-| `LocationManager`    | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings; generates Maps URLs; and reverse-geocodes locations through Nominatim (results cached in localStorage up to 1,000 entries). |
-| `FrameInterpolator`  | object singleton | Fills gaps in a roll's frame numbering. Private `_interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). Public `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `roll-ui.js`'s `RollActionsModal` interpolate button. |
+| Export              | Kind             | Purpose                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FrameModal`        | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Public interface via `openAddModal()` / `openEditModal(frameId)` called by the FAB and table row actions.                                                                                                                  |
+| `LocationManager`   | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings; generates Maps URLs; and reverse-geocodes locations through Nominatim (results cached in localStorage up to 1,000 entries).                                                                                                                                                                              |
+| `FrameInterpolator` | object singleton | Fills gaps in a roll's frame numbering. Private `_interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). Public `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `roll-ui.js`'s `RollActionsModal` interpolate button. |
 
 `FrameModal` (used inside `index.html`) and `entity-editor.js`'s
 `PropertyEditModal` / `FrameFieldOptionsModal` (used inside
@@ -408,15 +420,17 @@ and `/entity-editor.html?type=film`.
 
 ### `export.js`
 
-| Export                | Kind             | Purpose                                                                                                                                                                                                                                                                |
-| --------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `_buildExifTags(meta)` | function         | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export. Private to this module. |
-| `Export`              | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
+| Export                             | Kind             | Purpose                                                                                                                                                                                                                                                                |
+| ---------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `_buildExifTags(meta, sourceFile)` | function         | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export, optionally overriding `SourceFile`. Private to this module.                                                           |
+| `Export`                           | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
-Loaded on **both** `index.html` and `settings.html`. On the main page,
+Loaded on `index.html`, `export.html`, and `settings.html`. On the main page,
 `importRoll` is reachable via `NewRollModal`'s "Import from file…" button, and
-`exportRoll` / `exportToExiftoolCSV` are reachable via `RollActionsModal`.
-The storage backup/restore functions are wired up by `settings.js` only.
+`exportRoll` is reachable via `RollActionsModal`; its CSV row navigates to
+`export.html`. The export page supplies matched frame IDs and scan filenames to
+`exportToExiftoolCSV`. The storage backup/restore functions are wired up by
+`settings.js` only.
 
 **Single-roll JSON format** (`exportRoll` / `importRoll`) — a roll-level object,
 not a flat frame array:
@@ -439,12 +453,23 @@ differ.
 
 ---
 
+### `export-page.js`
+
+Standalone page controller loaded by `export.html`. `ExportPage` reads the
+active roll, natural-sorts locally selected scan files, and matches included
+files to logged frames in ascending ID order from a configurable first frame.
+It owns preview object URLs, reverse/exclude/clear controls, match summaries,
+and passes matched frame IDs with the original filenames to
+`Export.exportToExiftoolCSV`.
+
+---
+
 ### `settings.js`
 
 Standalone page script loaded by `settings.html`.
 
-| Export         | Kind             | Purpose                                                                                                                                                                                                                                                                                      |
-| -------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Export         | Kind             | Purpose                                                                                                                                                                                                                                                             |
+| -------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `SettingsPage` | object singleton | Seeds the entity/roll managers, then wires the settings page buttons: Edit Cameras/Films links (→ `entity-editor.html`, carrying the current camera/film name), full backup export/import, refresh assets, clear all (clears storage then returns to `index.html`). |
 
 ---
@@ -491,18 +516,18 @@ flowchart TD
 
 ## localStorage Key Map
 
-| Key               | Owner            | Contents                                                                                                               |
-| ----------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `cameras`         | `CameraManager`  | JSON array of camera objects                                                                                           |
-| `camera-counter`  | `CameraManager`  | Auto-increment counter for IDs                                                                                         |
-| `cameras-seeded`  | `CameraManager`  | JSON array of default camera names already introduced (suppresses re-seeding deleted/renamed defaults)                 |
-| `films`           | `FilmManager`    | JSON array of film objects                                                                                             |
-| `film-counter`    | `FilmManager`    | Auto-increment counter for IDs                                                                                         |
-| `films-seeded`    | `FilmManager`    | JSON array of default film names already introduced (suppresses re-seeding deleted/renamed defaults)                   |
-| `rolls`           | `RollManager`    | JSON array of roll objects (each contains `frames[]`)                                                                  |
-| `roll-counter`    | `RollManager`    | Auto-increment counter for roll IDs                                                                                    |
-| `current-roll-id` | `RollManager`    | ID of the currently active roll                                                                                        |
-| `fieldOptions`    | `OptionsManager` | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options               |
-| `maps-provider`   | `SettingsPage`   | Selected maps provider for frame location links (`google` \| `apple` \| `osm`); read by `LocationManager.getMapsUrl()` |
-| `rgc-enabled`     | `SettingsPage`   | Enable reverse geocoding using Nominatim API; read by `LocationManager.getReverseGeocode()`                            |
+| Key                        | Owner             | Contents                                                                                                                |
+| -------------------------- | ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `cameras`                  | `CameraManager`   | JSON array of camera objects                                                                                            |
+| `camera-counter`           | `CameraManager`   | Auto-increment counter for IDs                                                                                          |
+| `cameras-seeded`           | `CameraManager`   | JSON array of default camera names already introduced (suppresses re-seeding deleted/renamed defaults)                  |
+| `films`                    | `FilmManager`     | JSON array of film objects                                                                                              |
+| `film-counter`             | `FilmManager`     | Auto-increment counter for IDs                                                                                          |
+| `films-seeded`             | `FilmManager`     | JSON array of default film names already introduced (suppresses re-seeding deleted/renamed defaults)                    |
+| `rolls`                    | `RollManager`     | JSON array of roll objects (each contains `frames[]`)                                                                   |
+| `roll-counter`             | `RollManager`     | Auto-increment counter for roll IDs                                                                                     |
+| `current-roll-id`          | `RollManager`     | ID of the currently active roll                                                                                         |
+| `fieldOptions`             | `OptionsManager`  | JSON object `{ [entityType]: { [entityName]: { [fieldName]: string[] } } }` of customised select options                |
+| `maps-provider`            | `SettingsPage`    | Selected maps provider for frame location links (`google` \| `apple` \| `osm`); read by `LocationManager.getMapsUrl()`  |
+| `rgc-enabled`              | `SettingsPage`    | Enable reverse geocoding using Nominatim API; read by `LocationManager.getReverseGeocode()`                             |
 | `reverse-geocode-cache-v1` | `LocationManager` | JSON object mapping normalized `"lat,lng"` coordinate strings to Nominatim display names; bounded to 1,000 FIFO entries |

@@ -3,9 +3,9 @@
 // ============================================================================
 
 // Convert app metadata fields to exiftool tag names.
-function _buildExifTags(meta) {
+function _buildExifTags(meta, sourceFile) {
   const frameId = String(meta.id).padStart(2, "0");
-  const tags = { SourceFile: `frame_${frameId}.jpg` };
+  const tags = { SourceFile: sourceFile ?? `frame_${frameId}.jpg` };
 
   // Camera make & model (split first word as Make)
   if (meta.camera) {
@@ -365,9 +365,28 @@ const Export = {
     });
   },
 
-  exportToExiftoolCSV() {
-    const data = this._getFrameData().sort((f1, f2) => f1.id - f2.id);
-    const exif = data.map(_buildExifTags);
+  exportToExiftoolCSV(matches = null) {
+    const data = this._getFrameData();
+    let exportRows;
+
+    if (matches) {
+      const framesById = new Map(data.map((frame) => [frame.id, frame]));
+      exportRows = matches.map(({ frameId, sourceFile }) => {
+        const frame = framesById.get(frameId);
+        if (!frame) {
+          throw new Error(`Frame ${frameId} is no longer available.`);
+        }
+        return { frame, sourceFile };
+      });
+    } else {
+      exportRows = data
+        .sort((f1, f2) => f1.id - f2.id)
+        .map((frame) => ({ frame }));
+    }
+
+    const exif = exportRows.map(({ frame, sourceFile }) =>
+      _buildExifTags(frame, sourceFile),
+    );
 
     const keys = [...new Set(exif.flatMap((obj) => Object.keys(obj)))];
 

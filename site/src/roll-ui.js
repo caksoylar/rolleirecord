@@ -210,7 +210,9 @@ const RollActionsModal = {
 
     document
       .getElementById("rollActionsExportCsvBtn")
-      .addEventListener("click", () => Export.exportToExiftoolCSV());
+      .addEventListener("click", () => {
+        window.location.href = "export.html";
+      });
 
     document
       .getElementById("rollActionsDeleteBtn")

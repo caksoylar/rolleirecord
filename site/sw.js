@@ -1,8 +1,9 @@
-const CACHE_NAME = "rolleirecord-v45";
+const CACHE_NAME = "rolleirecord-v46";
 const ASSETS = [
   "./",
   "./index.html",
   "./entity-editor.html",
+  "./export.html",
   "./settings.html",
   "./icons.svg",
   "./styles.css",
@@ -18,6 +19,7 @@ const ASSETS = [
   "./src/entities.js",
   "./src/entity-editor.js",
   "./src/export.js",
+  "./src/export-page.js",
   "./src/frame.js",
   "./src/rolls.js",
   "./src/roll-ui.js",

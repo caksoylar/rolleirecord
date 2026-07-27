@@ -163,6 +163,23 @@ const LocationManager = {
     });
   },
 
+  getLocationLabel(location, onResolved) {
+    if (!location) return "Location unavailable";
+
+    const lookup = this.getReverseGeocode(location);
+    if (lookup && typeof lookup.then === "function") {
+      void lookup.then(
+        (label) => {
+          if (label) onResolved?.(label);
+        },
+        (error) => console.error("Reverse geocode lookup failed:", error),
+      );
+      return location;
+    }
+
+    return lookup || location;
+  },
+
   // Build an anonymous uMap URL that preloads a marker per frame with valid
   // coordinates, named "Frame <id>". Returns null when no frame has a location.
   buildUmapUrl(frames) {

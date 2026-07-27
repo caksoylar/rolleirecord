@@ -30,26 +30,18 @@ const TableRenderer = {
     });
   },
 
-  _getLocationLabel(location) {
-    if (!location) return "Location unavailable";
-
-    const lookup = LocationManager.getReverseGeocode(location);
-    if (lookup && typeof lookup.then === "function") {
-      void lookup.then(
-        (label) => {
-          if (label) this.render();
-        },
-        (error) => console.error("Reverse geocode lookup failed:", error),
-      );
-      return location;
-    }
-
-    return lookup || location;
-  },
-
   _renderFrameRow(row) {
     const exposure = this._getExposureDetails(row);
-    const location = this._getLocationLabel(row.location);
+    const rawLocation = row.location || "";
+    const location = LocationManager.getLocationLabel(
+      rawLocation,
+      (resolvedLocation) => {
+        const label = document.getElementById(`frame-location-${row.id}`);
+        if (label?.dataset.location === rawLocation) {
+          label.textContent = resolvedLocation;
+        }
+      },
+    );
     const notes = row.notes
       ? `<span class="frame-row-notes">"${escapeHtml(String(row.notes))}"</span>`
       : "";
@@ -71,7 +63,11 @@ const TableRenderer = {
         }
         <span class="frame-row-location">
           <svg class="icon" aria-hidden="true"><use href="icons.svg#icon-pin"></use></svg>
-          <span class="frame-row-location-label">${escapeHtml(location)}</span>
+          <span
+            id="frame-location-${escapeHtml(String(row.id))}"
+            class="frame-row-location-label"
+            data-location="${escapeHtml(rawLocation)}"
+          >${escapeHtml(location)}</span>
         </span>
         ${notes}
       </button>`;

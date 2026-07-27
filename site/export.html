@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Export Metadata</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="assets/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="shortcut icon" href="assets/favicon.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="assets/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="Rolleirecord" />
+    <link rel="manifest" href="assets/site.webmanifest" />
+  </head>
+  <body class="export-page">
+    <header>
+      <h1>
+        <a href="index.html" id="backLink" title="Back" aria-label="Back"
+          ><svg class="icon"><use href="icons.svg#icon-left"></use></svg
+        ></a>
+        <svg class="icon" aria-hidden="true">
+          <use href="icons.svg#icon-csv"></use>
+        </svg>
+        Export Metadata
+      </h1>
+    </header>
+
+    <main>
+      <p class="export-intro">
+        Pair your scanner's filenames with logged frames, then export the
+        metadata.
+      </p>
+
+      <p class="settings-group-label">Roll</p>
+      <section class="settings-list export-roll-summary">
+        <div class="export-roll-title">
+          <span id="rollName"></span>
+          <span id="rollFrameCount"></span>
+        </div>
+        <div id="rollMeta" class="export-roll-meta"></div>
+      </section>
+
+      <p id="emptyState" class="export-empty-state" hidden></p>
+
+      <div id="exportWorkflow">
+        <p class="settings-group-label">1 &middot; Choose scan files</p>
+        <section class="settings-list export-file-panel">
+          <label class="export-file-picker" for="scanFiles">
+            <svg class="icon" aria-hidden="true">
+              <use href="icons.svg#icon-upload"></use>
+            </svg>
+            Choose files
+            <input
+              id="scanFiles"
+              type="file"
+              accept=".jpg,.jpeg,.png,.tif,.tiff,image/*"
+              multiple
+            />
+          </label>
+          <p class="export-privacy-note">
+            Files stay on this device and are never uploaded.
+          </p>
+        </section>
+
+        <section id="matchingSection" hidden>
+          <p class="settings-group-label">2 &middot; Review matching</p>
+          <div class="export-match-toolbar">
+            <div class="export-start-frame">
+              <label for="startFrame">First frame</label>
+              <input id="startFrame" type="number" />
+            </div>
+            <button id="reverseBtn" type="button" class="secondary">
+              <svg class="icon" aria-hidden="true">
+                <use href="icons.svg#icon-refresh"></use>
+              </svg>
+              Reverse order
+            </button>
+          </div>
+
+          <div id="matchList" class="settings-list export-match-list"></div>
+          <p
+            id="matchSummary"
+            class="export-match-summary"
+            aria-live="polite"
+          ></p>
+
+          <div class="export-actions">
+            <button id="exportBtn" type="button">
+              <svg class="icon" aria-hidden="true">
+                <use href="icons.svg#icon-download"></use>
+              </svg>
+              Download matched CSV
+            </button>
+            <button id="clearBtn" type="button" class="secondary">Clear</button>
+          </div>
+
+          <p class="settings-group-label">3 &middot; Apply metadata</p>
+          <p class="export-intro">
+            Apply the downloaded metadata to the chosen images using the
+            following command: <br />
+            <code
+              >exiftool -csv=&lt;exported_csv&gt; &lt;uploaded_files&gt;</code
+            >
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <script src="src/util.js"></script>
+    <script src="src/config.js"></script>
+    <script src="src/entities.js"></script>
+    <script src="src/rolls.js"></script>
+    <script src="src/export.js"></script>
+    <script src="src/frame.js"></script>
+    <script src="src/export-page.js"></script>
+  </body>
+</html>
