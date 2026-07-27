@@ -21,6 +21,7 @@ const ASSETS = [
   "./src/export.js",
   "./src/export-page.js",
   "./src/frame.js",
+  "./src/location.js",
   "./src/rolls.js",
   "./src/roll-ui.js",
   "./src/settings.js",

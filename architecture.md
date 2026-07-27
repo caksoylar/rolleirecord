@@ -11,7 +11,7 @@ Four HTML entry points share the same `src/` directory:
 **`index.html` — main app** (in dependency order):
 
 ```
-util.js → config.js → entities.js → rolls.js → table.js →
+util.js → config.js → entities.js → rolls.js → location.js → table.js →
 roll-ui.js → export.js → frame.js → app.js
 ```
 
@@ -24,7 +24,8 @@ util.js → config.js → entities.js → rolls.js → entity-editor.js
 **`export.html` — scan matching and CSV export page**:
 
 ```
-util.js → config.js → entities.js → rolls.js → export.js → export-page.js
+util.js → config.js → entities.js → rolls.js → export.js → location.js →
+export-page.js
 ```
 
 **`settings.html` — settings page**:
@@ -50,11 +51,12 @@ graph LR
     config["config.js\nschemas · defaults"]
     entities["entities.js\nCameraManager · FilmManager · OptionsManager"]
     rolls["rolls.js\nRollManager"]
+    location["location.js\nLocationManager"]
     table["table.js\nTableRenderer"]
     roll_ui["roll-ui.js\nRollSelector · NewRollModal · refreshAllUI"]
     export_["export.js\nExport"]
     export_page["export-page.js\nExportPage\n(loaded by export.html)"]
-    frame["frame.js\nFrameModal · LocationManager"]
+    frame["frame.js\nFrameModal · FrameInterpolator"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
     settings["settings.js\nSettingsPage\n(loaded by settings.html)"]
@@ -86,6 +88,11 @@ graph LR
     rolls --> export_page
     rolls --> settings
     rolls --> entity_editor
+
+    location --> table
+    location --> roll_ui
+    location --> frame
+    location --> export_page
 
     table --> roll_ui
     table --> app
@@ -298,15 +305,15 @@ The `getCurrentCamera()` / `getCurrentFilm()` helpers return the current roll's 
 | `TableRenderer` | object singleton | Renders the active roll as expanded, tappable frame rows. Each row groups exposure metadata and notes on the left with an explicit date and reverse-geocoded location on the right. |
 
 It depends on the earlier `config`, `rolls`, and `entities` modules, and uses
-`LocationManager` at render time to resolve location labels. Rendering occurs
-after `frame.js` has loaded, so that lookup introduces no load-order dependency.
+`LocationManager` at render time to resolve location labels. `location.js`
+loads before `table.js`, so that lookup introduces no forward reference.
 
 Private helpers select the active camera's non-hidden `FRAME_SCHEMA` fields
 marked `in_card`, render their header/label and value as the left-side exposure
 summary, and sort frames by descending ID before creating the card list. Date
 values are locale-formatted, and missing date/location values use explicit
 unavailable labels. Reverse geocoding returns the coordinate string while an
-asynchronous lookup is pending, then re-renders once a label is available.
+asynchronous lookup is pending, then updates the matching label in place.
 
 ---
 
@@ -385,12 +392,23 @@ dims the parent sheet via a `dimmed` class on its `.modal-content`.
 
 ---
 
+### `location.js`
+
+| Export            | Kind             | Purpose                                                                                                                                                                                                               |
+| ----------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LocationManager` | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings; generates Maps URLs; and reverse-geocodes locations through Nominatim (results cached in localStorage up to 1,000 entries). |
+
+Loaded by `index.html` and `export.html` before modules that render location
+labels. Keeping it separate prevents the export page from loading the
+frame-editing UI solely for shared location utilities.
+
+---
+
 ### `frame.js`
 
 | Export              | Kind             | Purpose                                                                                                                                                                                                                                                                                                                                                                                            |
 | ------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `FrameModal`        | object singleton | Add/edit modal for individual frames. Renders form from `FRAME_SCHEMA`, respecting current camera's hidden fields. Pre-fills new frames from the previous frame's data. Public interface via `openAddModal()` / `openEditModal(frameId)` called by the FAB and table row actions.                                                                                                                  |
-| `LocationManager`   | object singleton | Wraps the Geolocation API. Formats, parses, and validates `"lat,lng"` coordinate strings; generates Maps URLs; and reverse-geocodes locations through Nominatim (results cached in localStorage up to 1,000 entries).                                                                                                                                                                              |
 | `FrameInterpolator` | object singleton | Fills gaps in a roll's frame numbering. Private `_interpolateFrame(index, prevFrame, nextFrame)` builds one interpolated frame (copies `prevFrame`, linearly interpolates `date`/`location` by index distance, sets a note). Public `interpolateFramesInRoll(frames)` finds all gaps and returns the interpolated frames for each. Called by `roll-ui.js`'s `RollActionsModal` interpolate button. |
 
 `FrameModal` (used inside `index.html`) and `entity-editor.js`'s
