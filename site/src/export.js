@@ -148,11 +148,10 @@ function _buildExifTags(meta, sourceFile) {
 // eslint-disable-next-line no-unused-vars
 const Export = {
   // Build clean frame data for CSV export (flat rows with camera, film, and EI)
-  _getFrameData() {
-    const rows = RollManager.getFrames();
-    const roll = RollManager.getCurrentRoll();
-    const camera = RollManager.getCurrentCamera();
-    const film = RollManager.getCurrentFilm();
+  _getFrameData(roll = RollManager.getCurrentRoll()) {
+    const rows = roll?.frames ?? [];
+    const camera = roll?.camera ?? CameraManager.getAll()[0]?.name ?? "";
+    const film = roll?.film ?? FilmManager.getAll()[0]?.name ?? "";
     const ei = roll?.ei ?? FilmManager.getByName(film)?.iso ?? "";
 
     return rows.map((row) => {
@@ -208,16 +207,13 @@ const Export = {
     return `${name} (${suffix})`;
   },
 
-  _rollFilename(extension) {
-    const currentRoll = RollManager.getCurrentRoll();
+  _rollFilename(extension, roll = RollManager.getCurrentRoll()) {
     const timestamp = new Date()
       .toISOString()
       .replace(/[:.]/g, "-")
       .slice(0, -5);
-    const rollName = currentRoll
-      ? currentRoll.name.replace(/[^a-z0-9]/gi, "_")
-      : "export";
-    const frameCount = RollManager.getMaxFrameId(currentRoll) ?? 0;
+    const rollName = roll ? roll.name.replace(/[^a-z0-9]/gi, "_") : "export";
+    const frameCount = RollManager.getMaxFrameId(roll) ?? 0;
     return `${rollName}_${frameCount}-${timestamp}.${extension}`;
   },
 
@@ -365,8 +361,11 @@ const Export = {
     });
   },
 
-  exportToExiftoolCSV(matches = null) {
-    const data = this._getFrameData();
+  exportToExiftoolCSV({
+    matches = null,
+    roll = RollManager.getCurrentRoll(),
+  } = {}) {
+    const data = this._getFrameData(roll);
     let exportRows;
 
     if (matches) {
@@ -403,6 +402,6 @@ const Export = {
 
     const csvString = [keys.join(","), ...exif.map(toCsvLine)].join("\n");
 
-    this._downloadFile(csvString, "text/csv", this._rollFilename("csv"));
+    this._downloadFile(csvString, "text/csv", this._rollFilename("csv", roll));
   },
 };

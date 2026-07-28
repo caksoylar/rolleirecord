@@ -448,9 +448,9 @@ and `/entity-editor.html?type=film`.
 Loaded on `index.html`, `export.html`, and `settings.html`. On the main page,
 `importRoll` is reachable via `NewRollModal`'s "Import from file…" button, and
 `exportRoll` is reachable via `RollActionsModal`; its CSV row navigates to
-`export.html`. The export page supplies matched frame IDs and scan filenames to
-`exportToExiftoolCSV`. The storage backup/restore functions are wired up by
-`settings.js` only.
+`export.html`. The export page supplies its captured roll snapshot alongside
+matched frame IDs and scan filenames to `exportToExiftoolCSV`. The storage
+backup/restore functions are wired up by `settings.js` only.
 
 **Single-roll JSON format** (`exportRoll` / `importRoll`) — a roll-level object,
 not a flat frame array:
@@ -480,7 +480,7 @@ active roll, natural-sorts locally selected scan files, and matches included
 files to logged frames in ascending ID order from a configurable first frame.
 It owns preview object URLs, reverse/exclude/clear controls, match summaries,
 and passes matched frame IDs with the original filenames to
-`Export.exportToExiftoolCSV`.
+`Export.exportToExiftoolCSV` alongside the captured roll snapshot.
 
 ---
 

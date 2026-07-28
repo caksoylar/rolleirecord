@@ -96,7 +96,9 @@ const ExportPage = {
 
     document
       .getElementById("exportWithoutMatch")
-      .addEventListener("click", () => Export.exportToExiftoolCSV());
+      .addEventListener("click", () =>
+        Export.exportToExiftoolCSV({ roll: this._roll }),
+      );
 
     this._exportBtn.addEventListener("click", () => {
       const matches = this._getAssignments()
@@ -107,7 +109,7 @@ const ExportPage = {
         }));
 
       try {
-        Export.exportToExiftoolCSV(matches);
+        Export.exportToExiftoolCSV({ matches, roll: this._roll });
       } catch (error) {
         alert(`Failed to export: ${error.message}`);
       }
