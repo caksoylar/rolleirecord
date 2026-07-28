@@ -206,7 +206,7 @@ const RollActionsModal = {
 
     document
       .getElementById("rollActionsExportJsonBtn")
-      .addEventListener("click", () => Export.exportRoll());
+      .addEventListener("click", () => DataIO.exportRoll());
 
     document
       .getElementById("rollActionsExportCsvBtn")
@@ -304,7 +304,7 @@ const NewRollModal = {
       .addEventListener("click", () => {
         this._mandatory = false;
         this._close();
-        Export.importRoll();
+        DataIO.importRoll();
       });
 
     this._modalEl.addEventListener("click", (e) => {

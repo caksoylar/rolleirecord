@@ -46,11 +46,11 @@ const SettingsPage = {
 
     document
       .getElementById("settingsFullExportBtn")
-      .addEventListener("click", () => Export.exportStorage());
+      .addEventListener("click", () => DataIO.exportStorage());
 
     document
       .getElementById("settingsFullImportBtn")
-      .addEventListener("click", () => Export.importStorage());
+      .addEventListener("click", () => DataIO.importStorage());
 
     document
       .getElementById("settingsRefreshCacheBtn")

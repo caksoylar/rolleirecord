@@ -1,407 +1,290 @@
 // ============================================================================
-// EXPORT & IMPORT - I/O for rolls
+// EXPORT PAGE - Match local scan filenames to the active roll's logged frames
 // ============================================================================
 
-// Convert app metadata fields to exiftool tag names.
-function _buildExifTags(meta, sourceFile) {
-  const frameId = String(meta.id).padStart(2, "0");
-  const tags = { SourceFile: sourceFile ?? `frame_${frameId}.jpg` };
+const ExportPage = {
+  _roll: null,
+  _frames: [],
+  _scans: [],
 
-  // Camera make & model (split first word as Make)
-  if (meta.camera) {
-    const parts = meta.camera.split(" ");
-    tags["Make"] = parts[0];
-    tags["Model"] = parts.length > 1 ? parts.slice(1).join(" ") : parts[0];
-  }
+  init() {
+    CameraManager.init();
+    FilmManager.init();
+    RollManager.init();
 
-  // Date: use AllDates to set DateTimeOriginal, CreateDate, ModifyDate at once
-  if (meta.date) {
-    const d = meta.date
-      .replace(/^(\d+)-(\d+)-(\d+)/, "$1:$2:$3")
-      .replace(/T/, " ");
+    this._roll = RollManager.getCurrentRoll();
+    this._frames = [...(this._roll?.frames ?? [])].sort(
+      (frameA, frameB) => frameA.id - frameB.id,
+    );
 
-    tags["AllDates"] = d.replace(/[+-]\d+:\d+$/, "");
+    this._fileInput = document.getElementById("scanFiles");
+    this._matchingSection = document.getElementById("matchingSection");
+    this._startFrameInput = document.getElementById("startFrame");
+    this._matchList = document.getElementById("matchList");
+    this._matchSummary = document.getElementById("matchSummary");
+    this._exportBtn = document.getElementById("exportBtn");
 
-    // Timezone offset
-    const offset = d.match(/[+-]\d+:\d+$/)?.[0];
-    if (offset) {
-      tags["OffsetTime"] = offset;
-      tags["OffsetTimeOriginal"] = offset;
-      tags["OffsetTimeDigitized"] = offset;
+    this._renderRoll();
+    this._bindEvents();
+  },
+
+  _renderRoll() {
+    const workflow = document.getElementById("exportWorkflow");
+    const emptyState = document.getElementById("emptyState");
+
+    if (!this._roll) {
+      document.getElementById("rollName").textContent = "No active roll";
+      document.getElementById("rollFrameCount").textContent = "0 frames";
+      document.getElementById("rollMeta").textContent =
+        "Return to the app and select a roll.";
+      emptyState.textContent = "A roll is required to match and export scans.";
+      emptyState.hidden = false;
+      workflow.hidden = true;
+      return;
     }
-  }
 
-  // Shutter speed (e.g. "1/125" or "1s"). Bulb ("B") has no numeric representation.
-  if (meta.shutter && !/^(auto|b)$/i.test(meta.shutter)) {
-    const val = String(meta.shutter).replace(/s$/, "");
-    tags["ExposureTime"] = val;
-  }
+    document.getElementById("rollName").textContent = this._roll.name;
+    document.getElementById("rollFrameCount").textContent =
+      `${this._frames.length} logged ${this._frames.length === 1 ? "frame" : "frames"}`;
+    document.getElementById("rollMeta").textContent = [
+      this._roll.camera,
+      this._roll.film,
+      // eslint-disable-next-line eqeqeq
+      this._roll.ei != null ? `EI ${this._roll.ei}` : null,
+    ]
+      .filter(Boolean)
+      .join(" \u00b7 ");
 
-  // Aperture (e.g. "ƒ/5.6" or "5.6")
-  if (meta.aperture && !/^auto$/i.test(meta.aperture)) {
-    const val = String(meta.aperture).replace(/^[ƒf]\//, "");
-    tags["FNumber"] = val;
-  }
-
-  // ISO
-  if (meta.iso) {
-    tags["ISO"] = String(meta.iso);
-  }
-
-  // Exposure compensation
-  if (meta.exposure_comp) {
-    tags["ExposureCompensation"] = String(meta.exposure_comp);
-  }
-
-  // Flash: EXIF Flash tag:  0 = No Flash, 1 = Fired
-  // eslint-disable-next-line eqeqeq
-  if (meta.flash != null) {
-    tags["Flash"] = meta.flash ? "1" : "0";
-  }
-
-  // Lens make & model (split first word as Make, like camera)
-  if (meta.lens) {
-    const parts = String(meta.lens).trim().split(" ");
-    // If lens has multiple words, try make/model split
-    // Typical analog lens names may be just "50mm f/1.8" (no brand)
-    // or "Nikon 50mm f/1.4" (with brand)
-    if (parts.length > 1 && !/^\d/.test(parts[0])) {
-      // First word looks like a brand (starts with a letter)
-      tags["LensMake"] = parts[0];
-      tags["LensModel"] = parts.slice(1).join(" ");
-    } else {
-      // No brand prefix:  use full string as model
-      tags["LensModel"] = meta.lens;
+    if (this._frames.length === 0) {
+      emptyState.textContent =
+        "Log at least one frame before matching and exporting scans.";
+      emptyState.hidden = false;
+      workflow.hidden = true;
+      return;
     }
-  }
 
-  // Focal length (e.g. "85mm" or "85")
-  // Note: we write FocalLength (actual physical focal length) only.
-  // FocalLengthIn35mmFormat is intentionally omitted - computing it requires
-  // a per-format crop factor that we don't have reliably for user-added cameras
-  // and medium format bodies where the relationship to 35mm varies widely.
-  if (meta.focal_length) {
-    const val = String(meta.focal_length).replace(/mm$/i, "");
-    tags["FocalLength"] = val;
-  }
+    this._startFrameInput.value = this._frames[0].id;
+  },
 
-  // Exposure program / shooting mode
-  if (meta.mode) {
-    // Map common shorthand values to EXIF ExposureProgram numeric codes.
-    // Numeric values are passed through directly if already valid.
-    const MODE_MAP = {
-      M: 1,
-      Manual: 1,
-      P: 2,
-      Program: 2,
-      Auto: 2,
-      A: 3,
-      Av: 3,
-      "Aperture-priority": 3,
-      Bokeh: 3,
-      S: 4,
-      Tv: 4,
-      "Shutter-priority": 4,
-      Slow: 5,
-      Night: 5,
-    };
-    const VALID_CODES = new Set([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
-    const numeric = Number(meta.mode);
-    if (!isNaN(numeric) && VALID_CODES.has(numeric)) {
-      tags["ExposureProgram"] = String(numeric);
-    } else {
-      tags["ExposureProgram"] = String(MODE_MAP[meta.mode] ?? 0);
-    }
-  }
+  _bindEvents() {
+    this._fileInput.addEventListener("change", () => {
+      this._setScans(Array.from(this._fileInput.files));
+    });
 
-  // GPS coordinates
-  if (meta.location) {
-    const [latitude, longitude] = meta.location.split(/, */).map(parseFloat);
-    if (!isNaN(latitude) && !isNaN(longitude)) {
-      tags["GPSLatitude"] = latitude.toFixed(5);
-      tags["GPSLatitudeRef"] = latitude >= 0 ? "N" : "S";
-      tags["GPSLongitude"] = longitude.toFixed(5);
-      tags["GPSLongitudeRef"] = longitude >= 0 ? "E" : "W";
-    }
-  }
+    this._matchList.addEventListener("change", (event) => {
+      const checkbox = event.target.closest("input[data-index]");
+      if (!checkbox) return;
+      this._scans[Number(checkbox.dataset.index)].included = checkbox.checked;
+      this._renderMatches();
+    });
 
-  // Notes & Filter → UserComment
-  const userComment = [
-    meta.notes,
-    meta.filter && meta.filter !== "None" ? `Filter: ${meta.filter}` : null,
-  ]
-    .filter(Boolean)
-    .join("\n");
+    this._startFrameInput.addEventListener("input", () =>
+      this._renderMatches(),
+    );
 
-  if (userComment) {
-    tags["UserComment"] = userComment;
-  }
+    document.getElementById("reverseBtn").addEventListener("click", () => {
+      this._scans.reverse();
+      this._renderMatches();
+    });
 
-  // Film stock → ImageDescription
-  if (meta.film) {
-    tags["ImageDescription"] = meta.film;
-  }
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      this._releasePreviews();
+      this._scans = [];
+      this._fileInput.value = "";
+      this._renderMatches();
+    });
 
-  return tags;
-}
-
-// eslint-disable-next-line no-unused-vars
-const Export = {
-  // Build clean frame data for CSV export (flat rows with camera, film, and EI)
-  _getFrameData(roll = RollManager.getCurrentRoll()) {
-    const rows = roll?.frames ?? [];
-    const camera = roll?.camera ?? CameraManager.getAll()[0]?.name ?? "";
-    const film = roll?.film ?? FilmManager.getAll()[0]?.name ?? "";
-    const ei = roll?.ei ?? FilmManager.getByName(film)?.iso ?? "";
-
-    return rows.map((row) => {
-      const clean = Object.fromEntries(
-        Object.entries(row).filter(([, val]) => val != null), // eslint-disable-line eqeqeq
+    document
+      .getElementById("exportWithoutMatch")
+      .addEventListener("click", () =>
+        DataIO.exportToExiftoolCSV({ roll: this._roll }),
       );
-      clean.camera = camera;
-      clean.film = film;
-      clean.iso = ei;
-      return clean;
-    });
-  },
 
-  // Strip internal id, keep only entity-relevant properties
-  _cleanEntity(entity) {
-    if (!entity) return {};
-    const { id: _id, ...rest } = entity;
-    return rest;
-  },
+    this._exportBtn.addEventListener("click", () => {
+      const matches = this._getAssignments()
+        .filter(({ scan, frame }) => scan.included && frame)
+        .map(({ scan, frame }) => ({
+          frameId: frame.id,
+          sourceFile: scan.name,
+        }));
 
-  // Coerce raw frame objects to match FRAME_SCHEMA types, strip nulls
-  _coerceFrames(rawFrames) {
-    const fieldMap = new Map(FRAME_SCHEMA.fields.map((f) => [f.name, f]));
-    return rawFrames.map((row) => {
-      const frame = {};
-      for (const key of Object.keys(row)) {
-        const field = fieldMap.get(key);
-        if (!field) continue;
-        let val = row[key];
-        if (field.type === "number") {
-          val = val == null ? null : Number(val); // eslint-disable-line eqeqeq
-          if (isNaN(val)) val = null;
-        } else if (field.type === "checkbox") {
-          val = val === true || val === "true";
-          // eslint-disable-next-line eqeqeq
-        } else if (val != null) {
-          val = String(val);
-        }
-        if (val != null) frame[key] = val; // eslint-disable-line eqeqeq
+      try {
+        DataIO.exportToExiftoolCSV({ matches, roll: this._roll });
+      } catch (error) {
+        alert(`Failed to export: ${error.message}`);
       }
-      return frame;
     });
+
+    window.addEventListener("pagehide", () => this._releasePreviews());
   },
 
-  // Append numeric suffix if a roll with this name already exists
-  _deduplicateRollName(name) {
-    const existingNames = new Set(RollManager.getRolls().map((r) => r.name));
-    if (!existingNames.has(name)) return name;
-    let suffix = 2;
-    while (existingNames.has(`${name} (${suffix})`)) {
-      suffix++;
-    }
-    return `${name} (${suffix})`;
-  },
-
-  _rollFilename(extension, roll = RollManager.getCurrentRoll()) {
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[:.]/g, "-")
-      .slice(0, -5);
-    const rollName = roll ? roll.name.replace(/[^a-z0-9]/gi, "_") : "export";
-    const frameCount = RollManager.getMaxFrameId(roll) ?? 0;
-    return `${rollName}_${frameCount}-${timestamp}.${extension}`;
-  },
-
-  _downloadFile(content, mimeType, filename) {
-    const blob = new Blob([content], { type: mimeType });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-  },
-
-  exportStorage() {
-    const backup = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      backup[key] = localStorage.getItem(key);
-    }
-    const timestamp = new Date()
-      .toISOString()
-      .replace(/[:.]/g, "-")
-      .slice(0, -5);
-    this._downloadFile(
-      JSON.stringify(backup, null, 2),
-      "application/json",
-      `rolleirecord-backup-${timestamp}.json`,
+  _naturalSort(files) {
+    return files.toSorted((fileA, fileB) =>
+      fileA.name.localeCompare(fileB.name, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      }),
     );
   },
 
-  _importFile(handler) {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".json,application/json";
+  _setScans(files) {
+    this._releasePreviews();
+    this._scans = this._naturalSort(files).map((file) => ({
+      name: file.name,
+      detail: `${file.type || "Image"}${
+        file.size ? ` \u00b7 ${(file.size / 1024 / 1024).toFixed(1)} MB` : ""
+      }`,
+      previewUrl: URL.createObjectURL(file),
+      included: true,
+    }));
+    this._startFrameInput.value = this._frames[0].id;
+    this._renderMatches();
+  },
 
-    input.addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
+  _releasePreviews() {
+    this._scans.forEach((scan) => URL.revokeObjectURL(scan.previewUrl));
+  },
 
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        try {
-          handler(event.target.result, file);
-        } catch (err) {
-          alert("Failed to import: " + err.message);
+  _getStartFrame() {
+    return this._startFrameInput.valueAsNumber;
+  },
+
+  _getAvailableFrames() {
+    const firstFrame = this._getStartFrame();
+    if (Number.isNaN(firstFrame)) return [];
+    return this._frames.filter((frame) => frame.id >= firstFrame);
+  },
+
+  _getAssignments() {
+    const availableFrames = this._getAvailableFrames();
+    let frameIndex = 0;
+
+    return this._scans.map((scan) => {
+      if (!scan.included) return { scan, frame: null };
+      const frame = availableFrames[frameIndex] ?? null;
+      frameIndex++;
+      return { scan, frame };
+    });
+  },
+
+  _renderMatchRow({ scan, frame }, index) {
+    let status = "No logged frame";
+    if (!scan.included) status = "Excluded";
+    else if (frame) status = `Frame ${frame.id}`;
+
+    const location = frame?.location || "";
+    const mapsUrl = LocationManager.getMapsUrl(location);
+    const locationStr = LocationManager.getLocationLabel(
+      location,
+      (resolvedLocation) => {
+        const label = document.getElementById(`export-location-${index}`);
+        if (label?.dataset.location === location) {
+          label.textContent = resolvedLocation;
         }
-      };
-      reader.readAsText(file);
-    });
-
-    input.click();
-  },
-
-  importStorage() {
-    this._importFile((text) => {
-      const backup = JSON.parse(text);
-      if (!backup || typeof backup !== "object" || Array.isArray(backup)) {
-        alert("Invalid file: expected a JSON object.");
-        return;
-      }
-      if (
-        !confirm(
-          "This will replace all current data with the backup. Continue?",
-        )
-      )
-        return;
-      localStorage.clear();
-      Object.entries(backup).forEach(([k, v]) => localStorage.setItem(k, v));
-      location.reload();
-    });
-  },
-
-  exportRoll() {
-    const roll = RollManager.getCurrentRoll();
-    if (!roll) return;
-
-    const cameraName = RollManager.getCurrentCamera();
-    const filmName = RollManager.getCurrentFilm();
-
-    const data = {
-      name: roll.name,
-      frameCount: roll.frameCount ?? null,
-      ei: roll.ei ?? FilmManager.getByName(filmName)?.iso ?? null,
-      status: roll.status || "Loaded",
-      notes: roll.notes || "",
-      camera: this._cleanEntity(CameraManager.getByName(cameraName)),
-      film: this._cleanEntity(FilmManager.getByName(filmName)),
-      frames: this._coerceFrames(roll.frames),
-    };
-
-    const jsonString = JSON.stringify(data, null, 2);
-    this._downloadFile(
-      jsonString,
-      "application/json",
-      this._rollFilename("json"),
+      },
     );
+
+    return `
+      <div class="settings-row export-match-row${scan.included ? "" : " excluded"}">
+        <input
+          type="checkbox"
+          data-index="${index}"
+          ${scan.included ? "checked" : ""}
+        />
+        <span class="export-scan-thumbnail">
+          <img src="${escapeHtml(scan.previewUrl)}" alt="" loading="lazy" />
+          <svg class="icon export-preview-fallback" aria-hidden="true">
+            <use href="icons.svg#icon-camera"></use>
+          </svg>
+        </span>
+        <span class="row-label">
+          <span class="row-title">${escapeHtml(scan.name)}</span>
+          <span class="row-sub">${escapeHtml(scan.detail)}</span>
+        </span>
+        <span class="export-match-arrow" aria-hidden="true">&rarr;</span>
+        <span class="export-frame-details">
+          <span class="export-frame-heading">
+            <span class="export-frame-match${scan.included && !frame ? " unmatched" : ""}">
+              ${escapeHtml(status)}
+            </span>
+            <a
+              class="export-map-button"
+              ${mapsUrl ? `href="${escapeHtml(mapsUrl)}"` : ""}
+              target="_blank"
+              rel="noopener"
+              title="Open frame location in map"
+              aria-label="Open frame location in map"
+              ${mapsUrl ? "" : 'aria-disabled="true"'}
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="icons.svg#icon-map"></use>
+              </svg>
+            </a>
+          </span>
+          <span class="export-frame-detail">${
+            frame
+              ? escapeHtml(formatDisplayDate(frame.date))
+              : "No frame metadata"
+          }</span>
+          <span
+            id="export-location-${index}"
+            class="export-frame-detail"
+            data-location="${escapeHtml(location)}"
+          >${frame ? escapeHtml(locationStr) : "Location unavailable"}</span>
+          ${
+            frame?.notes
+              ? `<span class="export-frame-detail export-frame-note">"${escapeHtml(frame.notes)}"</span>`
+              : ""
+          }
+        </span>
+      </div>`;
   },
 
-  importRoll() {
-    this._importFile((text, file) => {
-      const data = JSON.parse(text);
+  _renderMatches() {
+    if (this._scans.length === 0) {
+      this._matchingSection.hidden = true;
+      this._matchList.replaceChildren();
+      this._matchSummary.textContent = "";
+      this._exportBtn.disabled = true;
+      return;
+    }
+    this._matchingSection.hidden = false;
 
-      if (!data || typeof data !== "object" || !Array.isArray(data.frames)) {
-        alert("Invalid file: expected a JSON object with a frames array.");
-        return;
-      }
+    const assignments = this._getAssignments();
+    this._matchList.innerHTML = assignments
+      .map((assignment, index) => this._renderMatchRow(assignment, index))
+      .join("");
 
-      // Reconcile camera and film entities
-      const camera = data.camera
-        ? CameraManager.upsertByName(data.camera)
-        : null;
-      const film = data.film ? FilmManager.upsertByName(data.film) : null;
-
-      const cameraName = camera?.name || CameraManager.getAll()[0]?.name || "";
-      const filmName = film?.name || FilmManager.getAll()[0]?.name || "";
-
-      const frames = this._coerceFrames(data.frames);
-
-      // Use roll name from data, fall back to filename
-      let rollName = data.name;
-      if (!rollName) {
-        const baseName = file.name.replace(/\.json$/i, "");
-        rollName = baseName
-          .replace(/-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}$/, "")
-          .replace(/_-?\d+$/, "")
-          .replace(/_/g, " ");
-      }
-      rollName = this._deduplicateRollName(rollName || "Imported Roll");
-
-      const newRoll = RollManager.createRoll({
-        name: rollName,
-        frameCount: data.frameCount,
-        ei: data.ei,
-        status: data.status,
-        notes: data.notes || "",
-        camera: cameraName,
-        film: filmName,
-        frames,
+    this._matchList
+      .querySelectorAll("input[data-index]")
+      .forEach((checkbox) => {
+        const scan = this._scans[Number(checkbox.dataset.index)];
+        checkbox.setAttribute("aria-label", `Include ${scan.name}`);
       });
-      RollManager.setCurrentRoll(newRoll.id);
 
-      refreshAllUI();
-    });
-  },
-
-  exportToExiftoolCSV({
-    matches = null,
-    roll = RollManager.getCurrentRoll(),
-  } = {}) {
-    const data = this._getFrameData(roll);
-    let exportRows;
-
-    if (matches) {
-      const framesById = new Map(data.map((frame) => [frame.id, frame]));
-      exportRows = matches.map(({ frameId, sourceFile }) => {
-        const frame = framesById.get(frameId);
-        if (!frame) {
-          throw new Error(`Frame ${frameId} is no longer available.`);
-        }
-        return { frame, sourceFile };
+    this._matchList
+      .querySelectorAll(".export-scan-thumbnail img")
+      .forEach((image) => {
+        image.addEventListener(
+          "error",
+          () => image.closest(".export-scan-thumbnail").classList.add("failed"),
+          { once: true },
+        );
       });
-    } else {
-      exportRows = data
-        .sort((f1, f2) => f1.id - f2.id)
-        .map((frame) => ({ frame }));
-    }
 
-    const exif = exportRows.map(({ frame, sourceFile }) =>
-      _buildExifTags(frame, sourceFile),
+    const included = assignments.filter(({ scan }) => scan.included);
+    const matched = included.filter(({ frame }) => frame).length;
+    const unmatchedFiles = included.length - matched;
+    const missingScans = Math.max(
+      0,
+      this._getAvailableFrames().length - matched,
     );
-
-    const keys = [...new Set(exif.flatMap((obj) => Object.keys(obj)))];
-
-    const toCsvLine = (obj) =>
-      keys
-        .map((key) => {
-          const val = obj[key] ?? "";
-          // Wrap in quotes if value contains comma, quote, or newline
-          return /[,"\n]/.test(String(val))
-            ? `"${String(val).replace(/"/g, '""')}"`
-            : val;
-        })
-        .join(",");
-
-    const csvString = [keys.join(","), ...exif.map(toCsvLine)].join("\n");
-
-    this._downloadFile(csvString, "text/csv", this._rollFilename("csv", roll));
+    const details = [`${matched} matched`];
+    if (unmatchedFiles) details.push(`${unmatchedFiles} without a frame`);
+    if (missingScans) details.push(`${missingScans} frames without a scan`);
+    this._matchSummary.textContent = details.join(" \u00b7 ");
+    this._exportBtn.disabled = matched === 0;
   },
 };
+
+document.addEventListener("DOMContentLoaded", () => ExportPage.init());

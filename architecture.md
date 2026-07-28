@@ -12,7 +12,7 @@ Four HTML entry points share the same `src/` directory:
 
 ```
 util.js → config.js → entities.js → rolls.js → location.js → table.js →
-roll-ui.js → export.js → frame.js → app.js
+roll-ui.js → data-io.js → frame.js → app.js
 ```
 
 **`entity-editor.html` — camera/film editor page**:
@@ -24,20 +24,21 @@ util.js → config.js → entities.js → rolls.js → entity-editor.js
 **`export.html` — scan matching and CSV export page**:
 
 ```
-util.js → config.js → entities.js → rolls.js → export.js → location.js →
-export-page.js
+util.js → config.js → entities.js → rolls.js → data-io.js → location.js →
+export.js
 ```
 
 **`settings.html` — settings page**:
 
 ```
-util.js → config.js → entities.js → rolls.js → export.js → settings.js
+util.js → config.js → entities.js → rolls.js → data-io.js → settings.js
 ```
 
 `util.js` holds pure, dependency-free helpers (`escapeHtml`, `formatDate`,
 `formatDisplayDate`) and loads first on every page.
-`export.js` loads on both `index.html` (for roll import and roll/CSV export via
-the roll actions modal) and `settings.html` (for full backup export/restore).
+`data-io.js` loads on `index.html` (for roll import and roll/CSV export via the
+roll actions modal), `export.html`, and `settings.html` (for full backup
+export/restore).
 
 Each file may reference globals defined by any earlier script.
 
@@ -54,8 +55,8 @@ graph LR
     location["location.js\nLocationManager"]
     table["table.js\nTableRenderer"]
     roll_ui["roll-ui.js\nRollSelector · NewRollModal · refreshAllUI"]
-    export_["export.js\nExport"]
-    export_page["export-page.js\nExportPage\n(loaded by export.html)"]
+    data_io["data-io.js\nDataIO"]
+    export_page["export.js\nExportPage\n(loaded by export.html)"]
     frame["frame.js\nFrameModal · FrameInterpolator"]
     app["app.js\ninit · gear → settings.html"]
     entity_editor["entity-editor.js\n(loaded by entity-editor.html)"]
@@ -70,21 +71,21 @@ graph LR
     config --> rolls
     config --> table
     config --> frame
-    config --> export_
+    config --> data_io
     config --> entity_editor
     config --> settings
 
     entities --> rolls
     entities --> roll_ui
     entities --> frame
-    entities --> export_
+    entities --> data_io
     entities --> entity_editor
     entities --> settings
 
     rolls --> roll_ui
     rolls --> table
     rolls --> frame
-    rolls --> export_
+    rolls --> data_io
     rolls --> export_page
     rolls --> settings
     rolls --> entity_editor
@@ -98,10 +99,10 @@ graph LR
     table --> app
 
     roll_ui --> app
-    roll_ui --> export_
+    roll_ui --> data_io
     roll_ui --> frame
-    export_ --> settings
-    export_ --> export_page
+    data_io --> settings
+    data_io --> export_page
     frame --> app
 ```
 
@@ -110,12 +111,12 @@ graph LR
 > orchestrates `RollSelector` + `TableRenderer`), so `table.js` is a pure
 > provider with no forward references.
 > `app.js` no longer owns settings logic — the header gear button simply
-> navigates to `settings.html`. `roll-ui.js` depends on `export.js` for the
+> navigates to `settings.html`. `roll-ui.js` depends on `data-io.js` for the
 > roll-import flow (`NewRollModal`'s "Import from file…" button) and roll JSON
 > export via `RollActionsModal`; the CSV row navigates to `export.html`.
-> `export-page.js` depends on `export.js` to generate ExifTool CSV rows with
+> `export.js` depends on `data-io.js` to generate ExifTool CSV rows with
 > scan filenames supplied by the matching UI. `settings.js` depends on
-> `export.js` for backup export/import.
+> `data-io.js` for backup export/import.
 
 ---
 
@@ -360,7 +361,7 @@ In addition to the singletons above, `roll-ui.js` defines `refreshAllUI()` —
 a free function that re-renders both roll-dependent surfaces
 (`RollSelector.render()` + `TableRenderer.render()`). It lives here because it
 orchestrates `RollSelector` and `TableRenderer`, and every caller
-(`roll-ui.js`, `export.js`, `frame.js`, `app.js`) loads at or after this
+(`roll-ui.js`, `data-io.js`, `frame.js`, `app.js`) loads at or after this
 point, so no forward references are introduced.
 
 `RollSelector` renders the header dropdown. The dropdown lists rolls plus a
@@ -371,7 +372,7 @@ object pre-filled with defaults and renders each field from `ROLL_FIELDS` as a
 tappable `settings-row`. Tapping a row opens `RollPropertyEditModal` with the
 staging data; saves update the staging object in memory. The footer has
 **Create Roll**, **Cancel**, and **Import from file…** buttons. The import
-button calls `Export.importRoll()` as an alternative creation path.
+button calls `DataIO.importRoll()` as an alternative creation path.
 
 `RollActionsModal` is a bottom-sheet opened by the bottom-left FAB
 (`#rollActionsFab`). It contains:
@@ -438,12 +439,12 @@ and `/entity-editor.html?type=film`.
 
 ---
 
-### `export.js`
+### `data-io.js`
 
 | Export                             | Kind             | Purpose                                                                                                                                                                                                                                                                |
 | ---------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `_buildExifTags(meta, sourceFile)` | function         | Maps app frame fields to exiftool tag names (`Make`, `Model`, `AllDates`, `FNumber`, `ExposureTime`, `ISO`, `FocalLength`, etc.) for CSV export, optionally overriding `SourceFile`. Private to this module.                                                           |
-| `Export`                           | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
+| `DataIO`                           | object singleton | All import/export I/O. Single-roll JSON round-trip (`exportRoll` / `importRoll`), full localStorage backup/restore (`exportStorage` / `importStorage`), exiftool CSV export (`exportToExiftoolCSV`). Import reconciles cameras/films via `EntityManager.upsertByName`. |
 
 Loaded on `index.html`, `export.html`, and `settings.html`. On the main page,
 `importRoll` is reachable via `NewRollModal`'s "Import from file…" button, and
@@ -473,14 +474,14 @@ differ.
 
 ---
 
-### `export-page.js`
+### `export.js`
 
 Standalone page controller loaded by `export.html`. `ExportPage` reads the
 active roll, natural-sorts locally selected scan files, and matches included
 files to logged frames in ascending ID order from a configurable first frame.
 It owns preview object URLs, reverse/exclude/clear controls, match summaries,
 and passes matched frame IDs with the original filenames to
-`Export.exportToExiftoolCSV` alongside the captured roll snapshot.
+`DataIO.exportToExiftoolCSV` alongside the captured roll snapshot.
 
 ---
 
@@ -511,13 +512,13 @@ flowchart TD
     schema["FRAME_SCHEMA.fields"]
     form["FrameModal\n_renderFormFields()"]
     table["TableRenderer\n_renderFrames()"]
-    export_["Export\n_coerceFrames() / _buildExifTags()"]
+    data_io["DataIO\n_coerceFrames() / _buildExifTags()"]
     options["entity-editor.js\nFrameFieldOptionsModal"]
     hidden["EntityManager\nhidden-fields[]"]
 
     schema --> form
     schema --> table
-    schema --> export_
+    schema --> data_io
     schema --> options
     schema --> hidden
 
