@@ -55,18 +55,30 @@
       <div id="exportWorkflow">
         <p class="settings-group-label">1 &middot; Choose scan files</p>
         <section class="settings-list export-file-panel">
-          <label class="export-file-picker" for="scanFiles">
-            <svg class="icon" aria-hidden="true">
-              <use href="icons.svg#icon-upload"></use>
-            </svg>
-            Choose files
-            <input
-              id="scanFiles"
-              type="file"
-              accept=".jpg,.jpeg,.png,.tif,.tiff,image/*"
-              multiple
-            />
-          </label>
+          <div class="export-file-actions">
+            <label class="export-file-action" for="scanFiles">
+              <svg class="icon" aria-hidden="true">
+                <use href="icons.svg#icon-upload"></use>
+              </svg>
+              Choose files
+              <input
+                id="scanFiles"
+                type="file"
+                accept=".jpg,.jpeg,.png,.tif,.tiff,image/*"
+                multiple
+              />
+            </label>
+            <button
+              id="exportWithoutMatch"
+              class="export-file-action secondary"
+              type="button"
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="icons.svg#icon-download"></use>
+              </svg>
+              Export without matching
+            </button>
+          </div>
           <p class="export-privacy-note">
             Files stay on this device and are never uploaded.
           </p>

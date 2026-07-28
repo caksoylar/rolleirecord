@@ -94,6 +94,10 @@ const ExportPage = {
       this._renderMatches();
     });
 
+    document
+      .getElementById("exportWithoutMatch")
+      .addEventListener("click", () => Export.exportToExiftoolCSV());
+
     this._exportBtn.addEventListener("click", () => {
       const matches = this._getAssignments()
         .filter(({ scan, frame }) => scan.included && frame)
