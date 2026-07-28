@@ -165,6 +165,79 @@ const ExportPage = {
     });
   },
 
+  _renderMatchRow({ scan, frame }, index) {
+    let status = "No logged frame";
+    if (!scan.included) status = "Excluded";
+    else if (frame) status = `Frame ${frame.id}`;
+
+    const location = frame?.location || "";
+    const mapsUrl = LocationManager.getMapsUrl(location);
+    const locationStr = LocationManager.getLocationLabel(
+      location,
+      (resolvedLocation) => {
+        const label = document.getElementById(`export-location-${index}`);
+        if (label?.dataset.location === location) {
+          label.textContent = resolvedLocation;
+        }
+      },
+    );
+
+    return `
+      <div class="settings-row export-match-row${scan.included ? "" : " excluded"}">
+        <input
+          type="checkbox"
+          data-index="${index}"
+          ${scan.included ? "checked" : ""}
+        />
+        <span class="export-scan-thumbnail">
+          <img src="${escapeHtml(scan.previewUrl)}" alt="" loading="lazy" />
+          <svg class="icon export-preview-fallback" aria-hidden="true">
+            <use href="icons.svg#icon-camera"></use>
+          </svg>
+        </span>
+        <span class="row-label">
+          <span class="row-title">${escapeHtml(scan.name)}</span>
+          <span class="row-sub">${escapeHtml(scan.detail)}</span>
+        </span>
+        <span class="export-match-arrow" aria-hidden="true">&rarr;</span>
+        <span class="export-frame-details">
+          <span class="export-frame-heading">
+            <span class="export-frame-match${scan.included && !frame ? " unmatched" : ""}">
+              ${escapeHtml(status)}
+            </span>
+            <a
+              class="export-map-button"
+              ${mapsUrl ? `href="${escapeHtml(mapsUrl)}"` : ""}
+              target="_blank"
+              rel="noopener"
+              title="Open frame location in map"
+              aria-label="Open frame location in map"
+              ${mapsUrl ? "" : 'aria-disabled="true"'}
+            >
+              <svg class="icon" aria-hidden="true">
+                <use href="icons.svg#icon-map"></use>
+              </svg>
+            </a>
+          </span>
+          <span class="export-frame-detail">${
+            frame
+              ? escapeHtml(formatDisplayDate(frame.date))
+              : "No frame metadata"
+          }</span>
+          <span
+            id="export-location-${index}"
+            class="export-frame-detail"
+            data-location="${escapeHtml(location)}"
+          >${frame ? escapeHtml(locationStr) : "Location unavailable"}</span>
+          ${
+            frame?.notes
+              ? `<span class="export-frame-detail export-frame-note">"${escapeHtml(frame.notes)}"</span>`
+              : ""
+          }
+        </span>
+      </div>`;
+  },
+
   _renderMatches() {
     if (this._scans.length === 0) {
       this._matchingSection.hidden = true;
@@ -177,79 +250,7 @@ const ExportPage = {
 
     const assignments = this._getAssignments();
     this._matchList.innerHTML = assignments
-      .map(({ scan, frame }, index) => {
-        let status = "No logged frame";
-        if (!scan.included) status = "Excluded";
-        else if (frame) status = `Frame ${frame.id}`;
-
-        const location = frame?.location || "";
-
-        const mapsUrl = LocationManager.getMapsUrl(location);
-        const locationStr = LocationManager.getLocationLabel(
-          location,
-          (resolvedLocation) => {
-            const label = document.getElementById(`export-location-${index}`);
-            if (label?.dataset.location === location) {
-              label.textContent = resolvedLocation;
-            }
-          },
-        );
-
-        return `
-          <div class="settings-row export-match-row${scan.included ? "" : " excluded"}">
-            <input
-              type="checkbox"
-              data-index="${index}"
-              ${scan.included ? "checked" : ""}
-            />
-            <span class="export-scan-thumbnail">
-              <img src="${escapeHtml(scan.previewUrl)}" alt="" loading="lazy" />
-              <svg class="icon export-preview-fallback" aria-hidden="true">
-                <use href="icons.svg#icon-camera"></use>
-              </svg>
-            </span>
-            <span class="row-label">
-              <span class="row-title">${escapeHtml(scan.name)}</span>
-              <span class="row-sub">${escapeHtml(scan.detail)}</span>
-            </span>
-            <span class="export-match-arrow" aria-hidden="true">&rarr;</span>
-            <span class="export-frame-details">
-              <span class="export-frame-heading">
-                <span class="export-frame-match${scan.included && !frame ? " unmatched" : ""}">
-                  ${escapeHtml(status)}
-                </span>
-                <a
-                  class="export-map-button"
-                  ${mapsUrl ? `href="${escapeHtml(mapsUrl)}"` : ""}
-                  target="_blank"
-                  rel="noopener"
-                  title="Open frame location in map"
-                  aria-label="Open frame location in map"
-                  ${mapsUrl ? "" : 'aria-disabled="true"'}
-                >
-                  <svg class="icon" aria-hidden="true">
-                    <use href="icons.svg#icon-map"></use>
-                  </svg>
-                </a>
-              </span>
-              <span class="export-frame-detail">${
-                frame
-                  ? escapeHtml(formatDisplayDate(frame.date))
-                  : "No frame metadata"
-              }</span>
-              <span
-                id="export-location-${index}"
-                class="export-frame-detail"
-                data-location="${escapeHtml(location)}"
-              >${frame ? escapeHtml(locationStr) : "Location unavailable"}</span>
-              ${
-                frame?.notes
-                  ? `<span class="export-frame-detail export-frame-note">"${escapeHtml(frame.notes)}"</span>`
-                  : ""
-              }
-            </span>
-          </div>`;
-      })
+      .map((assignment, index) => this._renderMatchRow(assignment, index))
       .join("");
 
     this._matchList
