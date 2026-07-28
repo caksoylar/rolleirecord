@@ -34,8 +34,8 @@ export-page.js
 util.js → config.js → entities.js → rolls.js → export.js → settings.js
 ```
 
-`util.js` holds pure, dependency-free helpers (`escapeHtml`, `formatDate`) and
-loads first on every page.
+`util.js` holds pure, dependency-free helpers (`escapeHtml`, `formatDate`,
+`formatDisplayDate`) and loads first on every page.
 `export.js` loads on both `index.html` (for roll import and roll/CSV export via
 the roll actions modal) and `settings.html` (for full backup export/restore).
 
@@ -47,7 +47,7 @@ Each file may reference globals defined by any earlier script.
 
 ```mermaid
 graph LR
-    util["util.js\nescapeHtml · formatDate"]
+    util["util.js\nescapeHtml · formatDate · formatDisplayDate"]
     config["config.js\nschemas · defaults"]
     entities["entities.js\nCameraManager · FilmManager · OptionsManager"]
     rolls["rolls.js\nRollManager"]
@@ -189,9 +189,11 @@ erDiagram
 
 ### `util.js`
 
-| Export             | Kind     | Purpose                                                                    |
-| ------------------ | -------- | -------------------------------------------------------------------------- |
-| `escapeHtml(text)` | function | Escapes text for safe interpolation into HTML strings (used on every page) |
+| Export                     | Kind     | Purpose                                                                    |
+| -------------------------- | -------- | -------------------------------------------------------------------------- |
+| `escapeHtml(text)`         | function | Escapes text for safe interpolation into HTML strings (used on every page) |
+| `formatDate(date)`         | function | Formats a `Date` for storage in local datetime fields                      |
+| `formatDisplayDate(value)` | function | Formats a stored date for localized display with a safe fallback           |
 
 Pure, dependency-free helpers. Loads first on every entry point so any later
 module can use them.

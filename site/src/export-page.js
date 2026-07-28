@@ -165,17 +165,6 @@ const ExportPage = {
     });
   },
 
-  _formatFrameDate(value) {
-    if (!value) return "Date unavailable";
-    const date = new Date(value);
-    return Number.isNaN(date.getTime())
-      ? value
-      : date.toLocaleString(undefined, {
-          dateStyle: "medium",
-          timeStyle: "short",
-        });
-  },
-
   _renderMatches() {
     if (this._scans.length === 0) {
       this._matchingSection.hidden = true;
@@ -245,7 +234,7 @@ const ExportPage = {
               </span>
               <span class="export-frame-detail">${
                 frame
-                  ? escapeHtml(this._formatFrameDate(frame.date))
+                  ? escapeHtml(formatDisplayDate(frame.date))
                   : "No frame metadata"
               }</span>
               <span

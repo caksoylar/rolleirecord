@@ -20,16 +20,6 @@ const TableRenderer = {
       .join(" · ");
   },
 
-  _formatDate(value) {
-    if (!value) return "Date unavailable";
-    const date = new Date(value);
-    if (isNaN(date.getTime())) return value;
-    return date.toLocaleString(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
-  },
-
   _renderFrameRow(row) {
     const exposure = this._getExposureDetails(row);
     const rawLocation = row.location || "";
@@ -54,7 +44,7 @@ const TableRenderer = {
       >
         <span class="frame-row-header">
           <span class="frame-row-id">Frame ${escapeHtml(String(row.id))}</span>
-          <span class="frame-row-date">${escapeHtml(this._formatDate(row.date))}</span>
+          <span class="frame-row-date">${escapeHtml(formatDisplayDate(row.date))}</span>
         </span>
         ${
           exposure

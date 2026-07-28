@@ -25,3 +25,17 @@ function formatDate(date) {
 
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
+
+// Format a stored date value for display in the user's locale.
+// eslint-disable-next-line no-unused-vars
+function formatDisplayDate(value) {
+  if (!value) return "Date unavailable";
+
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? value
+    : date.toLocaleString(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      });
+}
