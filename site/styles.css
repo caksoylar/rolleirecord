@@ -445,7 +445,7 @@ button.secondary {
   width: 100%;
   max-width: 600px;
   border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  padding: 1.25rem;
+  padding: 1rem;
   max-height: 95dvh;
   overflow-y: auto;
 }
@@ -666,7 +666,6 @@ textarea {
 
 .settings-row .row-label .row-title {
   font-weight: 500;
-  font-size: var(--font-size-sm);
 }
 
 .settings-row .row-label .row-sub {
@@ -684,7 +683,6 @@ textarea {
   width: fit-content;
   padding: 0.4rem 2rem 0.4rem 0.6rem;
   background-color: var(--color-surface-alt);
-  font-size: var(--font-size-sm);
   text-align: right;
 }
 
@@ -712,7 +710,6 @@ textarea {
 .settings-row input {
   padding: 0.4rem 0.6rem;
   background-color: var(--color-surface-alt);
-  font-size: var(--font-size-sm);
   min-width: 2.5rem;
 }
 
