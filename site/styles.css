@@ -116,7 +116,7 @@ body.main-page main {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: 0 1px 3px var(--color-shadow);
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 h1 {
@@ -165,14 +165,14 @@ h1 {
   text-align: center;
   padding: 0.5rem;
   border-radius: var(--radius-lg);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 header button {
@@ -196,7 +196,7 @@ header button {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .entity-selector-bar {
@@ -204,7 +204,7 @@ header button {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .roll-selector-bar label,
@@ -407,7 +407,7 @@ button.secondary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
-  height: 3.25rem;
+  height: 3rem;
 }
 
 .main-actions button {
@@ -470,7 +470,7 @@ button.secondary {
 }
 
 .modal-header {
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .modal-header h2 {
@@ -478,7 +478,7 @@ button.secondary {
 }
 
 .modal-body {
-  margin-bottom: 1rem;
+  margin-bottom: 0.8rem;
   display: grid;
   grid-template-columns: max-content 1fr;
   gap: 0.35rem;
@@ -607,7 +607,8 @@ textarea {
 
 /* Settings list-row pattern (grouped, tappable rows) */
 .settings-group-label {
-  margin: 0 0 0.5rem 0.25rem;
+  margin-bottom: 0.4rem;
+  margin-left: 0.25rem;
   font-size: var(--font-size-xxs);
   font-weight: 600;
   text-transform: uppercase;
@@ -621,7 +622,7 @@ textarea {
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: 0 1px 3px var(--color-shadow);
-  margin: 0 0 1rem;
+  margin-bottom: 0.8rem;
 }
 
 .settings-list button {
@@ -633,7 +634,7 @@ textarea {
   align-items: center;
   gap: 0.85rem;
   width: 100%;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 1rem;
   background: transparent;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text);
