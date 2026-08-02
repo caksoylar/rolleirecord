@@ -86,9 +86,7 @@ const TableRenderer = {
       container.innerHTML = this._renderFrames();
     }
 
-    const addFab = document.getElementById("addFrameFab");
-    if (addFab) addFab.style.display = hasRoll ? "" : "none";
-    const rollFab = document.getElementById("rollActionsFab");
-    if (rollFab) rollFab.style.display = hasRoll ? "" : "none";
+    const mainActions = document.getElementById("mainActions");
+    if (mainActions) mainActions.style.display = hasRoll ? "" : "none";
   },
 };

@@ -93,6 +93,32 @@ body {
   grid-template-rows: auto auto 1fr; /* update banner, header, main */
 }
 
+body.main-page {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+}
+
+body.main-page main {
+  display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  min-height: 0;
+}
+
+#tableContainer {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+#tableContainer:has(.frame-list) {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px var(--color-shadow);
+  margin-bottom: 1rem;
+}
+
 h1 {
   font-size: var(--font-size-xl);
 }
@@ -250,12 +276,7 @@ button.secondary {
 }
 
 .frame-list {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px var(--color-shadow);
-  margin-bottom: 1rem;
 }
 
 .frame-row {
@@ -381,33 +402,22 @@ button.secondary {
   vertical-align: text-bottom;
 }
 
-/* Floating Action Button */
-#rollActionsFab {
-  position: fixed;
-  bottom: 1.5rem;
-  left: 1.5rem;
-  width: 3.25rem;
+/* Main page actions */
+.main-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
   height: 3.25rem;
-  min-width: unset;
-  min-height: unset;
-  border-radius: 50%;
-  padding: 0;
-  box-shadow: 0 3px 8px var(--color-shadow);
-  z-index: 100;
 }
 
-#addFrameFab {
-  position: fixed;
-  bottom: 1.5rem;
-  right: 1.5rem;
-  width: 3.25rem;
-  height: 3.25rem;
-  min-width: unset;
+.main-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
   min-height: unset;
-  border-radius: 50%;
-  padding: 0;
-  box-shadow: 0 3px 8px var(--color-shadow);
-  z-index: 100;
 }
 
 /* Modal & Dialog Overlays */

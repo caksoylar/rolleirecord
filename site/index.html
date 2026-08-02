@@ -40,7 +40,7 @@
       }
     </script>
   </head>
-  <body>
+  <body class="main-page">
     <button id="updateBanner" style="display: none">
       Update available — tap to reload
     </button>
@@ -80,17 +80,18 @@
       <div id="tableContainer">
         <!-- Table will be rendered here -->
       </div>
+
+      <div id="mainActions" class="main-actions" style="display: none">
+        <button id="rollActionsFab" title="Roll actions" class="secondary">
+          <svg class="icon"><use href="icons.svg#icon-list"></use></svg>
+          <span>Roll actions</span>
+        </button>
+        <button id="addFrameFab" title="Add new frame">
+          <svg class="icon"><use href="icons.svg#icon-add"></use></svg>
+          <span>Add frame</span>
+        </button>
+      </div>
     </main>
-
-    <!-- FAB: Roll actions -->
-    <button id="rollActionsFab" title="Roll actions" style="display: none">
-      <svg class="icon"><use href="icons.svg#icon-list"></use></svg>
-    </button>
-
-    <!-- FAB: Add new frame -->
-    <button id="addFrameFab" title="Add new frame" style="display: none">
-      <svg class="icon"><use href="icons.svg#icon-add"></use></svg>
-    </button>
 
     <!-- Frame Modal -->
     <div
