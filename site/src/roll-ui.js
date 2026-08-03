@@ -48,7 +48,9 @@ const RollSelector = {
 
   render() {
     if (!this._select) return;
-    const rolls = RollManager.getRolls();
+    const rolls = RollManager.getRolls().sort(
+      (rollA, rollB) => new Date(rollA.updatedAt) - new Date(rollB.updatedAt),
+    );
     const currentRoll = RollManager.getCurrentRoll();
 
     let html = rolls
