@@ -39,8 +39,8 @@
   --font-size-xl: 1.5rem;
 
   /* Spacing */
-  --radius: 0.375rem;
-  --radius-lg: 0.75rem;
+  --radius-sm: 0.375rem;
+  --radius: 0.75rem;
   --transition-speed: 0.2s;
   --min-tap-target: 36px;
 
@@ -114,7 +114,7 @@ body.main-page main {
 #tableContainer:has(.frame-list) {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   box-shadow: 0 1px 3px var(--color-shadow);
   margin-bottom: 0.8rem;
 }
@@ -164,7 +164,7 @@ h1 {
 #updateBanner {
   text-align: center;
   padding: 0.5rem;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   margin-bottom: 0.4rem;
 }
 
@@ -194,7 +194,7 @@ header button {
 .roll-selector-bar {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 0.8rem;
 }
@@ -202,7 +202,7 @@ header button {
 .entity-selector-bar {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 0.8rem;
 }
@@ -454,7 +454,7 @@ button.secondary {
   background-color: var(--color-bg);
   width: 100%;
   max-width: 600px;
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border-radius: var(--radius) var(--radius) 0 0;
   padding: 1rem;
   max-height: 95dvh;
   overflow-y: auto;
@@ -525,7 +525,7 @@ textarea {
   color: var(--color-text);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   transition: border-color var(--transition-speed);
   field-sizing: content;
   width: fit-content;
@@ -619,7 +619,7 @@ textarea {
 .settings-list {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   overflow: hidden;
   box-shadow: 0 1px 3px var(--color-shadow);
   margin-bottom: 0.8rem;
@@ -764,7 +764,7 @@ textarea {
 .export-empty-state {
   padding: 1rem;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: var(--color-surface);
   color: var(--color-text-muted);
   text-align: center;
@@ -868,7 +868,7 @@ textarea {
   height: 3.5rem;
   overflow: hidden;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-sm);
   background: var(--color-surface-alt);
   color: var(--color-text-muted);
 }
