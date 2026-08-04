@@ -238,4 +238,13 @@ const RollManager = {
     const max = this.getLastFrameId();
     return max == null ? 1 : max + 1; // eslint-disable-line eqeqeq
   },
+
+  // Get the last recorded frame date for roll, fall back to create date if no frame dates
+  getLastRecordedTimestamp(roll) {
+    const latest = roll.frames.reduceRight((latest, frame) => {
+      const timestamp = Date.parse(frame.date);
+      return timestamp > latest ? timestamp : latest;
+    }, -Infinity);
+    return latest === -Infinity ? Date.parse(roll.createdAt) : latest;
+  },
 };

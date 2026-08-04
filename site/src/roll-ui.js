@@ -48,9 +48,15 @@ const RollSelector = {
 
   render() {
     if (!this._select) return;
-    const rolls = RollManager.getRolls().sort(
-      (rollA, rollB) => new Date(rollA.updatedAt) - new Date(rollB.updatedAt),
-    );
+
+    // get rolls sorted by their last recorded frame date
+    const rolls = RollManager.getRolls()
+      .map((roll) => ({
+        roll,
+        timestamp: RollManager.getLastRecordedTimestamp(roll),
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map((val) => val.roll);
     const currentRoll = RollManager.getCurrentRoll();
 
     let html = rolls
