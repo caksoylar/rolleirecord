@@ -43,7 +43,7 @@ const TableRenderer = {
         onclick="FrameModal.openEditModal(${row.id})"
       >
         <span class="frame-row-header">
-          <span class="frame-row-id">Frame ${escapeHtml(String(row.id))}</span>
+          <span class="frame-row-id"># ${escapeHtml(String(row.id))}</span>
           <span class="frame-row-date">${escapeHtml(formatDisplayDate(row.date))}</span>
         </span>
         ${
