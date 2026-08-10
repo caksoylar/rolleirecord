@@ -312,9 +312,11 @@ const FrameModal = {
       if (!select || !customWrap) return;
 
       select.addEventListener("change", () => {
-        if (select.value === "__custom__") {
-          select.style.display = "none";
-          customWrap.style.display = "";
+        const isCustom = select.value === "__custom__";
+        select.style.display = isCustom ? "none" : "";
+        customWrap.style.display = isCustom ? "" : "none";
+
+        if (isCustom) {
           customWrap.querySelector("input").focus();
         }
       });
@@ -378,6 +380,46 @@ const FrameModal = {
     const firstInput = this.bodyElement.querySelector("input, select");
     if (firstInput) {
       setTimeout(() => firstInput.focus(), 100);
+    }
+
+    // HACK: update focal length on lens change, if both fields exist
+    const lensInput = document.getElementById("field-lens");
+    const focalInput = document.getElementById("field-focal_length");
+    if (lensInput && focalInput) {
+      lensInput.addEventListener("change", (e) => {
+        const lens = e.target.value;
+        // Zoom range, e.g. "24-70mm f/2.8"
+        const zoomMatch = lens.match(/(?:^|\s)(\d+)\s*-\s*(\d+)\s*mm\b/i);
+        const focalMatch =
+          zoomMatch ??
+          // Focal length with unit, e.g. "50mm f/1.8"
+          lens.match(/(?:^|\s)(\d+)\s*mm\b/i) ??
+          // Aperture/focal notation, e.g. "Planar 2.8/80"
+          lens.match(
+            /(?:1:\d+(?:\.\d+)?|\d+(?:\.\d+)?)\s*\/\s*(\d+)(?![\d.])\b/,
+          ) ??
+          // Focal length before aperture, e.g. "Nikon 50 f/1.8"
+          lens.match(/(?:^|\s)(\d+)\s+(?=f\s*\/?\s*\d)/i);
+        const focalValue = zoomMatch
+          ? Math.min(Number(zoomMatch[1]), Number(zoomMatch[2]))
+          : focalMatch?.[1];
+        const extractedFocal = focalValue ? `${focalValue}mm` : null;
+        if (!extractedFocal) return;
+        const focalIndex = [...focalInput.options].findIndex(
+          (opt) => opt.value === extractedFocal,
+        );
+        if (focalIndex >= 0) {
+          focalInput.selectedIndex = focalIndex;
+        } else {
+          const newFocalOption = new Option(extractedFocal, extractedFocal);
+          const newFocalIndex = [...focalInput.options].findIndex(
+            (opt) => opt.value >= extractedFocal,
+          );
+          focalInput.options.add(newFocalOption, newFocalIndex);
+          focalInput.selectedIndex = newFocalIndex;
+        }
+        focalInput.dispatchEvent(new Event("change", { bubbles: true }));
+      });
     }
   },
 
