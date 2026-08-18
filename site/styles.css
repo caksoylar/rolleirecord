@@ -24,7 +24,7 @@
 
   /* Colors - Overlay */
   --color-backdrop: rgba(0, 0, 0, 0.5);
-  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-shadow: rgba(0, 0, 0, 0.15);
 
   /* Colors - Button text (always light, even in dark mode) */
   --color-btn-text: #fbffff;
