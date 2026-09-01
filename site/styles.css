@@ -43,6 +43,16 @@
   --radius: 0.75rem;
   --transition-speed: 0.2s;
   --min-tap-target: 36px;
+  --corner-radius-left: max(
+    var(--radius),
+    env(safe-area-inset-left, 0px),
+    env(safe-area-inset-bottom, 0px)
+  );
+  --corner-radius-right: max(
+    var(--radius),
+    env(safe-area-inset-right, 0px),
+    env(safe-area-inset-bottom, 0px)
+  );
 
   /* Select arrow (pure CSS chevron via two diagonal gradients) */
   --select-arrow-size: 6px;
@@ -84,7 +94,9 @@ body {
   font-size: var(--font-size-base);
   color: var(--color-text);
   background-color: var(--color-bg);
-  padding: 0.8rem;
+  padding: max(0.8rem, env(safe-area-inset-top, 0px))
+    max(0.8rem, env(safe-area-inset-right, 0px)) 0.8rem
+    max(0.8rem, env(safe-area-inset-left, 0px));
   line-height: 1.5;
   max-width: 600px;
   margin: 0 auto;
@@ -421,6 +433,14 @@ button.secondary {
   box-shadow: 0 1px 3px var(--color-shadow);
 }
 
+:is(.main-actions, .modal-footer) button:first-child {
+  border-bottom-left-radius: var(--corner-radius-left);
+}
+
+:is(.main-actions, .modal-footer) button:last-child {
+  border-bottom-right-radius: var(--corner-radius-right);
+}
+
 /* Modal & Dialog Overlays */
 .modal {
   display: none;
@@ -456,7 +476,8 @@ button.secondary {
   width: 100%;
   max-width: 600px;
   border-radius: var(--radius) var(--radius) 0 0;
-  padding: 1rem;
+  padding: 1rem max(1rem, env(safe-area-inset-right, 0px)) 1rem
+    max(1rem, env(safe-area-inset-left, 0px));
   max-height: 95dvh;
   overflow-y: auto;
 }

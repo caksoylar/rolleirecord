@@ -259,7 +259,7 @@ const RollActionsModal = {
     if (!roll) return;
     if (
       !confirm(
-        `Are you sure you want to delete the roll "${roll.name}"? This cannot be undone.`,
+        `Are you sure you want to delete the roll "${roll.name}" and all its frames? This cannot be undone.`,
       )
     )
       return;
