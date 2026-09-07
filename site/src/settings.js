@@ -55,13 +55,22 @@ const SettingsPage = {
     document
       .getElementById("settingsRefreshCacheBtn")
       .addEventListener("click", async () => {
-        if (!("caches" in window)) {
-          alert("Cache API not available.");
+        if (!("serviceWorker" in navigator)) {
+          alert("Service workers are not available.");
           return;
         }
-        const keys = await caches.keys();
-        await Promise.all(keys.map((k) => caches.delete(k)));
-        location.reload();
+
+        try {
+          const registration = await navigator.serviceWorker.ready;
+          if (!registration.active) {
+            throw new Error("No active service worker.");
+          }
+
+          registration.active.postMessage({ type: "refresh-assets" });
+        } catch (error) {
+          console.error("Failed to refresh assets:", error);
+          alert("Could not start the asset refresh.");
+        }
       });
 
     document

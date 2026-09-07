@@ -1,4 +1,5 @@
-const CACHE_NAME = "rolleirecord-v47";
+const CACHE_NAME = "rolleirecord-v48";
+const REFRESH_ASSETS_MESSAGE = "refresh-assets";
 const ASSETS = [
   "./",
   "./index.html",
@@ -29,14 +30,14 @@ const ASSETS = [
   "./src/util.js",
 ];
 
+function cacheAssets() {
+  // Keep install and manual refresh on the same complete app-shell manifest.
+  return caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS));
+}
+
 // Cache all assets on install
 self.addEventListener("install", (e) => {
-  e.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting()),
-  );
+  e.waitUntil(cacheAssets().then(() => self.skipWaiting()));
 });
 
 // Remove old caches on activate
@@ -53,18 +54,61 @@ self.addEventListener("activate", (e) => {
   );
 });
 
-// Cache-first, fallback to network; skip non-GET requests.
+self.addEventListener("message", (e) => {
+  if (e.data?.type !== REFRESH_ASSETS_MESSAGE) return;
+
+  // Refresh in place so the existing cache remains available while fetching.
+  e.waitUntil(
+    cacheAssets().catch((error) => {
+      console.error("Failed to refresh cached assets:", error);
+      throw error;
+    }),
+  );
+});
+
+async function offlineResponse(request) {
+  const url = new URL(request.url);
+  // Fall back only for app launches, not navigation to another uncached page.
+  if (
+    request.mode === "navigate" &&
+    (url.pathname.endsWith("/") || url.pathname.endsWith("/index.html"))
+  ) {
+    const appShell = await caches.match("./index.html");
+    if (appShell) return appShell;
+  }
+  return new Response("", { status: 504 });
+}
+
+// Serve cached responses first, refill same-origin misses from the network,
+// and return a controlled response when offline. Skip non-GET requests.
 // When offline, never let a network fetch reject - that can surface iOS's
 // "Turn Off Airplane Mode" prompt on PWA launch.
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
   e.respondWith(
-    caches.match(e.request).then((cached) => {
+    (async () => {
+      const cached = await caches.match(e.request);
       if (cached) return cached;
       if (!self.navigator.onLine) {
-        return new Response("", { status: 504 });
+        return offlineResponse(e.request);
       }
-      return fetch(e.request).catch(() => new Response("", { status: 504 }));
-    }),
+
+      try {
+        const response = await fetch(e.request);
+        const url = new URL(e.request.url);
+        // Refill evicted entries without caching cross-origin API responses.
+        if (url.origin === self.location.origin && response.ok) {
+          try {
+            const cache = await caches.open(CACHE_NAME);
+            await cache.put(e.request, response.clone());
+          } catch (error) {
+            console.error("Failed to cache fetched asset:", error);
+          }
+        }
+        return response;
+      } catch {
+        return offlineResponse(e.request);
+      }
+    })(),
   );
 });
