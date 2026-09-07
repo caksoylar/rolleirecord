@@ -43,22 +43,29 @@
   --radius: 0.75rem;
   --transition-speed: 0.2s;
   --min-tap-target: 36px;
-  --corner-radius-left: max(
-    var(--radius),
-    env(safe-area-inset-left, 0px),
-    env(safe-area-inset-bottom, 0px)
-  );
-  --corner-radius-right: max(
-    var(--radius),
-    env(safe-area-inset-right, 0px),
-    env(safe-area-inset-bottom, 0px)
-  );
+  --corner-radius-left: var(--radius);
+  --corner-radius-right: var(--radius);
 
   /* Select arrow (pure CSS chevron via two diagonal gradients) */
   --select-arrow-size: 6px;
   --select-arrow:
     linear-gradient(45deg, transparent 50%, var(--color-text) 50%),
     linear-gradient(315deg, transparent 50%, var(--color-text) 50%);
+}
+
+@media (max-width: 600px) {
+  :root {
+    --corner-radius-left: max(
+      var(--radius),
+      env(safe-area-inset-left, 0px),
+      env(safe-area-inset-bottom, 0px)
+    );
+    --corner-radius-right: max(
+      var(--radius),
+      env(safe-area-inset-right, 0px),
+      env(safe-area-inset-bottom, 0px)
+    );
+  }
 }
 
 @media (prefers-color-scheme: dark) {
