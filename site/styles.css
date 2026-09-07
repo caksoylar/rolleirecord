@@ -144,7 +144,19 @@ body.main-page > main {
   min-height: 0;
 }
 
+.table-region {
+  display: flex;
+  align-items: flex-start;
+  min-height: 0;
+}
+
+.table-region:has(.frame-list) {
+  margin-bottom: 0.8rem;
+}
+
 #tableContainer {
+  width: 100%;
+  max-height: 100%;
   min-height: 0;
   overflow-y: auto;
   scrollbar-gutter: stable;
@@ -155,7 +167,6 @@ body.main-page > main {
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   box-shadow: 0 1px 3px var(--color-shadow);
-  margin-bottom: 0.8rem;
 }
 
 h1 {

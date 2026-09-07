@@ -1,4 +1,4 @@
-const CACHE_NAME = "rolleirecord-v49";
+const CACHE_NAME = "rolleirecord-v50";
 const REFRESH_ASSETS_MESSAGE = "refresh-assets";
 const ASSETS = [
   "./",
