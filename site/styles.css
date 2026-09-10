@@ -92,13 +92,14 @@
 }
 
 html {
+  font-size: var(--font-size-base);
+  font: -apple-system-body;
   overflow-x: hidden;
   width: 100%;
 }
 
 body {
   font-family: var(--font-family);
-  font-size: var(--font-size-base);
   color: var(--color-text);
   background-color: var(--color-bg);
   padding: max(0.8rem, env(safe-area-inset-top, 0px))
