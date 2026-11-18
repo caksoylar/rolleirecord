@@ -889,7 +889,11 @@ textarea {
 
 .export-match-row {
   display: grid;
-  grid-template-columns: auto auto minmax(0, 0.9fr) auto minmax(0, 1.1fr);
+  grid-template-columns: auto auto auto minmax(0, 0.9fr) auto minmax(0, 1.1fr);
+}
+
+.export-scan-order {
+  flex-direction: column;
 }
 
 .export-match-row.excluded {
@@ -1019,7 +1023,7 @@ textarea {
 
 @media (max-width: 480px) {
   .export-match-row {
-    grid-template-columns: auto auto minmax(0, 1fr);
+    grid-template-columns: auto auto auto minmax(0, 1fr);
   }
 
   .export-match-arrow {
@@ -1027,7 +1031,7 @@ textarea {
   }
 
   .export-frame-details {
-    grid-column: 2 / -1;
+    grid-column: 3 / -1;
     padding-top: 0.35rem;
     border-top: 1px solid var(--color-border);
   }

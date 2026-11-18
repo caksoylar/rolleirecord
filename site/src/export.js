@@ -78,6 +78,26 @@ const ExportPage = {
       this._renderMatches();
     });
 
+    this._matchList.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-direction]");
+      if (!button || button.disabled) return;
+      const index = Number(button.dataset.index);
+      const nextIndex = index + Number(button.dataset.direction);
+      if (nextIndex < 0 || nextIndex >= this._scans.length) return;
+      [this._scans[index], this._scans[nextIndex]] = [
+        this._scans[nextIndex],
+        this._scans[index],
+      ];
+      this._renderMatches();
+      const movedButton = this._matchList.querySelector(
+        `button[data-index="${nextIndex}"][data-direction="${button.dataset.direction}"]`,
+      );
+      const focusButton = movedButton.disabled
+        ? movedButton.parentElement.querySelector("button:not(:disabled)")
+        : movedButton;
+      focusButton.focus();
+    });
+
     this._startFrameInput.addEventListener("input", () =>
       this._renderMatches(),
     );
@@ -191,6 +211,32 @@ const ExportPage = {
           data-index="${index}"
           ${scan.included ? "checked" : ""}
         />
+        <span class="row-control export-scan-order">
+          <button
+            type="button"
+            data-index="${index}"
+            data-direction="-1"
+            title="Move up"
+            aria-label="Move ${escapeHtml(scan.name)} up"
+            ${index === 0 ? "disabled" : ""}
+          >
+            <svg class="icon" aria-hidden="true">
+              <use href="icons.svg#icon-up"></use>
+            </svg>
+          </button>
+          <button
+            type="button"
+            data-index="${index}"
+            data-direction="1"
+            title="Move down"
+            aria-label="Move ${escapeHtml(scan.name)} down"
+            ${index === this._scans.length - 1 ? "disabled" : ""}
+          >
+            <svg class="icon" aria-hidden="true">
+              <use href="icons.svg#icon-down"></use>
+            </svg>
+          </button>
+        </span>
         <span class="export-scan-thumbnail">
           <img src="${escapeHtml(scan.previewUrl)}" alt="" loading="lazy" />
           <svg class="icon export-preview-fallback" aria-hidden="true">
