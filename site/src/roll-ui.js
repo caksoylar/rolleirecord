@@ -174,12 +174,14 @@ const RollActionsModal = {
 
         const { newFrames, failedIds } =
           FrameInterpolator.interpolateFramesInRoll(roll.frames);
+        const framesDesc = newFrames.map((frame) => frame.id).join(", ");
+        const idsDesc = failedIds.join(", ");
         if (newFrames.length === 0) {
           if (failedIds.length === 0) {
             alert(`No gaps found between logged frames.`);
           } else {
             alert(
-              `Skipped filling in ${failedIds.length} frame(s) due to too large time/location gaps.`,
+              `Skipped filling in frame(s) ${idsDesc} due to too large time/location gaps.`,
             );
           }
           return;
@@ -187,14 +189,13 @@ const RollActionsModal = {
 
         let msg = `Fill in ${newFrames.length} missing frame(s) using the nearest logged frame's data?`;
         if (failedIds.length > 0) {
-          msg += ` Will skip ${failedIds.length} frame(s) due to too large time/location gaps.`;
+          msg += ` Will skip frame(s) ${idsDesc} due to too large time/location gaps.`;
         }
         if (!confirm(msg)) {
           return;
         }
 
         newFrames.forEach((frame) => RollManager.addFrame(frame));
-        const framesDesc = newFrames.map((frame) => frame.id).join(", ");
         alert(`Filled in frame(s) ${framesDesc} using interpolation.`);
         refreshAllUI();
         this._close();
