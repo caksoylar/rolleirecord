@@ -181,7 +181,15 @@ const FrameModal = {
   },
 
   _renderDateField(field, inputId, required, rowData) {
-    const value = (rowData?.[field.name] ?? "").substring(0, 16);
+    const storedDate = rowData?.[field.name] ?? "";
+    const value = storedDate.substring(0, 16);
+    const offsetMatch = storedDate.match(/(Z|[+-]\d{2}:?\d{2})$/i);
+    const date = new Date(storedDate || Date.now());
+    const offsetHours = offsetMatch
+      ? offsetMatch[1].toUpperCase() === "Z"
+        ? 0
+        : Number(offsetMatch[1].substring(0, 3))
+      : Math.trunc(-date.getTimezoneOffset() / 60);
 
     return `
       <div class="settings-row form-group">
@@ -189,6 +197,12 @@ const FrameModal = {
         <div class="row-control">
           <input type="datetime-local" id="${inputId}" name="${field.name}"
             value="${escapeHtml(String(value))}" ${required}
+            ${field.readonly ? "readonly" : ""} />
+          <span>T</span>
+          <input type="text" id="${inputId}-offset" class="timezone-offset"
+            value="${offsetHours}" pattern="[+\\-]?[0-9]{1,2}" required
+            aria-label="UTC offset in hours"
+            title="UTC offset in whole hours (-12 to +14)"
             ${field.readonly ? "readonly" : ""} />
         </div>
       </div>
@@ -556,6 +570,10 @@ const FrameModal = {
 
     const now = new Date();
     dateField.value = formatDate(now);
+    const offsetField = document.getElementById("field-date-offset");
+    if (offsetField) {
+      offsetField.value = Math.trunc(-now.getTimezoneOffset() / 60);
+    }
   },
 
   // Handle form submission
@@ -564,7 +582,12 @@ const FrameModal = {
 
     const formData = FormValidator._getFormData();
     const excludeId = this.mode === "edit" ? this.currentRowId : null;
-    const validation = FormValidator._validate(formData, excludeId);
+    const timezoneOffset = document.getElementById("field-date-offset")?.value;
+    const validation = FormValidator._validate(
+      formData,
+      excludeId,
+      timezoneOffset,
+    );
 
     if (!validation.valid) {
       alert("Validation errors:\n" + validation.errors.join("\n"));
@@ -628,7 +651,7 @@ const FormValidator = {
     return formData;
   },
 
-  _validate(formData, excludeId = null) {
+  _validate(formData, excludeId = null, timezoneOffset = "") {
     const errors = [];
 
     // Check required fields
@@ -655,27 +678,29 @@ const FormValidator = {
       }
     }
 
-    // Validate and augment date coordinates if provided
+    // Validate the wall-clock time with its explicitly selected UTC offset.
     if (formData.date && formData.date.trim() !== "") {
       const dateStr = formData.date.trim();
       const dtLocal = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
-      const date = new Date(dateStr);
-      if (!dtLocal.test(dateStr) || isNaN(date.getTime())) {
-        errors.push(
-          "Date must be a valid date string (e.g., 2026-01-12T14:35)",
-        );
+      const offsetStr = String(timezoneOffset).trim();
+      const offset = Number(offsetStr);
+      if (!/^[+-]?\d{1,2}$/.test(offsetStr) || offset < -12 || offset > 14) {
+        errors.push("UTC offset must be a whole number from -12 to +14");
+      } else {
+        const sign = offset >= 0 ? "+" : "-";
+        const hours = String(Math.abs(offset)).padStart(2, "0");
+        const dateWithOffset = `${dateStr}:00${sign}${hours}:00`;
+        if (
+          !dtLocal.test(dateStr) ||
+          Number.isNaN(new Date(dateWithOffset).getTime())
+        ) {
+          errors.push(
+            "Date must be a valid date string (e.g., 2026-01-12T14:35)",
+          );
+        } else {
+          formData.date = dateWithOffset;
+        }
       }
-      // Add timezone information and convert to ISO8601.
-      // Use the offset at the entered date (not now) to handle DST correctly.
-      const pad = (n) => String(n).padStart(2, "0");
-
-      const seconds = "00";
-      const tzOffset = -new Date(dateStr).getTimezoneOffset();
-      const sign = tzOffset >= 0 ? "+" : "-";
-      const tzHours = pad(Math.floor(Math.abs(tzOffset) / 60));
-      const tzMinutes = pad(Math.abs(tzOffset) % 60);
-
-      formData.date += `:${seconds}${sign}${tzHours}:${tzMinutes}`;
     }
 
     return {

@@ -779,6 +779,12 @@ textarea {
   gap: 0.25rem;
 }
 
+.settings-row .timezone-offset {
+  width: 2.5rem;
+  min-width: 0;
+  text-align: center;
+}
+
 /* Scan matching export page */
 .export-page {
   grid-template-rows: auto 1fr;
