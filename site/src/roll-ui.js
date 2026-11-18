@@ -13,6 +13,7 @@ const RollSelector = {
   _container: null,
   _select: null,
   _caption: null,
+  _tableHeader: null,
 
   init() {
     this._container = document.querySelector("#rollContainer");
@@ -38,6 +39,8 @@ const RollSelector = {
     this._caption = document.createElement("div");
     this._caption.className = "roll-caption";
     this._container.appendChild(this._caption);
+
+    this._tableHeader = document.querySelector("#framesHeader");
 
     this.render();
 
@@ -70,6 +73,8 @@ const RollSelector = {
     this._select.innerHTML = html;
 
     this._renderCaption();
+
+    this._tableHeader.innerHTML = `Frames (${currentRoll?.frames?.length ?? 0})`;
 
     if (!RollManager.getCurrentRoll()) {
       NewRollModal.open({ mandatory: true });
