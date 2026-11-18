@@ -23,6 +23,10 @@ const FrameModal = {
       .querySelector("form")
       .addEventListener("submit", (e) => this._submitForm(e));
 
+    this.element
+      .querySelector(".duplicate-btn")
+      .addEventListener("click", () => this.openAddModal(this.currentRowId));
+
     // Cancel button
     this.element
       .querySelector(".cancel-btn")
@@ -56,13 +60,7 @@ const FrameModal = {
           isEditMode,
         );
       } else if (field.type === "datetime") {
-        html += this._renderDateField(
-          field,
-          inputId,
-          required,
-          rowData,
-          isEditMode,
-        );
+        html += this._renderDateField(field, inputId, required, rowData);
       } else if (field.type === "checkbox") {
         html += this._renderCheckboxField(field, inputId, rowData);
       } else if (field.name === "notes") {
@@ -136,7 +134,7 @@ const FrameModal = {
   },
 
   _renderLocationField(field, inputId, required, rowData, isEditMode) {
-    const value = isEditMode ? (rowData[field.name] ?? "") : "";
+    const value = rowData?.[field.name] ?? "";
     const mapsUrl = value ? LocationManager.getMapsUrl(value) : null;
 
     if (isEditMode) {
@@ -171,8 +169,7 @@ const FrameModal = {
         </span>
         <input type="text" id="${inputId}" name="${field.name}"
           value="${escapeHtml(String(value))}" ${required}
-          ${field.readonly ? "readonly" : ""}
-          placeholder="Auto-capturing via GPS..." />
+          ${field.readonly ? "readonly" : ""} />
         <div class="form-hint-row" style="display: none">
           <span class="accuracy-hint"></span>
         </div>
@@ -183,10 +180,8 @@ const FrameModal = {
     `;
   },
 
-  _renderDateField(field, inputId, required, rowData, isEditMode) {
-    const value = isEditMode
-      ? (rowData[field.name] ?? "").substring(0, 16)
-      : "";
+  _renderDateField(field, inputId, required, rowData) {
+    const value = (rowData?.[field.name] ?? "").substring(0, 16);
 
     return `
       <div class="settings-row form-group">
@@ -361,6 +356,10 @@ const FrameModal = {
       this._updateReverseGeocode(locationInput);
     }
 
+    this.element.querySelector(".duplicate-btn").style.display = isEditMode
+      ? ""
+      : "none";
+
     // Delete button
     const deleteBtn = this.element.querySelector(".delete-btn");
     if (isEditMode) {
@@ -445,15 +444,16 @@ const FrameModal = {
   },
 
   // Public entry point: open the add modal and auto-populate id, location, date
-  async openAddModal() {
-    const lastId = RollManager.getLastFrameId();
-    this._open("add", lastId);
+  // if an explicit reference is given, keep its date/location
+  async openAddModal(referenceId) {
+    this._open("add", referenceId ?? RollManager.getLastFrameId());
     const suggestedId = RollManager.getNextSuggestedFrameId();
     document.getElementById("field-id").value = suggestedId;
 
-    // Fetch location and date automatically
-    this._fetchAndSetLocation();
-    this._fetchAndSetDate();
+    if (referenceId === undefined) {
+      this._fetchAndSetLocation();
+      this._fetchAndSetDate();
+    }
   },
 
   // Public entry point: open the edit modal for given row id
@@ -508,7 +508,7 @@ const FrameModal = {
     if (!locationField) return;
 
     locationField.disabled = true;
-    const originalValue = locationField.value;
+    const originalValue = this.mode === "add" ? "" : locationField.value;
     locationField.value = "Fetching location...";
 
     try {
